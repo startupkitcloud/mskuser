@@ -1,11 +1,10 @@
 package com.mangobits.msk.user;
 
-
-
 import javax.persistence.NoResultException;
 
 import com.mangobits.startupkit.core.exception.DAOException;
 import com.mangobits.startupkit.core.utils.AbstractDAO;
+
 
 public class UserDAO extends AbstractDAO<User> {
 	
