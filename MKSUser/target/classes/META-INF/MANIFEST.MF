@@ -4,7 +4,13 @@ Class-Path: javaee-api-7.0.jar javax.mail-1.5.0.jar jackson-mapper-asl
  -1.9.3.jar jackson-core-asl-1.9.3.jar commons-email-1.3.3.jar mail-1.
  4.5.jar activation-1.1.1.jar sanselan-0.97-incubator.jar commons-io-2
  .4.jar commons-fileupload-1.2.1.jar commons-lang-2.6.jar commons-code
- c-1.9.jar MSKCore-1.0.0.jar thumbnailator-0.4.8.jar
+ c-1.9.jar MSKCore-1.0.10.jar javapns-jdk16-2.2.1.jar log4j-1.2.12.jar
+  bcprov-jdk16-1.46.jar jersey-client-1.8.jar jersey-core-1.8.jar java
+ -mpns-0.1.0.jar httpclient-4.3.6.jar httpcore-4.3.3.jar commons-loggi
+ ng-1.1.3.jar slf4j-api-1.6.1.jar jcl-over-slf4j-1.6.1.jar flickr4java
+ -2.16.jar scribe-1.3.5.jar axis-1.4.jar google-maps-services-0.1.16.j
+ ar gson-2.3.1.jar okhttp-2.7.5.jar okio-1.6.0.jar joda-time-2.4.jar t
+ humbnailator-0.4.8.jar
 Build-Jdk: 1.8.0_91
 Created-By: Maven Integration for Eclipse
 Dependencies: org.hibernate.ogm:5.0 services, org.hibernate.ogm.mongod

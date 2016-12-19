@@ -26,7 +26,7 @@ import org.apache.commons.io.IOUtils;
 
 import com.mangobits.startupkit.core.configuration.Configuration;
 import com.mangobits.startupkit.core.configuration.ConfigurationEnum;
-import com.mangobits.startupkit.core.configuration.ConfigurationFacade;
+import com.mangobits.startupkit.core.configuration.ConfigurationService;
 import com.mangobits.startupkit.core.exception.ApplicationException;
 import com.mangobits.startupkit.core.exception.BusinessException;
 import com.mangobits.startupkit.core.utils.ImageUtil;
@@ -42,7 +42,7 @@ public class UserFacadeImpl implements UserFacade {
 	
 	
 	@EJB
-	private ConfigurationFacade configurationFacade;
+	private ConfigurationService configurationService;
 	
 	
 	
@@ -404,7 +404,7 @@ public class UserFacadeImpl implements UserFacade {
 			URL url = new URL(photoUpload.getUrl());
 			BufferedImage image = ImageIO.read(url);
 			
-			Configuration confPath = configurationFacade.loadByCode(ConfigurationEnum.PATH_IMAGE);
+			Configuration confPath = configurationService.loadByCode(ConfigurationEnum.PATH_BASE);
 			File folder = new File(confPath.getValue() + "/user/" + photoUpload.getIdUser());
 			folder.mkdirs();
 			
@@ -412,7 +412,7 @@ public class UserFacadeImpl implements UserFacade {
 			ImageIO.write(image, "jpg", destiny);
 			
 			//escreve a versao reduzida
-			Configuration confSize = configurationFacade.loadByCode(ConfigurationEnum.SIZE_DETAIL_MOBILE);
+			Configuration confSize = configurationService.loadByCode("SIZE_DETAIL_MOBILE");
 			
 			String reduced = "reduced.jpg";
 			
@@ -434,7 +434,7 @@ public class UserFacadeImpl implements UserFacade {
 		
 		try {
 			
-			Configuration confPath = configurationFacade.loadByCode(ConfigurationEnum.PATH_IMAGE);
+			Configuration confPath = configurationService.loadByCode(ConfigurationEnum.PATH_BASE);
 			
 			File folder = new File(confPath.getValue() + "/user/" + photoUpload.getIdUser());
 			folder.mkdirs();
@@ -449,7 +449,7 @@ public class UserFacadeImpl implements UserFacade {
 			
 			
 			//escreve a versao reduzida
-			Configuration confSize = configurationFacade.loadByCode(ConfigurationEnum.SIZE_DETAIL_MOBILE);
+			Configuration confSize = configurationService.loadByCode("SIZE_DETAIL_MOBILE");
 			File destinyReduced = new File(folder, "/reduced.jpg");
 			
 			Thumbnails.of(destiny)
