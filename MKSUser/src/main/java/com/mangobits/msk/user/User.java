@@ -71,6 +71,9 @@ public class User {
 	private Date birthDate;
 	
 	
+	private String birthDateStr;
+	
+	
 	
 	private String gender;
 	
@@ -356,5 +359,15 @@ public class User {
 
 	public void setCreationDate(Date creationDate) {
 		this.creationDate = creationDate;
+	}
+
+
+	public String getBirthDateStr() {
+		return birthDateStr;
+	}
+
+
+	public void setBirthDateStr(String birthDateStr) {
+		this.birthDateStr = birthDateStr;
 	}
 }

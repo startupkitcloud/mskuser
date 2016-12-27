@@ -10,7 +10,7 @@ import com.mangobits.startupkit.core.utils.PhotoUpload;
 
 
 @Local
-public interface UserFacade {
+public interface UserService {
 
 	
 	

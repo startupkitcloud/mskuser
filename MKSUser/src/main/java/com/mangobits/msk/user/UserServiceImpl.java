@@ -37,7 +37,7 @@ import net.coobird.thumbnailator.Thumbnails;
 
 @Stateless
 @TransactionManagement(TransactionManagementType.CONTAINER)
-public class UserFacadeImpl implements UserFacade {
+public class UserServiceImpl implements UserService {
 	
 	
 	
