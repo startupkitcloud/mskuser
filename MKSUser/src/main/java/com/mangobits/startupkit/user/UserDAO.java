@@ -14,8 +14,8 @@ public class UserDAO extends AbstractDAO<User> {
 	
 
 	@Override
-	protected Object getId(User usuario) {
-		return usuario.getId();
+	protected Object getId(User obj) {
+		return obj.getId();
 	}
 
 	

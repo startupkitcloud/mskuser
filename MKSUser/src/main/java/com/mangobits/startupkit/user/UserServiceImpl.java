@@ -30,7 +30,15 @@ import com.mangobits.startupkit.core.configuration.ConfigurationService;
 import com.mangobits.startupkit.core.exception.ApplicationException;
 import com.mangobits.startupkit.core.exception.BusinessException;
 import com.mangobits.startupkit.core.utils.ImageUtil;
+import com.mangobits.startupkit.core.utils.MessageUtils;
 import com.mangobits.startupkit.core.utils.PhotoUpload;
+import com.mangobits.startupkit.notification.NotificationBuilder;
+import com.mangobits.startupkit.notification.NotificationService;
+import com.mangobits.startupkit.notification.TypeSendingNotificationEnum;
+import com.mangobits.startupkit.notification.email.data.EmailDataTemplate;
+import com.mangobits.startupkit.userauthkey.UserAuthKey;
+import com.mangobits.startupkit.userauthkey.UserAuthKeyService;
+import com.mangobits.startupkit.userauthkey.UserAuthKeyTypeEnum;
 
 import net.coobird.thumbnailator.Thumbnails;
 
@@ -43,6 +51,16 @@ public class UserServiceImpl implements UserService {
 	
 	@EJB
 	private ConfigurationService configurationService;
+	
+	
+	
+	@EJB
+	private UserAuthKeyService userAuthKeyService;
+	
+	
+	
+	@EJB
+	private NotificationService notificationService;
 	
 	
 	
@@ -582,30 +600,14 @@ public class UserServiceImpl implements UserService {
 
 
 
-
-	@Override
-	public Integer combinationProfile(User user1, User user2) throws BusinessException, ApplicationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-
-
-
 	@Asynchronous
 	@Override
 	public void updateStartInfo(UserStartInfo userStartInfo) throws BusinessException, ApplicationException {
 		
 		try {
-			
-//			AddressInfo addressInfo = new AddressInfo();
-//			addressInfo.setLatitude(userStartInfo.getLatitude());
-//			addressInfo.setLongitude(userStartInfo.getLongitude());
-			
+
 			UserInfo userInfo = userInfoDAO.retrieve(new UserInfo(userStartInfo.getIdUser()));
 			userInfo.setLastLogin(new Date());
-//			userInfo.setAddressInfo(addressInfo);
 			
 			userInfoDAO.update(userInfo);
 			
@@ -614,6 +616,136 @@ public class UserServiceImpl implements UserService {
 			
 		} catch (Exception e) {
 			throw new ApplicationException("Got an error updating an user info", e);
+		}
+	}
+
+
+
+
+
+	@Override
+	public void confirmUserSMS(String idUser) throws BusinessException, ApplicationException {
+		
+		try {
+			
+			User user = load(idUser);
+			
+			UserAuthKey key = userAuthKeyService.createKey(idUser, UserAuthKeyTypeEnum.SMS);
+			
+			String message = MessageUtils.message(user.getLanguage(), "user.confirm.sms", key.getKey());
+			
+			notificationService.sendNotification(new NotificationBuilder()
+					.setTo(user)
+					.setTypeSending(TypeSendingNotificationEnum.SMS)
+					.setMessage(message)
+					.setFgAlertOnly(true)
+					.build());
+			
+		} catch (Exception e) {
+			throw new ApplicationException("Got an error creating a SMS confirmation", e);
+		}
+	}
+
+
+
+
+
+	@Override
+	public void confirmUserEmail(String idUser) throws BusinessException, ApplicationException {
+		
+		try {
+			
+			User user = load(idUser);
+			
+			UserAuthKey key = userAuthKeyService.createKey(idUser, UserAuthKeyTypeEnum.EMAIL);
+			
+			String title = MessageUtils.message(user.getLanguage(), "user.confirm.email.title", key.getKey());
+			
+			final int emailTemplateId = configurationService.loadByCode("USER_EMAIL_CONFIRM_ID").getValueAsInt();
+			
+			notificationService.sendNotification(new NotificationBuilder()
+					.setTo(user)
+					.setTypeSending(TypeSendingNotificationEnum.EMAIL)
+					.setTitle(title)
+					.setFgAlertOnly(true)
+					.setEmailDataTemplate(new EmailDataTemplate() {
+						
+						@Override
+						public Integer getTemplateId() {
+							return emailTemplateId;
+						}
+						
+						@Override
+						public Map<String, String> getData() {
+							
+							Map<String, String> params = new HashMap<>();
+							params.put("user_name", user.getName());
+							params.put("confirmation_link", "http://www.mangobits.net");
+							
+							return params;
+						}
+					})
+					.build());
+			
+		} catch (Exception e) {
+			throw new ApplicationException("Got an error an creating an email confirmation", e);
+		}
+	}
+
+
+
+
+
+	@Override
+	public Boolean validateKey(String idUser, String key, UserAuthKeyTypeEnum type)
+			throws BusinessException, ApplicationException {
+		
+		return userAuthKeyService.validateKey(idUser, key, type);
+	}
+
+
+
+
+
+	@Override
+	public void forgotPassword(String email) throws BusinessException, ApplicationException {
+		
+		try {
+			
+			User user = retrieveByEmail(email);
+			
+			UserAuthKey key = userAuthKeyService.createKey(user.getEmail(), UserAuthKeyTypeEnum.EMAIL);
+			
+			String title = MessageUtils.message(user.getLanguage(), "user.confirm.email.forgot.title", key.getKey());
+			
+			final int emailTemplateId = configurationService.loadByCode("USER_EMAIL_FORGOT_ID").getValueAsInt();
+			
+			notificationService.sendNotification(new NotificationBuilder()
+					.setTo(user)
+					.setTypeSending(TypeSendingNotificationEnum.EMAIL)
+					.setTitle(title)
+					.setFgAlertOnly(true)
+					.setEmailDataTemplate(new EmailDataTemplate() {
+						
+						@Override
+						public Integer getTemplateId() {
+							return emailTemplateId;
+						}
+						
+						@Override
+						public Map<String, String> getData() {
+							
+							Map<String, String> params = new HashMap<>();
+							params.put("user_name", user.getName());
+							params.put("confirmation_link", "http://www.mangobits.net");
+							
+							return params;
+						}
+					})
+					.build());
+			
+		} catch (Exception e) {
+			throw new ApplicationException("Got an error creating a forgot password access", e);
 		}
 	}
 }

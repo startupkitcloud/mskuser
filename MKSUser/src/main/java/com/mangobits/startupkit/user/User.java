@@ -94,6 +94,17 @@ public class User {
 	
 	
 	
+	private Boolean phoneConfirmed;
+	
+	
+	
+	private Boolean emailConfirmed;
+	
+	
+	
+	private Boolean userConfirmed;
+	
+	
 	
 	
 	public User(){
@@ -369,5 +380,35 @@ public class User {
 
 	public void setBirthDateStr(String birthDateStr) {
 		this.birthDateStr = birthDateStr;
+	}
+
+
+	public Boolean getPhoneConfirmed() {
+		return phoneConfirmed;
+	}
+
+
+	public void setPhoneConfirmed(Boolean phoneConfirmed) {
+		this.phoneConfirmed = phoneConfirmed;
+	}
+
+
+	public Boolean getEmailConfirmed() {
+		return emailConfirmed;
+	}
+
+
+	public void setEmailConfirmed(Boolean emailConfirmed) {
+		this.emailConfirmed = emailConfirmed;
+	}
+
+
+	public Boolean getUserConfirmed() {
+		return userConfirmed;
+	}
+
+
+	public void setUserConfirmed(Boolean userConfirmed) {
+		this.userConfirmed = userConfirmed;
 	}
 }
