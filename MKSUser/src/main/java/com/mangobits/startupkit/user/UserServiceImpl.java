@@ -1,4 +1,4 @@
-package com.mangobits.msk.user;
+package com.mangobits.startupkit.user;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
