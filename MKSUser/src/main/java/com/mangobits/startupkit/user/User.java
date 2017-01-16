@@ -67,6 +67,10 @@ public class User {
 	private String password;
 	
 	
+	@JsonIgnore
+	private String salt;
+	
+	
 	
 	private Date birthDate;
 	
@@ -410,5 +414,15 @@ public class User {
 
 	public void setUserConfirmed(Boolean userConfirmed) {
 		this.userConfirmed = userConfirmed;
+	}
+
+
+	public String getSalt() {
+		return salt;
+	}
+
+
+	public void setSalt(String salt) {
+		this.salt = salt;
 	}
 }

@@ -7,7 +7,7 @@ import javax.ejb.Local;
 import com.mangobits.startupkit.core.exception.ApplicationException;
 import com.mangobits.startupkit.core.exception.BusinessException;
 import com.mangobits.startupkit.core.utils.PhotoUpload;
-import com.mangobits.startupkit.userauthkey.UserAuthKeyTypeEnum;
+import com.mangobits.startupkit.userauthkey.UserAuthKey;
 
 
 @Local
@@ -34,6 +34,9 @@ public interface UserService {
 	
 	
 	void updateInfo(UserInfo userInfo) throws BusinessException, ApplicationException;
+	
+	
+	void updatePassword(User user) throws BusinessException, ApplicationException;
 	
 	
 	User retrieveByEmail(String email) throws BusinessException, ApplicationException;
@@ -81,7 +84,7 @@ public interface UserService {
 	void confirmUserEmail(String idUser) throws BusinessException, ApplicationException;
 	
 	
-	Boolean validateKey(String idUser, String key, UserAuthKeyTypeEnum type) throws BusinessException, ApplicationException;
+	Boolean validateKey(UserAuthKey key) throws BusinessException, ApplicationException;
 	
 	
 	void forgotPassword(String email) throws BusinessException, ApplicationException;

@@ -32,6 +32,7 @@ import com.mangobits.startupkit.core.exception.BusinessException;
 import com.mangobits.startupkit.core.utils.ImageUtil;
 import com.mangobits.startupkit.core.utils.MessageUtils;
 import com.mangobits.startupkit.core.utils.PhotoUpload;
+import com.mangobits.startupkit.core.utils.SecUtils;
 import com.mangobits.startupkit.notification.NotificationBuilder;
 import com.mangobits.startupkit.notification.NotificationService;
 import com.mangobits.startupkit.notification.TypeSendingNotificationEnum;
@@ -144,6 +145,9 @@ public class UserServiceImpl implements UserService {
 			
 			user.setCreationDate(new Date());
 			user.setId(null);
+			
+			user.setSalt(SecUtils.getSalt());
+			user.setPassword(SecUtils.generateHash(user.getSalt(), user.getPassword()));
 			
 			userDAO.insert(user);
 			
@@ -321,7 +325,9 @@ public class UserServiceImpl implements UserService {
 			
 			User userDB = retrieveByEmail(user.getEmail());
 			
-			if(userDB == null || !userDB.getPassword().equals(user.getPassword())){
+			String passHash = SecUtils.generateHash(userDB.getSalt(), user.getPassword());
+			
+			if(userDB == null || !userDB.getPassword().equals(passHash)){
 				
 				throw new BusinessException("invalid_user_password");
 			}
@@ -370,6 +376,28 @@ public class UserServiceImpl implements UserService {
 		try {
 			
 			userDAO.update(user);
+			
+		} catch (BusinessException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new ApplicationException("Got an error updating an user", e);
+		}
+	}
+	
+	
+	
+	@Override
+	public void updatePassword(User user) throws BusinessException, ApplicationException {
+		
+		try {
+			
+			User userBase = userDAO.retrieve(user);
+			
+			if(userBase != null){
+			
+				userBase.setPassword(user.getPassword());
+				userDAO.update(userBase);
+			}
 			
 		} catch (BusinessException e) {
 			throw e;
@@ -663,6 +691,8 @@ public class UserServiceImpl implements UserService {
 			
 			final int emailTemplateId = configurationService.loadByCode("USER_EMAIL_CONFIRM_ID").getValueAsInt();
 			
+			final String link = configurationService.loadByCode("USER_EMAIL_CONFIRM_LINK").getValue() + key;
+			
 			notificationService.sendNotification(new NotificationBuilder()
 					.setTo(user)
 					.setTypeSending(TypeSendingNotificationEnum.EMAIL)
@@ -680,7 +710,7 @@ public class UserServiceImpl implements UserService {
 							
 							Map<String, String> params = new HashMap<>();
 							params.put("user_name", user.getName());
-							params.put("confirmation_link", "http://www.mangobits.net");
+							params.put("confirmation_link", link);
 							
 							return params;
 						}
@@ -697,10 +727,9 @@ public class UserServiceImpl implements UserService {
 
 
 	@Override
-	public Boolean validateKey(String idUser, String key, UserAuthKeyTypeEnum type)
-			throws BusinessException, ApplicationException {
+	public Boolean validateKey(UserAuthKey key)throws BusinessException, ApplicationException {
 		
-		return userAuthKeyService.validateKey(idUser, key, type);
+		return userAuthKeyService.validateKey(key);
 	}
 
 
@@ -720,6 +749,8 @@ public class UserServiceImpl implements UserService {
 			
 			final int emailTemplateId = configurationService.loadByCode("USER_EMAIL_FORGOT_ID").getValueAsInt();
 			
+			final String link = configurationService.loadByCode("USER_EMAIL_FORGOT_LINK").getValue() + key;
+			
 			notificationService.sendNotification(new NotificationBuilder()
 					.setTo(user)
 					.setTypeSending(TypeSendingNotificationEnum.EMAIL)
@@ -737,7 +768,7 @@ public class UserServiceImpl implements UserService {
 							
 							Map<String, String> params = new HashMap<>();
 							params.put("user_name", user.getName());
-							params.put("confirmation_link", "http://www.mangobits.net");
+							params.put("confirmation_link", link);
 							
 							return params;
 						}

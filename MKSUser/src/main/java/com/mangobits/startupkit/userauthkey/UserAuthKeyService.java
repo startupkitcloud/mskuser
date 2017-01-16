@@ -12,5 +12,5 @@ public interface UserAuthKeyService {
 	UserAuthKey createKey(String idUser, UserAuthKeyTypeEnum type) throws BusinessException, ApplicationException;
 	
 	
-	Boolean validateKey(String idUser, String key, UserAuthKeyTypeEnum type) throws BusinessException, ApplicationException;
+	Boolean validateKey(UserAuthKey key) throws BusinessException, ApplicationException;
 }

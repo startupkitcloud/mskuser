@@ -79,13 +79,18 @@ public class UserAuthKeyServiceImpl implements UserAuthKeyService {
 	
 	
 	@Override
-	public Boolean validateKey(String idUser, String key, UserAuthKeyTypeEnum type) throws BusinessException, ApplicationException {
+	public Boolean validateKey(UserAuthKey key) throws BusinessException, ApplicationException {
 		
 		Boolean validated = false;
 		
 		try {
 			
+			UserAuthKey keyBase = loadKeyByUser(key.getIdUser(), key.getType());
 			
+			if(keyBase != null && keyBase.getKey().equals(key.getKey())){
+				validated = true;
+				userAuthKeyDAO.delete(keyBase);
+			}
 			
 		} catch (Exception e) {
 			throw new ApplicationException("Got an error generating an user auth key", e);
