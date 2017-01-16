@@ -632,7 +632,7 @@ public class UserServiceImpl implements UserService {
 			
 			UserAuthKey key = userAuthKeyService.createKey(idUser, UserAuthKeyTypeEnum.SMS);
 			
-			String message = MessageUtils.message(user.getLanguage(), "user.confirm.sms", key.getKey());
+			String message = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.confirm.sms", key.getKey());
 			
 			notificationService.sendNotification(new NotificationBuilder()
 					.setTo(user)
@@ -659,7 +659,7 @@ public class UserServiceImpl implements UserService {
 			
 			UserAuthKey key = userAuthKeyService.createKey(idUser, UserAuthKeyTypeEnum.EMAIL);
 			
-			String title = MessageUtils.message(user.getLanguage(), "user.confirm.email.title", key.getKey());
+			String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.confirm.email.title");
 			
 			final int emailTemplateId = configurationService.loadByCode("USER_EMAIL_CONFIRM_ID").getValueAsInt();
 			
@@ -716,7 +716,7 @@ public class UserServiceImpl implements UserService {
 			
 			UserAuthKey key = userAuthKeyService.createKey(user.getEmail(), UserAuthKeyTypeEnum.EMAIL);
 			
-			String title = MessageUtils.message(user.getLanguage(), "user.confirm.email.forgot.title", key.getKey());
+			String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.confirm.email.forgot.title");
 			
 			final int emailTemplateId = configurationService.loadByCode("USER_EMAIL_FORGOT_ID").getValueAsInt();
 			

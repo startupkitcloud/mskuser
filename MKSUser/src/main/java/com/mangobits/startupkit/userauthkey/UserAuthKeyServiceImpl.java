@@ -61,6 +61,8 @@ public class UserAuthKeyServiceImpl implements UserAuthKeyService {
 						//4 digitos ramdomicos para SMS
 						key.setKey(generateSMSNumber());
 					}
+					
+					userAuthKeyDAO.insert(key);
 				}
 			}
 			else{
@@ -125,7 +127,7 @@ public class UserAuthKeyServiceImpl implements UserAuthKeyService {
 			
 			while(!numberFound){
 				
-				Integer number = (int)(Math.random() * 1000);
+				Integer number = (int)(Math.random() * 10000);
 				numberStr = String.valueOf(number);
 				
 				Map<String, Object> params = new HashMap<>();

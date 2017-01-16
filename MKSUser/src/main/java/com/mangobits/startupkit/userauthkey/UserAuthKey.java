@@ -15,7 +15,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-@Entity(name="user")
+@Entity(name="userAuthKey")
 @Indexed
 public class UserAuthKey {
 	
