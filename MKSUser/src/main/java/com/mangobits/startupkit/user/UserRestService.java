@@ -261,6 +261,7 @@ public class UserRestService{
 		try { 
 			
 			userService.updatePassword(usMon);
+			cont.setDesc("OK");
 			
 		} catch (Exception e) {
 			

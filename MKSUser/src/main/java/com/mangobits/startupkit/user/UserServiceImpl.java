@@ -395,7 +395,9 @@ public class UserServiceImpl implements UserService {
 			
 			if(userBase != null){
 			
-				userBase.setPassword(user.getPassword());
+				userBase.setSalt(SecUtils.getSalt());
+				userBase.setPassword(SecUtils.generateHash(userBase.getSalt(), user.getPassword()));
+				
 				userDAO.update(userBase);
 			}
 			
@@ -689,9 +691,15 @@ public class UserServiceImpl implements UserService {
 			
 			String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.confirm.email.title");
 			
-			final int emailTemplateId = configurationService.loadByCode("USER_EMAIL_CONFIRM_ID").getValueAsInt();
+			String configKeyLang = user.getLanguage() == null ? "" : "_"+user.getLanguage().toUpperCase(); 
 			
-			final String link = configurationService.loadByCode("USER_EMAIL_CONFIRM_LINK").getValue() + key;
+			final int emailTemplateId = configurationService.loadByCode("USER_EMAIL_CONFIRM_ID" + configKeyLang).getValueAsInt();
+			
+			final String link = configurationService.loadByCode("USER_EMAIL_CONFIRM_LINK").getValue()
+					.replaceAll("__LANGUAGE__", user.getLanguage())
+					.replaceAll("__KEY__", key.getKey())
+					.replaceAll("__USER__", user.getId())
+					.replaceAll("__TYPE__", key.getType().toString());
 			
 			notificationService.sendNotification(new NotificationBuilder()
 					.setTo(user)
@@ -729,7 +737,31 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public Boolean validateKey(UserAuthKey key)throws BusinessException, ApplicationException {
 		
-		return userAuthKeyService.validateKey(key);
+		boolean validate = false;
+		
+		try {
+			
+			validate = userAuthKeyService.validateKey(key);
+			
+			if(validate){
+				User user = userDAO.retrieve(new User(key.getIdUser()));
+				user.setUserConfirmed(true);
+				
+				if(key.getType().equals(UserAuthKeyTypeEnum.EMAIL)){
+					user.setEmailConfirmed(true);
+				}
+				else{
+					user.setPhoneConfirmed(true);
+				}
+				
+				userDAO.update(user);
+			}
+			
+		} catch (Exception e) {
+			throw new ApplicationException("Got an error validating a user", e);
+		}
+		
+		return validate;
 	}
 
 
@@ -743,13 +775,23 @@ public class UserServiceImpl implements UserService {
 			
 			User user = retrieveByEmail(email);
 			
-			UserAuthKey key = userAuthKeyService.createKey(user.getEmail(), UserAuthKeyTypeEnum.EMAIL);
+			if(user == null){
+				throw new BusinessException("user_not_found");
+			}
+			
+			UserAuthKey key = userAuthKeyService.createKey(user.getId(), UserAuthKeyTypeEnum.EMAIL);
 			
 			String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.confirm.email.forgot.title");
 			
-			final int emailTemplateId = configurationService.loadByCode("USER_EMAIL_FORGOT_ID").getValueAsInt();
+			String configKeyLang = user.getLanguage() == null ? "" : "_"+user.getLanguage().toUpperCase(); 
 			
-			final String link = configurationService.loadByCode("USER_EMAIL_FORGOT_LINK").getValue() + key;
+			final int emailTemplateId = configurationService.loadByCode("USER_EMAIL_FORGOT_ID" + configKeyLang).getValueAsInt();
+			
+			final String link = configurationService.loadByCode("USER_EMAIL_FORGOT_LINK").getValue()
+					.replaceAll("__LANGUAGE__", user.getLanguage())
+					.replaceAll("__KEY__", key.getKey())
+					.replaceAll("__USER__", user.getId())
+					.replaceAll("__TYPE__", key.getType().toString());
 			
 			notificationService.sendNotification(new NotificationBuilder()
 					.setTo(user)
@@ -775,6 +817,8 @@ public class UserServiceImpl implements UserService {
 					})
 					.build());
 			
+		} catch (BusinessException e) {
+			throw e;
 		} catch (Exception e) {
 			throw new ApplicationException("Got an error creating a forgot password access", e);
 		}

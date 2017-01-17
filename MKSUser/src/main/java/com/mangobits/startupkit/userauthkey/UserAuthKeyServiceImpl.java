@@ -88,7 +88,7 @@ public class UserAuthKeyServiceImpl implements UserAuthKeyService {
 			UserAuthKey keyBase = loadKeyByUser(key.getIdUser(), key.getType());
 			
 			if(keyBase != null && keyBase.getKey().equals(key.getKey())){
-				validated = true;
+				validated = true; 
 				userAuthKeyDAO.delete(keyBase);
 			}
 			

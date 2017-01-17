@@ -27,9 +27,12 @@ public class UserAuthKey {
     private String id;
 	
 	
+	@Field
 	private String idUser;
 	
 	
+	
+	@Field
 	private String key;
 	
 	
