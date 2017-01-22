@@ -146,8 +146,10 @@ public class UserServiceImpl implements UserService {
 			user.setCreationDate(new Date());
 			user.setId(null);
 			
-			user.setSalt(SecUtils.getSalt());
-			user.setPassword(SecUtils.generateHash(user.getSalt(), user.getPassword()));
+			if(user.getPassword() != null){
+				user.setSalt(SecUtils.getSalt());
+				user.setPassword(SecUtils.generateHash(user.getSalt(), user.getPassword()));
+			}
 			
 			userDAO.insert(user);
 			
@@ -358,7 +360,67 @@ public class UserServiceImpl implements UserService {
 			
 			validateUser(user);
 			
-			userDAO.update(user);
+			User userBase = userDAO.retrieve(user);
+			
+			if(userBase != null){
+				
+				if(user.getBirthDate() != null){
+					userBase.setBirthDate(user.getBirthDate());
+				}
+				
+				if(user.getEmail() != null){
+					userBase.setEmail(user.getEmail());
+				}
+				
+				if(user.getGender() != null){
+					userBase.setGender(user.getGender());
+				}
+				
+				if(user.getLanguage() != null){
+					userBase.setLanguage(user.getLanguage());
+				}
+				
+				if(user.getName() != null){
+					userBase.setName(user.getName());
+				}
+				
+				if(user.getPassword() != null){
+					
+					userBase.setSalt(SecUtils.getSalt());
+					userBase.setPassword(SecUtils.generateHash(userBase.getSalt(), user.getPassword()));
+				}
+				
+				if(user.getPhone() != null){
+					userBase.setPhone(user.getPhone());
+				}
+				
+				if(user.getPhoneCountryCode() != null){
+					userBase.setPhoneCountryCode(user.getPhoneCountryCode());
+				}
+				
+				if(user.getPhoneNumber() != null){
+					userBase.setPhoneNumber(user.getPhoneNumber());
+				}
+				
+				if(user.getKeyAndroid() != null){
+					userBase.setKeyAndroid(user.getKeyAndroid());
+				}
+				
+				if(user.getKeyIOS() != null){
+					userBase.setKeyIOS(user.getKeyIOS());
+				}
+				
+				if(user.getIdFacebook() != null){
+					userBase.setIdFacebook(user.getIdFacebook());
+				}
+				
+				if(user.getIdGoogle() != null){
+					userBase.setIdGoogle(user.getIdGoogle());
+				}
+				
+				userDAO.update(userBase);
+			}
+			
 			
 		} catch (BusinessException e) {
 			throw e;
