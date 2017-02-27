@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -110,6 +111,41 @@ public class UserServiceImpl implements UserService {
 	
 	
 	
+	@Override
+	public User retrieveByPhone(Long phoneNumber) throws BusinessException, ApplicationException{
+		
+		User user = null;
+		
+		try {
+			
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("phoneNumber", phoneNumber);
+			
+			user = userDAO.retrieve(params);
+			
+		} catch (Exception e) {
+			throw new ApplicationException("Got an error retrieving an user by phone", e);
+		}
+		
+		
+		return user;
+	}
+	
+	
+	
+	
+	@Override
+	public void save(User user) throws BusinessException, ApplicationException {
+	
+		if(user.getId() == null){
+			createNewUser(user);
+		}
+		else{
+			updateFromClient(user);
+		}
+	}
+	
+	
 	
 	@Override
 	public User createNewUser(User user) throws BusinessException, ApplicationException {
@@ -117,9 +153,15 @@ public class UserServiceImpl implements UserService {
 		try {
 			
 			User userDB = null;
+			boolean fgPhoneError = false;
 			
 			if(user.getEmail() != null && !user.getEmail().equals("")){
 				userDB = retrieveByEmail(user.getEmail());
+			}
+			
+			if(userDB == null && user.getPhoneNumber() != null){
+				userDB = retrieveByPhone(user.getPhoneNumber());
+				fgPhoneError = true;
 			}
 			
 			if(userDB != null){
@@ -140,7 +182,12 @@ public class UserServiceImpl implements UserService {
 					return userDB;
 				}
 				
-				throw new BusinessException("This email is already registred");
+				if(fgPhoneError){
+					throw new BusinessException("phone_exists");
+				}
+				else{
+					throw new BusinessException("email_exists");
+				}
 			}
 			
 			user.setCreationDate(new Date());
@@ -557,10 +604,11 @@ public class UserServiceImpl implements UserService {
 			FileOutputStream output = new FileOutputStream(destiny);
 			IOUtils.write(data, output);
 			
-			
 			//escreve a versao reduzida
 			Configuration confSize = configurationService.loadByCode("SIZE_DETAIL_MOBILE");
 			File destinyReduced = new File(folder, "/reduced.jpg");
+		
+//			new ImageUtil().recortarImagemComAjuste("reduced.jpg", data, folder, confSize.getValueAsInt(), confSize.getValueAsInt(), false, TypeAdjustImageEnum.BASE_HEIGHT, -1);
 			
 			Thumbnails.of(destiny)
 		    	.size(confSize.getValueAsInt(), confSize.getValueAsInt())
@@ -682,8 +730,10 @@ public class UserServiceImpl implements UserService {
 		
 		try {
 			
-			card.setIdUser(user.getId());
-			card.setNameUser(user.getName());
+			card.setId(user.getId());
+			card.setName(user.getName());
+			card.setEmail(user.getEmail());
+			card.setPhone(user.getPhone());
 			
 		} catch (Exception e) {
 			throw new ApplicationException("Got an error creating an user card", e);
@@ -884,5 +934,64 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception e) {
 			throw new ApplicationException("Got an error creating a forgot password access", e);
 		}
+	}
+
+
+
+
+
+	@Override
+	public List<UserCard> searchByName(String name) throws BusinessException, ApplicationException {
+		
+		List<UserCard> list = null;
+		
+		try {
+			
+			Map<String, Object> params = new HashMap<>();
+			params.put("like:name", name);
+			
+			List<User> listUsers = userDAO.search(params, null, 10, 0);
+			
+			if(listUsers != null){
+				list = new ArrayList<>();
+				
+				for(User user : listUsers){
+					list.add(generateCard(user));
+				}
+			}
+			
+		} catch (Exception e) {
+			throw new ApplicationException("Got an error searching users names", e);
+		}
+		
+		return list;
+	}
+
+
+
+
+
+	@Override
+	public List<UserCard> listAll() throws BusinessException, ApplicationException {
+		
+		List<UserCard> list = null;
+		
+		try {
+			
+			List<User> listUsers = userDAO.listAll();
+			
+			if(listUsers != null){
+				list = new ArrayList<>();
+				
+				for(User user : listUsers){
+					list.add(generateCard(user));
+				}
+			}
+			
+		} catch (Exception e) {
+			throw new ApplicationException("Got an error listing all users cards", e);
+		}
+		
+		return list;
 	}
 }

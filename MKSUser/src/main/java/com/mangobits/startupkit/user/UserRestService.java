@@ -3,6 +3,7 @@ package com.mangobits.startupkit.user;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -12,6 +13,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
 
@@ -23,9 +25,7 @@ import com.mangobits.startupkit.core.configuration.ConfigurationService;
 import com.mangobits.startupkit.core.exception.BusinessException;
 import com.mangobits.startupkit.core.utils.FileUtil;
 import com.mangobits.startupkit.core.utils.PhotoUpload;
-import com.mangobits.startupkit.user.User;
-import com.mangobits.startupkit.user.UserService;
-import com.mangobits.startupkit.user.UserStartInfo;
+import com.mangobits.startupkit.service.admin.util.Secured;
 import com.mangobits.startupkit.ws.JsonContainer;
 
 
@@ -466,6 +466,105 @@ public class UserRestService{
 			cont.setSuccess(false);
 			cont.setDesc(e.getMessage());
 		}
+		
+		ObjectMapper mapper = new ObjectMapper();
+		resultStr = mapper.writeValueAsString(cont);
+		
+		return resultStr;
+	}
+	
+	
+	
+	@GET
+	@Path("/searchByName")
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+	public String searchByName(@QueryParam("q") String name) throws Exception {
+		
+		String resultStr = null;
+		JsonContainer cont = new JsonContainer();
+		
+		try {
+			
+			List<UserCard> list = userService.searchByName(name);
+			
+			cont.setData(list);
+			
+		} catch (Exception e) {
+			
+			if(!(e instanceof BusinessException)){
+				e.printStackTrace();
+			}
+			
+			cont.setSuccess(false);
+			cont.setDesc(e.getMessage());
+		}
+		
+		ObjectMapper mapper = new ObjectMapper();
+		resultStr = mapper.writeValueAsString(cont);
+		
+		return resultStr;
+	}
+	
+	
+	
+	
+	@Secured
+	@GET
+	@Path("/listAll")
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+	public String listAll() throws Exception {
+		
+		String resultStr = null;
+		JsonContainer cont = new JsonContainer();
+		
+		try {
+			
+			List<UserCard> list = userService.listAll();
+			cont.setData(list);
+			
+		} catch (Exception e) {
+			
+			if(!(e instanceof BusinessException)){
+				e.printStackTrace();
+			}
+			
+			cont.setSuccess(false);
+			cont.setDesc(e.getMessage());
+		}
+		
+		ObjectMapper mapper = new ObjectMapper();
+		resultStr = mapper.writeValueAsString(cont);
+		
+		return resultStr;
+	}
+	
+	
+	
+	@Secured
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+	@Path("/save")
+	public String save(User user)  throws Exception{ 
+		
+		String resultStr = null;
+		JsonContainer cont = new JsonContainer();
+		
+		try { 
+			
+			userService.save(user);
+			cont.setData(user);
+			
+		} catch (Exception e) {
+			
+			if(!(e instanceof BusinessException)){
+				e.printStackTrace();
+			}
+			
+			cont.setSuccess(false);
+			cont.setDesc(e.getMessage());
+		}
+		
 		
 		ObjectMapper mapper = new ObjectMapper();
 		resultStr = mapper.writeValueAsString(cont);

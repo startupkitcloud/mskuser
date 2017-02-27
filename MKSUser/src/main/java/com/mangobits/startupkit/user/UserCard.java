@@ -7,36 +7,57 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 public class UserCard {
 
 	
-	private String idUser;
+	private String id;
 	
 	
-	private String nameUser;
+	private String name;
 	
 	
+	private String email;
 	
+	
+	private String phone;
 
-	public String getIdUser() {
-		return idUser;
+
+	public String getId() {
+		return id;
 	}
 
 
-
-
-	public String getNameUser() {
-		return nameUser;
+	public void setId(String id) {
+		this.id = id;
 	}
 
 
-
-
-	public void setNameUser(String nameUser) {
-		this.nameUser = nameUser;
+	public String getName() {
+		return name;
 	}
 
 
-
-
-	public void setIdUser(String idUser) {
-		this.idUser = idUser;
+	public void setName(String name) {
+		this.name = name;
 	}
+
+
+	public String getEmail() {
+		return email;
+	}
+
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+
+	public String getPhone() {
+		return phone;
+	}
+
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+	
+	
+	
 }

@@ -30,6 +30,9 @@ public interface UserService {
 	void updateFromClient(User user) throws BusinessException, ApplicationException;
 	
 	
+	void save(User user) throws BusinessException, ApplicationException;
+	
+	
 	void update(User user) throws BusinessException, ApplicationException;
 	
 	
@@ -40,6 +43,9 @@ public interface UserService {
 	
 	
 	User retrieveByEmail(String email) throws BusinessException, ApplicationException;
+	
+	
+	User retrieveByPhone(Long phoneNumber) throws BusinessException, ApplicationException;
 	
 	
 	User retrieveByIdFacebook(String idFB) throws BusinessException, ApplicationException;
@@ -88,4 +94,10 @@ public interface UserService {
 	
 	
 	void forgotPassword(String email) throws BusinessException, ApplicationException;
+	
+	
+	List<UserCard> searchByName(String name) throws BusinessException, ApplicationException;
+	
+	
+	List<UserCard> listAll() throws BusinessException, ApplicationException;
 }
