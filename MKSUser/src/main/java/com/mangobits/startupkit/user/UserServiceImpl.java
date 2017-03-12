@@ -374,9 +374,14 @@ public class UserServiceImpl implements UserService {
 			
 			User userDB = retrieveByEmail(user.getEmail());
 			
+			if(userDB == null){
+				
+				throw new BusinessException("invalid_user_password");
+			}
+			
 			String passHash = SecUtils.generateHash(userDB.getSalt(), user.getPassword());
 			
-			if(userDB == null || !userDB.getPassword().equals(passHash)){
+			if(!userDB.getPassword().equals(passHash)){
 				
 				throw new BusinessException("invalid_user_password");
 			}

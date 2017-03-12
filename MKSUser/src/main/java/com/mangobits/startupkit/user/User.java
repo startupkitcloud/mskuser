@@ -56,6 +56,10 @@ public class User {
 	private String email;
 	
 	
+	@Field
+	private String cpf;
+	
+	
 	
 	private String keyIOS;
 	
@@ -424,5 +428,15 @@ public class User {
 
 	public void setSalt(String salt) {
 		this.salt = salt;
+	}
+
+
+	public String getCpf() {
+		return cpf;
+	}
+
+
+	public void setCpf(String cpf) {
+		this.cpf = cpf;
 	}
 }
