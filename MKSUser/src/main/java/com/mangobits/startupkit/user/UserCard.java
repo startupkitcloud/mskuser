@@ -1,9 +1,14 @@
 package com.mangobits.startupkit.user;
 
+import javax.persistence.Embeddable;
+
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.hibernate.search.annotations.Indexed;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Indexed
+@Embeddable
 public class UserCard {
 
 	

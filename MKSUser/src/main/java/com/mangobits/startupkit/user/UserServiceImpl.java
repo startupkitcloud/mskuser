@@ -72,9 +72,9 @@ public class UserServiceImpl implements UserService {
 	
 	
 	
-	@Inject
-	@New
-	private UserInfoDAO userInfoDAO;
+//	@Inject
+//	@New
+//	private UserInfoDAO userInfoDAO;
 	
 	
 	
@@ -200,8 +200,8 @@ public class UserServiceImpl implements UserService {
 			
 			userDAO.insert(user);
 			
-			UserInfo userInfo = new UserInfo(user.getId());
-			userInfoDAO.insert(userInfo);
+//			UserInfo userInfo = new UserInfo(user.getId());
+//			userInfoDAO.insert(userInfo);
 			
 		} catch (BusinessException e) {
 			throw e;
@@ -524,37 +524,37 @@ public class UserServiceImpl implements UserService {
 	
 	
 	
-	@Override
-	public void updateInfo(UserInfo userInfo) throws BusinessException, ApplicationException {
-		
-		try {
-			
-			userInfoDAO.update(userInfo);
-			
-		} catch (Exception e) {
-			throw new ApplicationException("Got an error updating an user info", e);
-		}
-	}
+//	@Override
+//	public void updateInfo(UserInfo userInfo) throws BusinessException, ApplicationException {
+//		
+//		try {
+//			
+//			userInfoDAO.update(userInfo);
+//			
+//		} catch (Exception e) {
+//			throw new ApplicationException("Got an error updating an user info", e);
+//		}
+//	}
 
 
 
 
 
-	@Override
-	public UserInfo retrieveInfo(String id) throws BusinessException, ApplicationException {
-		
-		UserInfo userInfo = null;
-		
-		try {
-			
-			userInfo = userInfoDAO.retrieve(new UserInfo(id));
-			
-		} catch (Exception e) {
-			throw new ApplicationException("Got an error retrieving an user info", e);
-		}
-		
-		return userInfo;
-	}
+//	@Override
+//	public UserInfo retrieveInfo(String id) throws BusinessException, ApplicationException {
+//		
+//		UserInfo userInfo = null;
+//		
+//		try {
+//			
+//			userInfo = userInfoDAO.retrieve(new UserInfo(id));
+//			
+//		} catch (Exception e) {
+//			throw new ApplicationException("Got an error retrieving an user info", e);
+//		}
+//		
+//		return userInfo;
+//	}
 	
 	
 	
@@ -753,10 +753,10 @@ public class UserServiceImpl implements UserService {
 		
 		try {
 
-			UserInfo userInfo = userInfoDAO.retrieve(new UserInfo(userStartInfo.getIdUser()));
-			userInfo.setLastLogin(new Date());
-			
-			userInfoDAO.update(userInfo);
+//			UserInfo userInfo = userInfoDAO.retrieve(new UserInfo(userStartInfo.getIdUser()));
+//			userInfo.setLastLogin(new Date());
+//			
+//			userInfoDAO.update(userInfo);
 			
 			User user = userDAO.retrieve(new User(userStartInfo.getIdUser()));
 			user.setKeyIOS(userStartInfo.getKeyIOS());

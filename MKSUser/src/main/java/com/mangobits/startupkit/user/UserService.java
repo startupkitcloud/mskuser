@@ -36,7 +36,7 @@ public interface UserService {
 	void update(User user) throws BusinessException, ApplicationException;
 	
 	
-	void updateInfo(UserInfo userInfo) throws BusinessException, ApplicationException;
+//	void updateInfo(UserInfo userInfo) throws BusinessException, ApplicationException;
 	
 	
 	void updatePassword(User user) throws BusinessException, ApplicationException;
@@ -57,7 +57,7 @@ public interface UserService {
 	User load(String id) throws BusinessException, ApplicationException;
 	
 	
-	UserInfo retrieveInfo(String id) throws BusinessException, ApplicationException;
+//	UserInfo retrieveInfo(String id) throws BusinessException, ApplicationException;
 	
 	
 	void saveFacebookAvatar(PhotoUpload photoUpload) throws BusinessException, ApplicationException;
