@@ -23,8 +23,8 @@ import com.mangobits.startupkit.core.configuration.Configuration;
 import com.mangobits.startupkit.core.configuration.ConfigurationEnum;
 import com.mangobits.startupkit.core.configuration.ConfigurationService;
 import com.mangobits.startupkit.core.exception.BusinessException;
+import com.mangobits.startupkit.core.photo.PhotoUpload;
 import com.mangobits.startupkit.core.utils.FileUtil;
-import com.mangobits.startupkit.core.utils.PhotoUpload;
 import com.mangobits.startupkit.service.admin.util.Secured;
 import com.mangobits.startupkit.ws.JsonContainer;
 
