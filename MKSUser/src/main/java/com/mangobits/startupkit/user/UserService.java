@@ -100,4 +100,7 @@ public interface UserService {
 	
 	
 	List<UserCard> listAll() throws BusinessException, ApplicationException;
+	
+	
+	void cancelUser(String idUser) throws BusinessException, ApplicationException;
 }

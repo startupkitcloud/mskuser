@@ -38,6 +38,7 @@ import com.mangobits.startupkit.notification.NotificationBuilder;
 import com.mangobits.startupkit.notification.NotificationService;
 import com.mangobits.startupkit.notification.TypeSendingNotificationEnum;
 import com.mangobits.startupkit.notification.email.data.EmailDataTemplate;
+import com.mangobits.startupkit.user.freezer.UserFreezerService;
 import com.mangobits.startupkit.userauthkey.UserAuthKey;
 import com.mangobits.startupkit.userauthkey.UserAuthKeyService;
 import com.mangobits.startupkit.userauthkey.UserAuthKeyTypeEnum;
@@ -64,6 +65,9 @@ public class UserServiceImpl implements UserService {
 	@EJB
 	private NotificationService notificationService;
 	
+	
+	@EJB
+	private UserFreezerService userFreezerService;
 	
 	
 	@Inject
@@ -998,5 +1002,23 @@ public class UserServiceImpl implements UserService {
 		}
 		
 		return list;
+	}
+
+
+
+
+
+	@Override
+	public void cancelUser(String idUser) throws BusinessException, ApplicationException {
+		
+		try {
+			
+			User user = retrieve(idUser);
+			
+			userFreezerService.moveToFreezer(user);
+			
+		} catch (Exception e) {
+			throw new ApplicationException("Got an error canceling an user", e);
+		}
 	}
 }

@@ -571,4 +571,37 @@ public class UserRestService{
 		
 		return resultStr;
 	}
+	
+	
+	
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+	@Path("/cancelUser")
+	public String cancelUser(User user)  throws Exception{ 
+		
+		String resultStr = null;
+		JsonContainer cont = new JsonContainer();
+		
+		try { 
+			
+			userService.cancelUser(user.getId());
+			cont.setData("OK");
+
+		} catch (Exception e) {
+			
+			if(!(e instanceof BusinessException)){
+				e.printStackTrace();
+			}
+			
+			cont.setSuccess(false);
+			cont.setDesc(e.getMessage());
+		}
+		
+		
+		ObjectMapper mapper = new ObjectMapper();
+		resultStr = mapper.writeValueAsString(cont);
+		
+		return resultStr;
+	}
 }
