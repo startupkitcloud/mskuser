@@ -5,6 +5,7 @@ import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
@@ -69,6 +70,10 @@ public class User {
 
 	
 	private String password;
+	
+	
+	@Transient
+	private String oldPassword;
 	
 	
 	@JsonIgnore
@@ -438,5 +443,15 @@ public class User {
 
 	public void setCpf(String cpf) {
 		this.cpf = cpf;
+	}
+
+
+	public String getOldPassword() {
+		return oldPassword;
+	}
+
+
+	public void setOldPassword(String oldPassword) {
+		this.oldPassword = oldPassword;
 	}
 }

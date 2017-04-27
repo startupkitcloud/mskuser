@@ -376,6 +376,24 @@ public class UserServiceImpl implements UserService {
 		
 		try {
 			
+			return login(user, user.getPassword());
+		} 
+		catch (BusinessException e) {
+
+			throw e;
+		}
+		catch (Exception e) {
+
+			throw new ApplicationException("Got an error logging an user", e);
+		}
+	}
+	
+	
+	
+	private User login(User user, String password) throws BusinessException, ApplicationException{
+		
+		try {
+			
 			User userDB = retrieveByEmail(user.getEmail());
 			
 			if(userDB == null){
@@ -383,7 +401,7 @@ public class UserServiceImpl implements UserService {
 				throw new BusinessException("invalid_user_password");
 			}
 			
-			String passHash = SecUtils.generateHash(userDB.getSalt(), user.getPassword());
+			String passHash = SecUtils.generateHash(userDB.getSalt(), password);
 			
 			if(!userDB.getPassword().equals(passHash)){
 				
@@ -509,7 +527,7 @@ public class UserServiceImpl implements UserService {
 		
 		try {
 			
-			User userBase = userDAO.retrieve(user);
+			User userBase = login(user, user.getOldPassword());
 			
 			if(userBase != null){
 			
