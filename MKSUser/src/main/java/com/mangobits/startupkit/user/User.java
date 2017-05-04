@@ -14,10 +14,12 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
+import com.mangobits.startupkit.core.user.GeneralUser;
+
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity(name="user")
 @Indexed
-public class User {
+public class User implements GeneralUser {
 
 	
 	

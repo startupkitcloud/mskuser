@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
@@ -14,16 +13,14 @@ import javax.inject.Inject;
 
 import com.mangobits.startupkit.core.exception.ApplicationException;
 import com.mangobits.startupkit.core.exception.BusinessException;
-import com.mangobits.startupkit.user.User;
-import com.mangobits.startupkit.user.UserService;
 
 @Stateless
 @TransactionManagement(TransactionManagementType.CONTAINER)
 public class UserAuthKeyServiceImpl implements UserAuthKeyService {
 	
 
-	@EJB
-	private UserService userService;
+//	@EJB
+//	private UserService userService;
 	
 	
 	
@@ -40,9 +37,9 @@ public class UserAuthKeyServiceImpl implements UserAuthKeyService {
 		
 		try {
 			
-			User user = userService.load(idUser);
-			
-			if(user != null){
+//			User user = userService.load(idUser);
+//			
+//			if(user != null){
 				
 				key = loadKeyByUser(idUser, type);
 				
@@ -64,10 +61,10 @@ public class UserAuthKeyServiceImpl implements UserAuthKeyService {
 					
 					userAuthKeyDAO.insert(key);
 				}
-			}
-			else{
-				throw new ApplicationException("user_not_found");
-			}
+//			}
+//			else{
+//				throw new ApplicationException("user_not_found");
+//			}
 			
 		} catch (Exception e) {
 			throw new ApplicationException("Got an error generating an user auth key", e);

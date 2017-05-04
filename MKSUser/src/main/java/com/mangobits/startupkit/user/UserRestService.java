@@ -1,6 +1,7 @@
 package com.mangobits.startupkit.user;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
@@ -390,6 +391,10 @@ public class UserRestService{
 					String base = config.getValue();
 					
 					String path = base + userService.pathImageAvatar(idUser);
+					
+					if(!new File(path).exists()){
+						path = base + "/user/default.png";
+					}
 					
 					ByteArrayInputStream in =  new ByteArrayInputStream(FileUtil.readFile(path));
 							
