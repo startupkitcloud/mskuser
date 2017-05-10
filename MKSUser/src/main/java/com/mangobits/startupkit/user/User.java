@@ -14,6 +14,7 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
+import com.mangobits.startupkit.core.address.AddressInfo;
 import com.mangobits.startupkit.core.user.GeneralUser;
 
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -68,6 +69,15 @@ public class User implements GeneralUser {
 	
 	
 	private String keyAndroid;
+	
+	
+	
+	private AddressInfo lastAddress;
+	
+	
+	
+	@Field
+	private Date lastLogin;
 	
 
 	
@@ -455,5 +465,25 @@ public class User implements GeneralUser {
 
 	public void setOldPassword(String oldPassword) {
 		this.oldPassword = oldPassword;
+	}
+
+
+	public AddressInfo getLastAddress() {
+		return lastAddress;
+	}
+
+
+	public void setLastAddress(AddressInfo lastAddress) {
+		this.lastAddress = lastAddress;
+	}
+
+
+	public Date getLastLogin() {
+		return lastLogin;
+	}
+
+
+	public void setLastLogin(Date lastLogin) {
+		this.lastLogin = lastLogin;
 	}
 }

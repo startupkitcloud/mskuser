@@ -4,10 +4,10 @@ import java.util.List;
 
 import javax.ejb.Local;
 
+import com.mangobits.startupkit.authkey.UserAuthKey;
 import com.mangobits.startupkit.core.exception.ApplicationException;
 import com.mangobits.startupkit.core.exception.BusinessException;
 import com.mangobits.startupkit.core.photo.PhotoUpload;
-import com.mangobits.startupkit.userauthkey.UserAuthKey;
 
 
 @Local
@@ -36,9 +36,6 @@ public interface UserService {
 	void update(User user) throws BusinessException, ApplicationException;
 	
 	
-//	void updateInfo(UserInfo userInfo) throws BusinessException, ApplicationException;
-	
-	
 	void updatePassword(User user) throws BusinessException, ApplicationException;
 	
 	
@@ -55,9 +52,6 @@ public interface UserService {
 	
 	
 	User load(String id) throws BusinessException, ApplicationException;
-	
-	
-//	UserInfo retrieveInfo(String id) throws BusinessException, ApplicationException;
 	
 	
 	void saveFacebookAvatar(PhotoUpload photoUpload) throws BusinessException, ApplicationException;
@@ -81,7 +75,7 @@ public interface UserService {
 	UserCard generateCard(User user) throws BusinessException, ApplicationException;
 	
 	
-	void updateStartInfo(UserStartInfo userStartInfo) throws BusinessException, ApplicationException;
+	void updateStartInfo(UserStartInfo userStartInfo) throws Exception;
 	
 	
 	void confirmUserSMS(String idUser) throws BusinessException, ApplicationException;

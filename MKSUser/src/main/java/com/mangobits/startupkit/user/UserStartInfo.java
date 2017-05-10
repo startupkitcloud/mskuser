@@ -19,6 +19,9 @@ public class UserStartInfo {
 	
 	
 	private Double longitude;
+	
+	
+	private String language;
 
 
 	public String getIdUser() {
@@ -68,5 +71,15 @@ public class UserStartInfo {
 
 	public void setKeyAndroid(String keyAndroid) {
 		this.keyAndroid = keyAndroid;
+	}
+
+
+	public String getLanguage() {
+		return language;
+	}
+
+
+	public void setLanguage(String language) {
+		this.language = language;
 	}
 }

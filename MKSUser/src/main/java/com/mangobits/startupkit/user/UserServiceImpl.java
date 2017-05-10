@@ -25,6 +25,10 @@ import javax.inject.Inject;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 
+import com.mangobits.startupkit.authkey.UserAuthKey;
+import com.mangobits.startupkit.authkey.UserAuthKeyService;
+import com.mangobits.startupkit.authkey.UserAuthKeyTypeEnum;
+import com.mangobits.startupkit.core.address.AddressInfo;
 import com.mangobits.startupkit.core.configuration.Configuration;
 import com.mangobits.startupkit.core.configuration.ConfigurationEnum;
 import com.mangobits.startupkit.core.configuration.ConfigurationService;
@@ -39,9 +43,6 @@ import com.mangobits.startupkit.notification.NotificationService;
 import com.mangobits.startupkit.notification.TypeSendingNotificationEnum;
 import com.mangobits.startupkit.notification.email.data.EmailDataTemplate;
 import com.mangobits.startupkit.user.freezer.UserFreezerService;
-import com.mangobits.startupkit.userauthkey.UserAuthKey;
-import com.mangobits.startupkit.userauthkey.UserAuthKeyService;
-import com.mangobits.startupkit.userauthkey.UserAuthKeyTypeEnum;
 
 import net.coobird.thumbnailator.Thumbnails;
 
@@ -163,7 +164,7 @@ public class UserServiceImpl implements UserService {
 				userDB = retrieveByEmail(user.getEmail());
 			}
 			
-			if(userDB == null && user.getPhoneNumber() != null){
+			if(userDB == null && user.getPhoneNumber() != null && user.getPhoneNumber() != 0){
 				userDB = retrieveByPhone(user.getPhoneNumber());
 				fgPhoneError = true;
 			}
@@ -396,7 +397,7 @@ public class UserServiceImpl implements UserService {
 			
 			User userDB = retrieveByEmail(user.getEmail());
 			
-			if(userDB == null){
+			if(userDB == null || password == null){
 				
 				throw new BusinessException("invalid_user_password");
 			}
@@ -771,21 +772,34 @@ public class UserServiceImpl implements UserService {
 
 	@Asynchronous
 	@Override
-	public void updateStartInfo(UserStartInfo userStartInfo) throws BusinessException, ApplicationException {
+	public void updateStartInfo(UserStartInfo userStartInfo) throws Exception {
 		
-		try {
-
-//			UserInfo userInfo = userInfoDAO.retrieve(new UserInfo(userStartInfo.getIdUser()));
-//			userInfo.setLastLogin(new Date());
-//			
-//			userInfoDAO.update(userInfo);
-			
-			User user = userDAO.retrieve(new User(userStartInfo.getIdUser()));
+		User user = userDAO.retrieve(new User(userStartInfo.getIdUser()));
+		user.setLastLogin(new Date());
+		
+		if(userStartInfo.getKeyIOS() != null){
 			user.setKeyIOS(userStartInfo.getKeyIOS());
-			
-		} catch (Exception e) {
-			throw new ApplicationException("Got an error updating an user info", e);
 		}
+		
+		if(userStartInfo.getKeyAndroid() != null){
+			user.setKeyAndroid(userStartInfo.getKeyAndroid());
+		}
+		
+		if(userStartInfo.getLanguage() != null){
+			user.setLanguage(userStartInfo.getLanguage());
+		}
+		
+		if(userStartInfo.getLatitude() != null){
+			
+			if(user.getLastAddress() == null){
+				user.setLastAddress(new AddressInfo());
+			}
+			
+			user.getLastAddress().setLatitude(userStartInfo.getLatitude());
+			user.getLastAddress().setLongitude(userStartInfo.getLongitude());
+		}
+		
+		userDAO.update(user);
 	}
 
 
