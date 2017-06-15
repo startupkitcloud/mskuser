@@ -97,4 +97,10 @@ public interface UserService {
 	
 	
 	void cancelUser(String idUser) throws BusinessException, ApplicationException;
+	
+	
+	Boolean checkToken(String token) throws ApplicationException, BusinessException;
+	
+	
+	User retrieveByToken(String token) throws BusinessException, ApplicationException;
 }

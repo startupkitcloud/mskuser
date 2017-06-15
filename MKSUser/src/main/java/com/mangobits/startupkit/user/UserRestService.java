@@ -28,6 +28,7 @@ import com.mangobits.startupkit.core.photo.PhotoUpload;
 import com.mangobits.startupkit.core.utils.FileUtil;
 import com.mangobits.startupkit.notification.email.EmailService;
 import com.mangobits.startupkit.service.admin.util.Secured;
+import com.mangobits.startupkit.user.util.SecuredUser;
 import com.mangobits.startupkit.ws.JsonContainer;
 
 
@@ -135,6 +136,78 @@ public class UserRestService{
 			User user = userService.load(idUser);
 			
 			cont.setData(user);
+			
+		} catch (Exception e) {
+			
+			if(!(e instanceof BusinessException)){
+				e.printStackTrace();
+				emailService.sendEmailError(e);
+			}
+			
+			cont.setSuccess(false);
+			cont.setDesc(e.getMessage());
+		}
+		
+		ObjectMapper mapper = new ObjectMapper();
+		resultStr = mapper.writeValueAsString(cont);
+		
+		return resultStr;
+	}
+	
+	
+	
+	
+	@SecuredUser
+	@GET
+	@Path("/loggedUser/{token}")
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+	public String loggedUser(@PathParam("token") String token) throws Exception {
+		
+		String resultStr = null;
+		JsonContainer cont = new JsonContainer();
+		
+		try {
+			
+			User user = userService.retrieveByToken(token);
+			cont.setData(user);
+			
+		} catch (Exception e) {
+			
+			if(!(e instanceof BusinessException)){
+				e.printStackTrace();
+				emailService.sendEmailError(e);
+			}
+			
+			cont.setSuccess(false);
+			cont.setDesc(e.getMessage());
+		}
+		
+		ObjectMapper mapper = new ObjectMapper();
+		resultStr = mapper.writeValueAsString(cont);
+		
+		return resultStr;
+	}
+	
+	
+	
+	
+	
+	@GET
+	@Path("/loggedUserCard/{token}")
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+	public String loggedUserCard(@PathParam("token") String token) throws Exception {
+		
+		String resultStr = null;
+		JsonContainer cont = new JsonContainer();
+		
+		try {
+			
+			User user = userService.retrieveByToken(token);
+			
+			if(user != null){
+				UserCard card = userService.generateCard(user);
+				cont.setData(card);
+			}
 			
 		} catch (Exception e) {
 			
@@ -430,37 +503,37 @@ public class UserRestService{
 	
 	
 	
-	@GET
-	@Path("/userProfile/{idUserRequest}/{idUser}/{idTravel}")
-	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-	public String userProfile(@PathParam("idUserRequest") String idUserRequest, @PathParam("idUser") String idUser, 
-			@PathParam("idTravel") String idTravel) throws Exception {
-		
-		String resultStr = null;
-		JsonContainer cont = new JsonContainer();
-		
-		try {
-			
-			User user = userService.userProfile(idUserRequest, idUser, idTravel);
-			
-			cont.setData(user);
-			
-		} catch (Exception e) {
-			
-			if(!(e instanceof BusinessException)){
-				e.printStackTrace();
-				emailService.sendEmailError(e);
-			}
-			
-			cont.setSuccess(false);
-			cont.setDesc(e.getMessage());
-		}
-		
-		ObjectMapper mapper = new ObjectMapper();
-		resultStr = mapper.writeValueAsString(cont);
-		
-		return resultStr;
-	}
+//	@GET
+//	@Path("/userProfile/{idUserRequest}/{idUser}/{idTravel}")
+//	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+//	public String userProfile(@PathParam("idUserRequest") String idUserRequest, @PathParam("idUser") String idUser, 
+//			@PathParam("idTravel") String idTravel) throws Exception {
+//		
+//		String resultStr = null;
+//		JsonContainer cont = new JsonContainer();
+//		
+//		try {
+//			
+//			User user = userService.userProfile(idUserRequest, idUser, idTravel);
+//			
+//			cont.setData(user);
+//			
+//		} catch (Exception e) {
+//			
+//			if(!(e instanceof BusinessException)){
+//				e.printStackTrace();
+//				emailService.sendEmailError(e);
+//			}
+//			
+//			cont.setSuccess(false);
+//			cont.setDesc(e.getMessage());
+//		}
+//		
+//		ObjectMapper mapper = new ObjectMapper();
+//		resultStr = mapper.writeValueAsString(cont);
+//		
+//		return resultStr;
+//	}
 	
 	
 	

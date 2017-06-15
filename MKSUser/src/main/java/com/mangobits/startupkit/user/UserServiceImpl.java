@@ -6,10 +6,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Level;
 
 import javax.annotation.PostConstruct;
@@ -294,6 +296,8 @@ public class UserServiceImpl implements UserService {
 			else{
 				
 				user = userDB;
+				
+				createToken(userDB);
 			}
 		} 
 		catch (Exception e) {
@@ -322,6 +326,8 @@ public class UserServiceImpl implements UserService {
 			else{
 				
 				user = userDB;
+				
+				createToken(userDB);
 			}
 		} 
 		catch (Exception e) {
@@ -411,6 +417,8 @@ public class UserServiceImpl implements UserService {
 			else{
 				
 				user = userDB;
+				
+				createToken(userDB);
 			}
 		} 
 		catch (BusinessException e) {
@@ -1051,6 +1059,68 @@ public class UserServiceImpl implements UserService {
 			
 		} catch (Exception e) {
 			throw new ApplicationException("Got an error canceling an user", e);
+		}
+	}
+	
+	
+	
+	@Override
+	public Boolean checkToken(String token) throws ApplicationException, BusinessException {
+		
+		Boolean validated = true;
+		
+		try {
+			
+			User user = retrieveByToken(token);
+			
+			if(user.getToken() == null || !user.getToken().equals(token) || user.getTokenExpirationDate().before(new Date())){
+				validated = false;
+			}
+			
+		} catch (Exception e) {
+			throw new ApplicationException("Got an error cheking a token", e);
+		}
+		
+		return validated;
+	}
+	
+	
+	
+	
+	@Override
+	public User retrieveByToken(String token) throws BusinessException, ApplicationException {
+		
+		User user = null;
+		
+		try {
+			
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("token", token);
+			
+			user = userDAO.retrieve(params);
+			
+		} catch (Exception e) {
+			throw new ApplicationException("Got an error retrieving a backoffice user by token", e);
+		}
+		
+		return user;
+	}
+	
+	
+	
+	private void createToken(User userDB) throws ApplicationException, BusinessException{
+		
+		try {
+			
+			userDB.setToken(UUID.randomUUID().toString());
+			
+			Calendar expCal = Calendar.getInstance();
+			expCal.add(Calendar.HOUR, 12);
+			userDB.setTokenExpirationDate(expCal.getTime());
+			
+			userDAO.update(userDB);
+		} catch (Exception e) {
+			throw new ApplicationException("Got an error retrieving creating an user token", e);
 		}
 	}
 }

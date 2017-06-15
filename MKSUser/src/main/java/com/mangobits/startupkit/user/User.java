@@ -131,6 +131,13 @@ public class User implements GeneralUser {
 	
 	
 	
+	@Field
+	private String token;
+	
+	
+	private Date tokenExpirationDate;
+	
+	
 	
 	public User(){
 		
@@ -485,5 +492,25 @@ public class User implements GeneralUser {
 
 	public void setLastLogin(Date lastLogin) {
 		this.lastLogin = lastLogin;
+	}
+
+
+	public String getToken() {
+		return token;
+	}
+
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+
+	public Date getTokenExpirationDate() {
+		return tokenExpirationDate;
+	}
+
+
+	public void setTokenExpirationDate(Date tokenExpirationDate) {
+		this.tokenExpirationDate = tokenExpirationDate;
 	}
 }
