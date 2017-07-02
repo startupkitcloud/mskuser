@@ -467,6 +467,10 @@ public class UserServiceImpl implements UserService {
 					userBase.setName(user.getName());
 				}
 				
+				if(user.getInfo() != null){
+					userBase.setInfo(user.getInfo());
+				}
+				
 				if(user.getPassword() != null && user.getPassword().length() != 88){
 					
 					userBase.setSalt(SecUtils.getSalt());

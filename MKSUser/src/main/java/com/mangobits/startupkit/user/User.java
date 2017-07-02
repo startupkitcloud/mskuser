@@ -1,8 +1,11 @@
 package com.mangobits.startupkit.user;
 
 import java.util.Date;
+import java.util.Map;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Transient;
@@ -11,6 +14,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -136,6 +140,11 @@ public class User implements GeneralUser {
 	
 	
 	private Date tokenExpirationDate;
+	
+	
+	@IndexedEmbedded
+	@ElementCollection(fetch=FetchType.EAGER)
+	private Map<String, String> info;
 	
 	
 	
@@ -512,5 +521,15 @@ public class User implements GeneralUser {
 
 	public void setTokenExpirationDate(Date tokenExpirationDate) {
 		this.tokenExpirationDate = tokenExpirationDate;
+	}
+
+
+	public Map<String, String> getInfo() {
+		return info;
+	}
+
+
+	public void setInfo(Map<String, String> info) {
+		this.info = info;
 	}
 }
