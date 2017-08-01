@@ -540,7 +540,14 @@ public class UserServiceImpl implements UserService {
 		
 		try {
 			
-			User userBase = login(user, user.getOldPassword());
+			User userBase = null;
+			
+			if(user.getOldPassword() != null){
+				userBase = login(user, user.getOldPassword());
+			}
+			else{
+				userBase = userDAO.retrieve(new User(user.getId()));
+			}
 			
 			if(userBase != null){
 			

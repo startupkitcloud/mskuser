@@ -3,7 +3,7 @@
   	<modelVersion>4.0.0</modelVersion>
     <groupId>com.mangobits.startupkit.user</groupId>
     <artifactId>MSKUser</artifactId>
-    <version>1.0.51</version>
+    <version>1.0.53</version>
     <packaging>ejb</packaging>
  
     <name>${project.groupId}:${project.artifactId}</name>
@@ -48,7 +48,7 @@
         
         <!-- msk config versions -->
 		<msk-core-version>1.0.38</msk-core-version>
-		<msk-notification-version>1.0.24</msk-notification-version>
+		<msk-notification-version>1.0.27</msk-notification-version>
 		<msk-rs-version>1.0.2</msk-rs-version>
 		<msk-admin-version>1.0.17</msk-admin-version>
     </properties>
