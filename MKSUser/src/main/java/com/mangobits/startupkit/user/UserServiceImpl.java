@@ -34,6 +34,7 @@ import com.mangobits.startupkit.core.address.AddressInfo;
 import com.mangobits.startupkit.core.configuration.Configuration;
 import com.mangobits.startupkit.core.configuration.ConfigurationEnum;
 import com.mangobits.startupkit.core.configuration.ConfigurationService;
+import com.mangobits.startupkit.core.dao.SearchBuilder;
 import com.mangobits.startupkit.core.exception.ApplicationException;
 import com.mangobits.startupkit.core.exception.BusinessException;
 import com.mangobits.startupkit.core.photo.PhotoUpload;
@@ -1133,5 +1134,28 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception e) {
 			throw new ApplicationException("Got an error retrieving creating an user token", e);
 		}
+	}
+
+
+
+
+
+	@Override
+	public List<User> customersByRadius(Double latitude, Double longitude, Integer distanceKM)
+			throws ApplicationException, BusinessException {
+	
+		List<User> list = null;
+		
+		try {
+			
+			list = userDAO.search(new SearchBuilder()
+					.appendParam("geo:lastAddress", new Double[]{latitude, longitude, new Double(distanceKM)})
+					.build());
+			
+		} catch (Exception e) {
+			throw new ApplicationException("Got an error listing users by radius", e);
+		}
+		
+		return list;
 	}
 }

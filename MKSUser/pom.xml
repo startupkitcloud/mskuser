@@ -47,7 +47,7 @@
         
         
         <!-- msk config versions -->
-		<msk-core-version>1.0.38</msk-core-version>
+		<msk-core-version>1.0.41</msk-core-version>
 		<msk-notification-version>1.0.27</msk-notification-version>
 		<msk-rs-version>1.0.2</msk-rs-version>
 		<msk-admin-version>1.0.17</msk-admin-version>

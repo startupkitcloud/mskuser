@@ -15,6 +15,8 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.SortableField;
+import org.hibernate.search.annotations.Spatial;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -76,6 +78,9 @@ public class User implements GeneralUser {
 	
 	
 	
+	@SortableField
+	@Spatial	
+	@IndexedEmbedded
 	private AddressInfo lastAddress;
 	
 	

@@ -103,4 +103,8 @@ public interface UserService {
 	
 	
 	User retrieveByToken(String token) throws BusinessException, ApplicationException;
+	
+	
+	List<User> customersByRadius(Double latitude, Double longitude, Integer distanceKM) throws ApplicationException, BusinessException;
+
 }
