@@ -649,6 +649,9 @@ public class UserRestService{
 		try { 
 			
 			userService.save(user);
+			
+			confirmUserEmail(user.getId());
+			
 			cont.setData(user);
 			
 		} catch (Exception e) {
