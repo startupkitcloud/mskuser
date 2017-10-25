@@ -144,7 +144,14 @@ public class User implements GeneralUser {
 	private String token;
 	
 	
+	
+	@Field
+	private String type;
+	
+	
+	
 	private Date tokenExpirationDate;
+	
 	
 	
 	@IndexedEmbedded
@@ -536,5 +543,15 @@ public class User implements GeneralUser {
 
 	public void setInfo(Map<String, String> info) {
 		this.info = info;
+	}
+
+
+	public String getType() {
+		return type;
+	}
+
+
+	public void setType(String type) {
+		this.type = type;
 	}
 }

@@ -435,8 +435,10 @@ public class UserRestService{
 	@POST
 	@Path("/saveAvatar")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void saveAvatar(PhotoUpload fotoUpload) throws Exception{
+	public String saveAvatar(PhotoUpload fotoUpload) throws Exception{
 		
+		String resultStr = null;
+		JsonContainer cont = new JsonContainer();
 		
 		try {
 			
@@ -447,6 +449,7 @@ public class UserRestService{
 			}
 			
 			userService.saveAvatar(fotoUpload);
+			cont.setData("OK");
 			
 		} catch (Exception e) {
 			
@@ -454,6 +457,11 @@ public class UserRestService{
 				e.printStackTrace();
 			}
 		}
+		
+		ObjectMapper mapper = new ObjectMapper();
+		resultStr = mapper.writeValueAsString(cont);
+		
+		return resultStr;
 	}
 	
 	

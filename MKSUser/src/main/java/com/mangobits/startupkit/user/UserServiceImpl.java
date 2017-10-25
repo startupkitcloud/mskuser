@@ -442,9 +442,17 @@ public class UserServiceImpl implements UserService {
 		
 		try {
 			
-			validateUser(user);
+			if(user.getId() == null){
+				throw new BusinessException("user_id_required");
+			}
 			
 			User userBase = userDAO.retrieve(user);
+			
+			if(userBase == null){
+				throw new BusinessException("user_not_found");
+			}
+			
+			validateUser(user);
 			
 			if(userBase != null){
 				
