@@ -22,9 +22,9 @@ public enum LanguageEnum {
 		
 		String locale = null;
 		
-		language = language.split("(_|\\-)")[0];
-		
 		if(language != null){
+			
+			language = language.split("(_|\\-)")[0];
 		
 			for(LanguageEnum item : values()){
 				

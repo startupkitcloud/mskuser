@@ -208,8 +208,7 @@ public class UserServiceImpl implements UserService {
 			
 			userDAO.insert(user);
 			
-//			UserInfo userInfo = new UserInfo(user.getId());
-//			userInfoDAO.insert(userInfo);
+			sendWelcomeEmail(user);
 			
 		} catch (BusinessException e) {
 			throw e;
@@ -220,6 +219,52 @@ public class UserServiceImpl implements UserService {
 		return user;
 	}
 	
+	
+	
+	private void sendWelcomeEmail(User user) throws ApplicationException, BusinessException{
+		
+		try {
+			
+			String configKeyLang = user.getLanguage() == null ? "" : "_"+user.getLanguage().toUpperCase();
+			
+			Configuration confEmailId = configurationService.loadByCode("EMAIL_USER_WELCOME" + configKeyLang);
+			
+			if(confEmailId != null){
+				
+				String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.email.welcome.title");
+				
+				final int emailTemplateId = confEmailId.getValueAsInt();
+				
+				notificationService.sendNotification(new NotificationBuilder()
+						.setTo(user)
+						.setTypeSending(TypeSendingNotificationEnum.EMAIL)
+						.setTitle(title)
+						.setFgAlertOnly(true)
+						.setEmailDataTemplate(new EmailDataTemplate() {
+							
+							@Override
+							public Integer getTemplateId() {
+								return emailTemplateId;
+							}
+							
+							@Override
+							public Map<String, String> getData() {
+								
+								Map<String, String> params = new HashMap<>();
+								params.put("user_name", user.getName());
+								
+								return params;
+							}
+						})
+						.build());
+			}
+
+		} catch (BusinessException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new ApplicationException("Got an error inserting a new user", e);
+		}
+	}
 	
 	
 	private void validateUser(User user) throws BusinessException, ApplicationException{
