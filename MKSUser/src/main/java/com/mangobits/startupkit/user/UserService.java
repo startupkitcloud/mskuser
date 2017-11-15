@@ -106,5 +106,8 @@ public interface UserService {
 	
 	
 	List<User> customersByRadius(Double latitude, Double longitude, Integer distanceKM) throws ApplicationException, BusinessException;
+	
+	
+	void testNotification(String idUser, String msg) throws ApplicationException, BusinessException;
 
 }

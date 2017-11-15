@@ -1211,4 +1211,51 @@ public class UserServiceImpl implements UserService {
 		
 		return list;
 	}
+
+
+
+
+
+	@Override
+	public void testNotification(String idUser, String msg) throws ApplicationException, BusinessException {
+		
+		try {
+			
+			User user = retrieve(idUser);
+			
+			NotificationBuilder builder = new NotificationBuilder()
+					.setTo(user)
+					.setMessage(msg)
+					.setTypeSending(TypeSendingNotificationEnum.APP_EMAIL);
+			
+			Configuration configuration = configurationService.loadByCode("MSG_EMAIL");
+			
+			if(configuration != null){
+				final int emailTemplateId = configuration.getValueAsInt();
+				
+				builder = builder.setEmailDataTemplate(new EmailDataTemplate() {
+					
+					@Override
+					public Integer getTemplateId() {
+						return emailTemplateId;
+					}
+					
+					@Override
+					public Map<String, String> getData() {
+						
+						Map<String, String> params = new HashMap<>();
+						params.put("user_name", user.getName());
+						params.put("msg", msg);
+						
+						return params;
+					}
+				});
+			}
+			
+			notificationService.sendNotification(builder.build());
+			
+		} catch (Exception e) {
+			throw new ApplicationException("Got an error sending a test notification", e);
+		}
+	}
 }

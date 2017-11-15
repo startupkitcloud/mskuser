@@ -844,4 +844,36 @@ public class UserRestService{
 		
 		return resultStr;
 	}
+	
+	
+	
+	@GET
+	@Path("/testNotification/{idUser}/{msg}")
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+	public String testNotification(@PathParam("idUser") String idUser, @PathParam("msg") String msg) throws Exception {
+		
+		String resultStr = null;
+		JsonContainer cont = new JsonContainer();
+		
+		try {
+			
+			userService.testNotification(idUser, msg);
+			cont.setData("OK");
+			
+		} catch (Exception e) {
+			
+			if(!(e instanceof BusinessException)){
+				e.printStackTrace();
+				emailService.sendEmailError(e);
+			}
+			
+			cont.setSuccess(false);
+			cont.setDesc(e.getMessage());
+		}
+		
+		ObjectMapper mapper = new ObjectMapper();
+		resultStr = mapper.writeValueAsString(cont);
+		
+		return resultStr;
+	}
 }
