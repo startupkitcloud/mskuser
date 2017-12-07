@@ -24,6 +24,9 @@ public interface UserService {
 	User login(User user) throws BusinessException, ApplicationException;
 	
 	
+	void logout(String idUser) throws BusinessException, ApplicationException;
+	
+	
 	User createNewUser(User user) throws BusinessException, ApplicationException;
 	
 	

@@ -29,12 +29,13 @@ import com.mangobits.startupkit.core.utils.FileUtil;
 import com.mangobits.startupkit.notification.email.EmailService;
 import com.mangobits.startupkit.service.admin.util.Secured;
 import com.mangobits.startupkit.user.util.SecuredUser;
+import com.mangobits.startupkit.user.util.UserBaseRestService;
 import com.mangobits.startupkit.ws.JsonContainer;
 
 
 @Stateless
 @Path("/user")
-public class UserRestService{
+public class UserRestService extends UserBaseRestService{
 	
 	
 	@EJB
@@ -123,6 +124,7 @@ public class UserRestService{
 	
 	
 	
+	@SecuredUser
 	@GET
 	@Path("/load/{idUser}")
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -191,18 +193,18 @@ public class UserRestService{
 	
 	
 	
-	
+	@SecuredUser
 	@GET
-	@Path("/loggedUserCard/{token}")
+	@Path("/loggedUserCard")
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-	public String loggedUserCard(@PathParam("token") String token) throws Exception {
+	public String loggedUserCard() throws Exception {
 		
 		String resultStr = null;
 		JsonContainer cont = new JsonContainer();
 		
 		try {
 			
-			User user = userService.retrieveByToken(token);
+			User user = getUserTokenSession();
 			
 			if(user != null){
 				UserCard card = userService.generateCard(user);
@@ -261,6 +263,39 @@ public class UserRestService{
 		
 		return resultStr;
 	}
+
+	
+	
+	@SecuredUser
+	@GET
+	@Path("/logout/{idUser}")
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+	public String logout(@PathParam("idUser") String idUser) throws Exception {
+		
+		String resultStr = null;
+		JsonContainer cont = new JsonContainer();
+		
+		try {
+			
+			userService.logout(idUser);
+			cont.setData("OK");
+			
+		} catch (Exception e) {
+			
+			if(!(e instanceof BusinessException)){
+				e.printStackTrace();
+				emailService.sendEmailError(e);
+			}
+			
+			cont.setSuccess(false);
+			cont.setDesc(e.getMessage());
+		}
+		
+		ObjectMapper mapper = new ObjectMapper();
+		resultStr = mapper.writeValueAsString(cont);
+		
+		return resultStr;
+	}
 	
 	
 	
@@ -300,7 +335,7 @@ public class UserRestService{
 	
 	
 	
-	
+	@SecuredUser
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -334,7 +369,7 @@ public class UserRestService{
 	
 	
 	
-	
+	@SecuredUser
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -369,7 +404,7 @@ public class UserRestService{
 	
 	
 	
-	
+	@SecuredUser
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -403,7 +438,7 @@ public class UserRestService{
 	
 	
 	
-	
+	@SecuredUser
 	@POST
 	@Path("/saveFacebookAvatar")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -431,7 +466,7 @@ public class UserRestService{
 	
 	
 	
-	
+	@SecuredUser
 	@POST
 	@Path("/saveAvatar")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -508,41 +543,7 @@ public class UserRestService{
 		};
 	}
 	
-	
-	
-	
-//	@GET
-//	@Path("/userProfile/{idUserRequest}/{idUser}/{idTravel}")
-//	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-//	public String userProfile(@PathParam("idUserRequest") String idUserRequest, @PathParam("idUser") String idUser, 
-//			@PathParam("idTravel") String idTravel) throws Exception {
-//		
-//		String resultStr = null;
-//		JsonContainer cont = new JsonContainer();
-//		
-//		try {
-//			
-//			User user = userService.userProfile(idUserRequest, idUser, idTravel);
-//			
-//			cont.setData(user);
-//			
-//		} catch (Exception e) {
-//			
-//			if(!(e instanceof BusinessException)){
-//				e.printStackTrace();
-//				emailService.sendEmailError(e);
-//			}
-//			
-//			cont.setSuccess(false);
-//			cont.setDesc(e.getMessage());
-//		}
-//		
-//		ObjectMapper mapper = new ObjectMapper();
-//		resultStr = mapper.writeValueAsString(cont);
-//		
-//		return resultStr;
-//	}
-	
+
 	
 	
 	
@@ -576,7 +577,7 @@ public class UserRestService{
 	}
 	
 	
-	
+	@SecuredUser
 	@GET
 	@Path("/searchByName")
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -682,6 +683,7 @@ public class UserRestService{
 	
 	
 	
+	@SecuredUser
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -716,7 +718,7 @@ public class UserRestService{
 	
 	
 	
-	
+	@SecuredUser
 	@GET
 	@Path("/confirmUserSMS/{idUser}")
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -749,7 +751,7 @@ public class UserRestService{
 	
 	
 	
-	
+	@SecuredUser
 	@GET
 	@Path("/confirmUserEmail/{idUser}")
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")

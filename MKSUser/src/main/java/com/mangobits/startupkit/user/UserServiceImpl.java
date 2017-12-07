@@ -443,6 +443,7 @@ public class UserServiceImpl implements UserService {
 	
 	
 	
+	
 	private User login(User user, String password) throws BusinessException, ApplicationException{
 		
 		try {
@@ -481,6 +482,24 @@ public class UserServiceImpl implements UserService {
 	
 	
 
+	@Override
+	public void logout(String idUser) throws BusinessException, ApplicationException {
+		
+		try {
+			
+			User user = load(idUser);
+			
+			user.setToken(null);
+			user.setTokenExpirationDate(null);
+			
+			update(user);
+			
+		} catch (Exception e) {
+			throw new ApplicationException("Got an error logouting an user", e);
+		}
+	}
+	
+	
 
 	@Override
 	public void updateFromClient(User user) throws BusinessException, ApplicationException {
@@ -1258,4 +1277,5 @@ public class UserServiceImpl implements UserService {
 			throw new ApplicationException("Got an error sending a test notification", e);
 		}
 	}
+
 }
