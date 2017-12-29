@@ -369,7 +369,6 @@ public class UserRestService extends UserBaseRestService{
 	
 	
 	
-	@SecuredUser
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")

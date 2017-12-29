@@ -26,6 +26,7 @@ import javax.inject.Inject;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 
 import com.mangobits.startupkit.authkey.UserAuthKey;
 import com.mangobits.startupkit.authkey.UserAuthKeyService;
@@ -456,6 +457,10 @@ public class UserServiceImpl implements UserService {
 			if(userDB == null || password == null){
 				
 				throw new BusinessException("invalid_user_password");
+			}
+			
+			if(StringUtils.isNotEmpty(user.getType()) && !user.getType().equals(userDB.getType())){
+				throw new BusinessException("invalid_user_Type");
 			}
 			
 			String passHash = SecUtils.generateHash(userDB.getSalt(), password);
