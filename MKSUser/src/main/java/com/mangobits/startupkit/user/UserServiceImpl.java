@@ -415,6 +415,9 @@ public class UserServiceImpl implements UserService {
 		try {
 			
 			user = userDAO.retrieve(new User(id));
+			
+			//PENSAR EM UMA SOLUCAO MELHOR DEPOIS
+			createToken(user);
 		} catch (Exception e) {
 			throw new ApplicationException("Got an exception retrieving an user by id", e);
 		}
@@ -682,7 +685,7 @@ public class UserServiceImpl implements UserService {
 			BufferedImage image = ImageIO.read(url);
 			
 			Configuration confPath = configurationService.loadByCode(ConfigurationEnum.PATH_BASE);
-			File folder = new File(confPath.getValue() + "/user/" + photoUpload.getIdUser());
+			File folder = new File(confPath.getValue() + "/user/" + photoUpload.getId());
 			folder.mkdirs();
 			
 			File destiny = new File(folder, "/original.jpg");
@@ -713,7 +716,7 @@ public class UserServiceImpl implements UserService {
 			
 			Configuration confPath = configurationService.loadByCode(ConfigurationEnum.PATH_BASE);
 			
-			File folder = new File(confPath.getValue() + "/user/" + photoUpload.getIdUser());
+			File folder = new File(confPath.getValue() + "/user/" + photoUpload.getIdObject());
 			folder.mkdirs();
 			
 			File destiny = new File(folder, "/original.jpg");

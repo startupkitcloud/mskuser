@@ -124,7 +124,7 @@ public class UserRestService extends UserBaseRestService{
 	
 	
 	
-	@SecuredUser
+
 	@GET
 	@Path("/load/{idUser}")
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -447,10 +447,10 @@ public class UserRestService extends UserBaseRestService{
 		
 		try {
 			
-			User user = userService.retrieve(fotoUpload.getIdUser());
+			User user = userService.retrieve(fotoUpload.getIdObject());
 			
 			if(user == null){
-				throw new BusinessException("User with id  '" + fotoUpload.getIdUser() + "' not found to attach photo");
+				throw new BusinessException("User with id  '" + fotoUpload.getIdObject() + "' not found to attach photo");
 			}
 			
 			userService.saveFacebookAvatar(fotoUpload);
@@ -477,10 +477,10 @@ public class UserRestService extends UserBaseRestService{
 		
 		try {
 			
-			User user = userService.retrieve(fotoUpload.getIdUser());
+			User user = userService.retrieve(fotoUpload.getIdObject());
 			
 			if(user == null){
-				throw new BusinessException("User with id  '" + fotoUpload.getIdUser() + "' not found to attach photo");
+				throw new BusinessException("User with id  '" + fotoUpload.getIdObject() + "' not found to attach photo");
 			}
 			
 			userService.saveAvatar(fotoUpload);
