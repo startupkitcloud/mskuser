@@ -1165,7 +1165,7 @@ public class UserServiceImpl implements UserService {
 			
 			User user = retrieveByToken(token);
 			
-			if(user.getToken() == null || !user.getToken().equals(token) || user.getTokenExpirationDate().before(new Date())){
+			if(user == null || user.getToken() == null || !user.getToken().equals(token) || user.getTokenExpirationDate().before(new Date())){
 				validated = false;
 			}
 			

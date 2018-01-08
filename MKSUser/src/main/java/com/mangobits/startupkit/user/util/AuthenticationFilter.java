@@ -14,6 +14,8 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.mangobits.startupkit.user.UserService;
 
 @SecuredUser
@@ -55,6 +57,12 @@ public class AuthenticationFilter implements ContainerRequestFilter {
             
         } catch (Exception e) {
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+            
+            if(StringUtils.isNotEmpty(e.getMessage())){
+            	throw new NotAuthorizedException(e.getMessage());
+            }else{
+            	throw new NotAuthorizedException("Error provided Token");
+            }
         }
     }
 
