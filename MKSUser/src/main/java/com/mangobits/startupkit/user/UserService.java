@@ -8,6 +8,7 @@ import com.mangobits.startupkit.authkey.UserAuthKey;
 import com.mangobits.startupkit.core.exception.ApplicationException;
 import com.mangobits.startupkit.core.exception.BusinessException;
 import com.mangobits.startupkit.core.photo.PhotoUpload;
+import com.mangobits.startupkit.core.photo.TypeFileEnum;
 
 
 @Local
@@ -112,5 +113,11 @@ public interface UserService {
 	
 	
 	void testNotification(String idUser, String msg) throws ApplicationException, BusinessException;
+
+
+	void saveGallery(PhotoUpload photoUpload) throws BusinessException, ApplicationException;
+
+
+	String pathGallery(String idUser, TypeFileEnum typeFileEnum) throws BusinessException, ApplicationException;
 
 }

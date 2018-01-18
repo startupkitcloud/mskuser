@@ -39,6 +39,8 @@ import com.mangobits.startupkit.core.dao.SearchBuilder;
 import com.mangobits.startupkit.core.exception.ApplicationException;
 import com.mangobits.startupkit.core.exception.BusinessException;
 import com.mangobits.startupkit.core.photo.PhotoUpload;
+import com.mangobits.startupkit.core.photo.PhotoUtils;
+import com.mangobits.startupkit.core.photo.TypeFileEnum;
 import com.mangobits.startupkit.core.utils.ImageUtil;
 import com.mangobits.startupkit.core.utils.MessageUtils;
 import com.mangobits.startupkit.core.utils.SecUtils;
@@ -748,6 +750,80 @@ public class UserServiceImpl implements UserService {
 		}
 	}
 	
+	@Override
+	public void saveGallery(PhotoUpload photoUpload) throws BusinessException, ApplicationException{
+		
+		try {
+			
+			User user = retrieve(photoUpload.getIdObject());
+			
+			if(user == null){
+				throw new BusinessException("User with id  '" + photoUpload.getIdObject() + "' not found to attach PhotoUpload");
+			}else if(photoUpload.getTypeFileEnum() == null){
+				throw new BusinessException("TypeFile is required");
+			}
+			
+			if(photoUpload.getPhoto() != null){
+				
+				if(user.getListPhotoUpload() == null){
+					user.setListPhotoUpload(new ArrayList<>());
+				}
+				
+				createGalleryPhotoUpload(photoUpload, user);
+				
+			}else{
+				
+				PhotoUpload photoUploadBase = user.getListPhotoUpload().stream()
+						.filter(p -> p.getIndex().equals(photoUpload.getIndex()))
+						.findFirst()
+						.orElse(null);
+				
+				if(photoUploadBase != null){
+					user.getListPhotoUpload().remove(photoUploadBase);
+				}
+			}
+			
+			save(user);
+			
+		} catch (Exception e) {
+			throw new ApplicationException("Got an error saving an avatar", e);
+		}
+	}
+	
+	private void createGalleryPhotoUpload (PhotoUpload photoUpload, User user) throws Exception {
+		
+		//get the final size
+        int finalWidth = configurationService.loadByCode("SIZE_DETAIL_MOBILE").getValueAsInt();
+        photoUpload.setFinalWidth(finalWidth);
+        
+        String idPhoto = photoUpload.getId() != null ? photoUpload.getId() : UUID.randomUUID().toString();
+        photoUpload.setId(idPhoto);
+        
+        if(photoUpload.getIndex() == null){
+        	int index = user.getListPhotoUpload().isEmpty() ? 0 : user.getListPhotoUpload().get(0).getIndex() +1;
+        	photoUpload.setIndex(index);
+        }
+		
+		String path = pathGallery(photoUpload.getIdObject(), photoUpload.getTypeFileEnum());
+		
+		if(photoUpload.getTypeFileEnum().equals(TypeFileEnum.IMAGE)){
+			new PhotoUtils().saveImage(photoUpload, path, idPhoto);
+		}else{
+			new PhotoUtils().saveVideo(photoUpload, path, idPhoto);
+		}
+		
+		PhotoUpload photoUploadBase = user.getListPhotoUpload().stream()
+				.filter(p -> p.getIndex().equals(photoUpload.getIndex()))
+				.findFirst()
+				.orElse(null);
+		
+		if(photoUploadBase != null){
+			user.getListPhotoUpload().remove(photoUploadBase);
+		}
+		
+		user.getListPhotoUpload().add(photoUpload);
+	}
+	
 	
 	
 	@Override
@@ -1285,5 +1361,29 @@ public class UserServiceImpl implements UserService {
 			throw new ApplicationException("Got an error sending a test notification", e);
 		}
 	}
+	
+	
+	@Override
+	public String pathGallery(String idUser, TypeFileEnum typeFileEnum) throws BusinessException, ApplicationException {
+		
+		String path = null;
+		
+		try {
+			
+			if(typeFileEnum == null){
+				path = configurationService.loadByCode("PATH_BASE").getValue() + "/user/" + idUser + "/gallery";
+			}else if(TypeFileEnum.IMAGE.equals(typeFileEnum)){
+				path = configurationService.loadByCode("PATH_BASE").getValue() + "/user/" + idUser + "/gallery/photo";
+			}else if(TypeFileEnum.VIDEO.equals(typeFileEnum)){
+				path = configurationService.loadByCode("PATH_BASE").getValue() + "/user/" + idUser + "/gallery/video";
+			}
+			
+		} catch (Exception e) {
+			throw new ApplicationException("Got an error loading the video path", e);
+		}
+		
+		return path;
+	}
+	
 
 }

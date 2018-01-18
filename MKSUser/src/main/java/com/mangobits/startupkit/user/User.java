@@ -1,6 +1,7 @@
 package com.mangobits.startupkit.user;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.ElementCollection;
@@ -21,6 +22,7 @@ import org.hibernate.search.annotations.Spatial;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.mangobits.startupkit.core.address.AddressInfo;
+import com.mangobits.startupkit.core.photo.PhotoUpload;
 import com.mangobits.startupkit.core.user.GeneralUser;
 
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -158,6 +160,9 @@ public class User implements GeneralUser {
 	@ElementCollection(fetch=FetchType.EAGER)
 	private Map<String, String> info;
 	
+	
+	@ElementCollection(fetch=FetchType.EAGER)
+	private List<PhotoUpload> listPhotoUpload;
 	
 	
 	public User(){
@@ -553,5 +558,15 @@ public class User implements GeneralUser {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+
+	public List<PhotoUpload> getListPhotoUpload() {
+		return listPhotoUpload;
+	}
+
+
+	public void setListPhotoUpload(List<PhotoUpload> listPhotoUpload) {
+		this.listPhotoUpload = listPhotoUpload;
 	}
 }
