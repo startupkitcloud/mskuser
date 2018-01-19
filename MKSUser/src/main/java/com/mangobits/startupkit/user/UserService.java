@@ -8,7 +8,7 @@ import com.mangobits.startupkit.authkey.UserAuthKey;
 import com.mangobits.startupkit.core.exception.ApplicationException;
 import com.mangobits.startupkit.core.exception.BusinessException;
 import com.mangobits.startupkit.core.photo.PhotoUpload;
-import com.mangobits.startupkit.core.photo.TypeFileEnum;
+import com.mangobits.startupkit.core.photo.PhotoUploadTypeEnum;
 
 
 @Local
@@ -118,6 +118,6 @@ public interface UserService {
 	void saveGallery(PhotoUpload photoUpload) throws BusinessException, ApplicationException;
 
 
-	String pathGallery(String idUser, TypeFileEnum typeFileEnum) throws BusinessException, ApplicationException;
+	String pathGallery(String idUser, PhotoUploadTypeEnum photoUploadTypeEnum) throws BusinessException, ApplicationException;
 
 }

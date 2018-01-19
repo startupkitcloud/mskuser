@@ -39,8 +39,9 @@ import com.mangobits.startupkit.core.dao.SearchBuilder;
 import com.mangobits.startupkit.core.exception.ApplicationException;
 import com.mangobits.startupkit.core.exception.BusinessException;
 import com.mangobits.startupkit.core.photo.PhotoUpload;
+import com.mangobits.startupkit.core.photo.PhotoUploadStatusEnum;
+import com.mangobits.startupkit.core.photo.PhotoUploadTypeEnum;
 import com.mangobits.startupkit.core.photo.PhotoUtils;
-import com.mangobits.startupkit.core.photo.TypeFileEnum;
 import com.mangobits.startupkit.core.utils.ImageUtil;
 import com.mangobits.startupkit.core.utils.MessageUtils;
 import com.mangobits.startupkit.core.utils.SecUtils;
@@ -759,11 +760,11 @@ public class UserServiceImpl implements UserService {
 			
 			if(user == null){
 				throw new BusinessException("User with id  '" + photoUpload.getIdObject() + "' not found to attach PhotoUpload");
-			}else if(photoUpload.getTypeFileEnum() == null){
+			}else if(photoUpload.getType() == null){
 				throw new BusinessException("TypeFile is required");
 			}
 			
-			if(photoUpload.getPhoto() != null){
+			if(photoUpload.getStatus() == null || !photoUpload.getStatus().equals(PhotoUploadStatusEnum.BLOCKED)){
 				
 				if(user.getListPhotoUpload() == null){
 					user.setListPhotoUpload(new ArrayList<>());
@@ -800,18 +801,22 @@ public class UserServiceImpl implements UserService {
         photoUpload.setId(idPhoto);
         
         if(photoUpload.getIndex() == null){
-        	int index = user.getListPhotoUpload().isEmpty() ? 0 : user.getListPhotoUpload().get(0).getIndex() +1;
+        	int index = user.getListPhotoUpload().isEmpty() ? 0 : user.getListPhotoUpload().get(user.getListPhotoUpload().size() - 1).getIndex() +1;
         	photoUpload.setIndex(index);
         }
 		
-		String path = pathGallery(photoUpload.getIdObject(), photoUpload.getTypeFileEnum());
-		
-		if(photoUpload.getTypeFileEnum().equals(TypeFileEnum.IMAGE)){
-			new PhotoUtils().saveImage(photoUpload, path, idPhoto);
-		}else{
-			new PhotoUtils().saveVideo(photoUpload, path, idPhoto);
-		}
-		
+        if(!photoUpload.getType().equals(PhotoUploadTypeEnum.YOUTUBE)){
+        	
+        	String path = pathGallery(photoUpload.getIdObject(), photoUpload.getType());
+    		
+    		if(photoUpload.getType().equals(PhotoUploadTypeEnum.IMAGE)){
+    			new PhotoUtils().saveImage(photoUpload, path, idPhoto);
+    		}else if(photoUpload.getType().equals(PhotoUploadTypeEnum.VIDEO)){
+    			new PhotoUtils().saveVideo(photoUpload, path, idPhoto);
+    		}
+        }
+        
+        
 		PhotoUpload photoUploadBase = user.getListPhotoUpload().stream()
 				.filter(p -> p.getIndex().equals(photoUpload.getIndex()))
 				.findFirst()
@@ -819,6 +824,10 @@ public class UserServiceImpl implements UserService {
 		
 		if(photoUploadBase != null){
 			user.getListPhotoUpload().remove(photoUploadBase);
+		}
+		
+		if(photoUpload.getStatus() == null){
+			photoUpload.setStatus(PhotoUploadStatusEnum.ACTIVE);
 		}
 		
 		user.getListPhotoUpload().add(photoUpload);
@@ -1364,17 +1373,17 @@ public class UserServiceImpl implements UserService {
 	
 	
 	@Override
-	public String pathGallery(String idUser, TypeFileEnum typeFileEnum) throws BusinessException, ApplicationException {
+	public String pathGallery(String idUser, PhotoUploadTypeEnum photoUploadTypeEnum) throws BusinessException, ApplicationException {
 		
 		String path = null;
 		
 		try {
 			
-			if(typeFileEnum == null){
+			if(photoUploadTypeEnum == null){
 				path = configurationService.loadByCode("PATH_BASE").getValue() + "/user/" + idUser + "/gallery";
-			}else if(TypeFileEnum.IMAGE.equals(typeFileEnum)){
+			}else if(PhotoUploadTypeEnum.IMAGE.equals(photoUploadTypeEnum)){
 				path = configurationService.loadByCode("PATH_BASE").getValue() + "/user/" + idUser + "/gallery/photo";
-			}else if(TypeFileEnum.VIDEO.equals(typeFileEnum)){
+			}else if(PhotoUploadTypeEnum.VIDEO.equals(photoUploadTypeEnum)){
 				path = configurationService.loadByCode("PATH_BASE").getValue() + "/user/" + idUser + "/gallery/video";
 			}
 			

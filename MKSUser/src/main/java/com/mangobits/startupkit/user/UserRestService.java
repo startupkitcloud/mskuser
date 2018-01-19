@@ -38,7 +38,7 @@ import com.mangobits.startupkit.core.configuration.ConfigurationEnum;
 import com.mangobits.startupkit.core.configuration.ConfigurationService;
 import com.mangobits.startupkit.core.exception.BusinessException;
 import com.mangobits.startupkit.core.photo.PhotoUpload;
-import com.mangobits.startupkit.core.photo.TypeFileEnum;
+import com.mangobits.startupkit.core.photo.PhotoUploadTypeEnum;
 import com.mangobits.startupkit.core.utils.FileUtil;
 import com.mangobits.startupkit.notification.email.EmailService;
 import com.mangobits.startupkit.service.admin.util.Secured;
@@ -947,9 +947,9 @@ public class UserRestService extends UserBaseRestService{
 						
 						if(photoUpload != null){
 							
-							String base = configurationService.loadByCode(ConfigurationEnum.PATH_BASE).getValue();;
+							String path = userService.pathGallery(idUser, photoUpload.getType());
 							
-							String path = base + "/user/" + idUser + "/gallery/photo/" + photoUpload.getId() + "_main.jpg";
+							path = path + "/" + photoUpload.getId() + "_main.jpg";
 							
 							ByteArrayInputStream in =  new ByteArrayInputStream(FileUtil.readFile(path));
 									
@@ -977,7 +977,7 @@ public class UserRestService extends UserBaseRestService{
 	@Path("/video/{idUser}/{name}")
 	@Produces("video/mp4")
     public Response video(@HeaderParam("Range") String range, final @PathParam("name") String name, final @PathParam("idUser") String idUser) throws Exception {
-        return buildStream(new File(userService.pathGallery(idUser, TypeFileEnum.VIDEO) + "/" + name), range);
+        return buildStream(new File(userService.pathGallery(idUser, PhotoUploadTypeEnum.VIDEO) + "/" + name), range);
     }
 	
 	private Response buildStream(final File asset, final String range) throws Exception {
