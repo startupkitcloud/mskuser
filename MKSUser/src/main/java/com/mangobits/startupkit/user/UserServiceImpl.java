@@ -25,6 +25,7 @@ import javax.imageio.ImageIO;
 import javax.inject.Inject;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -38,6 +39,7 @@ import com.mangobits.startupkit.core.configuration.ConfigurationService;
 import com.mangobits.startupkit.core.dao.SearchBuilder;
 import com.mangobits.startupkit.core.exception.ApplicationException;
 import com.mangobits.startupkit.core.exception.BusinessException;
+import com.mangobits.startupkit.core.photo.InfoUrl;
 import com.mangobits.startupkit.core.photo.PhotoUpload;
 import com.mangobits.startupkit.core.photo.PhotoUploadStatusEnum;
 import com.mangobits.startupkit.core.photo.PhotoUploadTypeEnum;
@@ -801,8 +803,7 @@ public class UserServiceImpl implements UserService {
         photoUpload.setId(idPhoto);
         
         if(photoUpload.getIndex() == null){
-        	int index = user.getListPhotoUpload().isEmpty() ? 0 : user.getListPhotoUpload().get(user.getListPhotoUpload().size() - 1).getIndex() +1;
-        	photoUpload.setIndex(index);
+        	photoUpload.setIndex(createIndexPhotoUpload(user));
         }
 		
         if(!photoUpload.getType().equals(PhotoUploadTypeEnum.YOUTUBE)){
@@ -814,6 +815,9 @@ public class UserServiceImpl implements UserService {
     		}else if(photoUpload.getType().equals(PhotoUploadTypeEnum.VIDEO)){
     			new PhotoUtils().saveVideo(photoUpload, path, idPhoto);
     		}
+        }else{
+        	InfoUrl infoUrl = new PhotoUtils().createInfoUrlYoutube(photoUpload.getUrl());
+        	photoUpload.setInfoUrl(infoUrl);
         }
         
         
@@ -833,6 +837,21 @@ public class UserServiceImpl implements UserService {
 		user.getListPhotoUpload().add(photoUpload);
 	}
 	
+	
+	private int createIndexPhotoUpload(User user){
+		
+		int index = 0;
+		
+		if(CollectionUtils.isNotEmpty(user.getListPhotoUpload())){
+			
+			for(PhotoUpload photoUpload : user.getListPhotoUpload()){
+				index = index > photoUpload.getIndex() ? index : photoUpload.getIndex() +1;
+			}
+			
+		}
+		
+		return index;
+	}
 	
 	
 	@Override
@@ -876,6 +895,8 @@ public class UserServiceImpl implements UserService {
 
 
 
+
+	
 
 	
 	

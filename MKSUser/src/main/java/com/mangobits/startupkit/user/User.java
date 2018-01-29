@@ -160,7 +160,6 @@ public class User implements GeneralUser {
 	@ElementCollection(fetch=FetchType.EAGER)
 	private Map<String, String> info;
 	
-	
 	@ElementCollection(fetch=FetchType.EAGER)
 	private List<PhotoUpload> listPhotoUpload;
 	

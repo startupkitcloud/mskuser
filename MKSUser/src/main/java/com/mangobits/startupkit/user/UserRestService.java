@@ -570,7 +570,7 @@ public class UserRestService extends UserBaseRestService{
 		try {
 			
 			userService.saveGallery(fotoUpload);
-			cont.setData("OK");
+			cont.setData(fotoUpload);
 			
 		} catch (Exception e) {
 			
@@ -932,7 +932,7 @@ public class UserRestService extends UserBaseRestService{
 				
 				try {
 					
-					User user = userService.load(idUser);
+					User user = userService.retrieve(idUser);
 					
 					if(user == null){
 						throw new BusinessException("User with id  '" + idUser + "' not found to attach photo");
