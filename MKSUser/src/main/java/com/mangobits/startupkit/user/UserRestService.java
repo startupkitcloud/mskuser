@@ -363,6 +363,9 @@ public class UserRestService extends UserBaseRestService{
 			
 			userService.updateFromClient(usMon);
 			
+			cont.setData("OK");
+			cont.setSuccess(true);
+			
 		} catch (Exception e) {
 			
 			if(!(e instanceof BusinessException)){
@@ -395,6 +398,7 @@ public class UserRestService extends UserBaseRestService{
 		try { 
 			
 			userService.updatePassword(usMon);
+			cont.setData("OK");
 			cont.setDesc("OK");
 			
 		} catch (Exception e) {
@@ -430,7 +434,7 @@ public class UserRestService extends UserBaseRestService{
 		try { 
 			
 			userService.updateStartInfo(userStartInfo);
-			
+			cont.setData("OK");
 		} catch (Exception e) {
 			
 			if(!(e instanceof BusinessException)){
@@ -569,7 +573,9 @@ public class UserRestService extends UserBaseRestService{
 		
 		try {
 			
+			fotoUpload.setPhotoBytes(null);
 			userService.saveGallery(fotoUpload);
+			
 			cont.setData(fotoUpload);
 			
 		} catch (Exception e) {
@@ -770,7 +776,7 @@ public class UserRestService extends UserBaseRestService{
 		try {
 			
 			userService.confirmUserSMS(idUser);
-			
+			cont.setData("OK");
 		} catch (Exception e) {
 			
 			if(!(e instanceof BusinessException)){
@@ -803,7 +809,7 @@ public class UserRestService extends UserBaseRestService{
 		try {
 			
 			userService.confirmUserEmail(idUser);
-			
+			cont.setData("OK");
 		} catch (Exception e) {
 			
 			if(!(e instanceof BusinessException)){
@@ -834,7 +840,7 @@ public class UserRestService extends UserBaseRestService{
 		try {
 			
 			userService.forgotPassword(email);
-			
+			cont.setData("OK");
 		} catch (Exception e) {
 			
 			if(!(e instanceof BusinessException)){
