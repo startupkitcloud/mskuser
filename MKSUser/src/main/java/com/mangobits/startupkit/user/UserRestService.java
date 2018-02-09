@@ -573,8 +573,8 @@ public class UserRestService extends UserBaseRestService{
 		
 		try {
 			
-			fotoUpload.setPhotoBytes(null);
 			userService.saveGallery(fotoUpload);
+			fotoUpload.setPhotoBytes(null);
 			
 			cont.setData(fotoUpload);
 			
