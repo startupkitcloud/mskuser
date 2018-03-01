@@ -120,4 +120,7 @@ public interface UserService {
 
 	String pathGallery(String idUser, PhotoUploadTypeEnum photoUploadTypeEnum) throws BusinessException, ApplicationException;
 
+
+	List<User> retrieveByFieldInfo(String field, String value) throws BusinessException, ApplicationException;
+
 }

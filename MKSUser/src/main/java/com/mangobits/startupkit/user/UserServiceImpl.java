@@ -422,6 +422,10 @@ public class UserServiceImpl implements UserService {
 			
 			user = userDAO.retrieve(new User(id));
 			
+//			if(CollectionUtils.isNotEmpty(user.getListPhotoUpload())){
+//				Collections.sort(user.getListPhotoUpload(), (s1, s2) -> Integer.compare(s1.getIndex(), s2.getIndex()));
+//			}
+			
 			//PENSAR EM UMA SOLUCAO MELHOR DEPOIS
 			createToken(user);
 		} catch (Exception e) {
@@ -430,7 +434,6 @@ public class UserServiceImpl implements UserService {
 		
 		return user;
 	}
-	
 	
 	
 	@Override
@@ -1415,5 +1418,22 @@ public class UserServiceImpl implements UserService {
 		return path;
 	}
 	
+	
+	@Override
+	public List<User> retrieveByFieldInfo(String field, String value) throws BusinessException, ApplicationException {
+		
+		List<User> listUser = null;
+		
+		try {
+			
+			listUser = userDAO.listByFieldInfo(field, value);
+			
+		} catch (Exception e) {
+			throw new ApplicationException("Got an error retrieveByFieldInfo", e);
+		}
+		
+		return listUser;
+		
+	}
 
 }
