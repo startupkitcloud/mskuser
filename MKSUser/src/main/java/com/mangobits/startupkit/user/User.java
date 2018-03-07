@@ -6,6 +6,8 @@ import java.util.Map;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -155,6 +157,10 @@ public class User implements GeneralUser {
 	
 	private Date tokenExpirationDate;
 	
+	
+	@Field
+	@Enumerated(EnumType.STRING)
+	private UserStatusEnum status;
 	
 	
 	@IndexedEmbedded
@@ -570,5 +576,15 @@ public class User implements GeneralUser {
 
 	public void setListPhotoUpload(List<PhotoUpload> listPhotoUpload) {
 		this.listPhotoUpload = listPhotoUpload;
+	}
+
+
+	public UserStatusEnum getStatus() {
+		return status;
+	}
+
+
+	public void setStatus(UserStatusEnum status) {
+		this.status = status;
 	}
 }

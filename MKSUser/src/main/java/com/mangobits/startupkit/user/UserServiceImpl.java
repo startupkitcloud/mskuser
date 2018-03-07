@@ -349,6 +349,10 @@ public class UserServiceImpl implements UserService {
 				
 				user = userDB;
 				
+				if(userDB.getStatus() != null && userDB.getStatus().equals(UserStatusEnum.BLOCKED)){
+					throw new BusinessException("user_blocked");
+				}
+				
 				createToken(userDB);
 			}
 		} 
@@ -378,6 +382,10 @@ public class UserServiceImpl implements UserService {
 			else{
 				
 				user = userDB;
+				
+				if(userDB.getStatus() != null && userDB.getStatus().equals(UserStatusEnum.BLOCKED)){
+					throw new BusinessException("user_blocked");
+				}
 				
 				createToken(userDB);
 			}
@@ -469,6 +477,11 @@ public class UserServiceImpl implements UserService {
 			
 			if(StringUtils.isNotEmpty(user.getType()) && !user.getType().equals(userDB.getType())){
 				throw new BusinessException("invalid_user_Type");
+			}
+			
+			
+			if(userDB.getStatus() != null && userDB.getStatus().equals(UserStatusEnum.BLOCKED)){
+				throw new BusinessException("user_blocked");
 			}
 			
 			String passHash = SecUtils.generateHash(userDB.getSalt(), password);
@@ -1420,7 +1433,7 @@ public class UserServiceImpl implements UserService {
 	
 	
 	@Override
-	public List<User> retrieveByFieldInfo(String field, String value) throws BusinessException, ApplicationException {
+	public List<User> listByFieldInfo(String field, String value) throws BusinessException, ApplicationException {
 		
 		List<User> listUser = null;
 		
@@ -1434,6 +1447,29 @@ public class UserServiceImpl implements UserService {
 		
 		return listUser;
 		
+	}
+	
+	
+
+	@Override
+	public void changeStatus(String idUser) throws BusinessException, ApplicationException {
+		
+		try {
+			
+			User user = retrieve(idUser);
+			
+			if(user.getStatus().equals(UserStatusEnum.ACTIVE)){
+				user.setStatus(UserStatusEnum.BLOCKED);
+			}
+			else{
+				user.setStatus(UserStatusEnum.ACTIVE);
+			}
+			
+			userDAO.update(user);
+			
+		} catch (Exception e) {
+			throw new ApplicationException("got an error changing the user status", e);
+		}
 	}
 
 }

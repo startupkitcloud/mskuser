@@ -926,6 +926,40 @@ public class UserRestService extends UserBaseRestService{
 	}
 	
 	
+	@POST
+	@Secured
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+	@Path("/changeStatus")
+	public String changeStatus(User user)  throws Exception{ 
+		
+		String resultStr = null;
+		JsonContainer cont = new JsonContainer();
+		
+		try { 
+			
+			userService.changeStatus(user.getId());
+			cont.setData("OK");
+			
+		} catch (Exception e) {
+			
+			if(!(e instanceof BusinessException)){
+				e.printStackTrace();
+				emailService.sendEmailError(e);
+			}
+			
+			cont.setSuccess(false);
+			cont.setDesc(e.getMessage());
+		}
+		
+		
+		ObjectMapper mapper = new ObjectMapper();
+		resultStr = mapper.writeValueAsString(cont);
+		
+		return resultStr;
+	}
+	
+	
 	@GET
 	@Path("/loadImageByIndex/{idUser}/{index}")
 	@Produces("image/jpeg")
