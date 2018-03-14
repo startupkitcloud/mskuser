@@ -212,6 +212,10 @@ public class UserServiceImpl implements UserService {
 				user.setPassword(SecUtils.generateHash(user.getSalt(), user.getPassword()));
 			}
 			
+			if(user.getStatus() == null){
+				user.setStatus(UserStatusEnum.ACTIVE);
+			}
+			
 			userDAO.insert(user);
 			
 			sendWelcomeEmail(user);
@@ -279,7 +283,7 @@ public class UserServiceImpl implements UserService {
 
 			User userDB = null;
 			
-			if(user.getPhoneNumber() != null){
+			if(user.getPhoneNumber() != null && user.getPhoneNumber() != 0){
 				
 				Map<String, Object> params = new HashMap<>();
 				params.put("phoneNumber", user.getPhoneNumber());
