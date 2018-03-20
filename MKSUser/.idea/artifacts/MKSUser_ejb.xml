@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="ejb-jar" name="MKSUser:ejb">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="MSKUser.jar">
+      <element id="artifact" artifact-name="MKSUser:ejb exploded" />
+    </root>
+  </artifact>
+</component>
