@@ -363,6 +363,9 @@ public class UserRestService extends UserBaseRestService{
 			
 			userService.updateFromClient(usMon);
 			
+			cont.setData("OK");
+			cont.setSuccess(true);
+			
 		} catch (Exception e) {
 			
 			if(!(e instanceof BusinessException)){
@@ -395,6 +398,7 @@ public class UserRestService extends UserBaseRestService{
 		try { 
 			
 			userService.updatePassword(usMon);
+			cont.setData("OK");
 			cont.setDesc("OK");
 			
 		} catch (Exception e) {
@@ -430,7 +434,7 @@ public class UserRestService extends UserBaseRestService{
 		try { 
 			
 			userService.updateStartInfo(userStartInfo);
-			
+			cont.setData("OK");
 		} catch (Exception e) {
 			
 			if(!(e instanceof BusinessException)){
@@ -570,7 +574,9 @@ public class UserRestService extends UserBaseRestService{
 		try {
 			
 			userService.saveGallery(fotoUpload);
-			cont.setData("OK");
+			fotoUpload.setPhotoBytes(null);
+			
+			cont.setData(fotoUpload);
 			
 		} catch (Exception e) {
 			
@@ -770,7 +776,7 @@ public class UserRestService extends UserBaseRestService{
 		try {
 			
 			userService.confirmUserSMS(idUser);
-			
+			cont.setData("OK");
 		} catch (Exception e) {
 			
 			if(!(e instanceof BusinessException)){
@@ -803,7 +809,7 @@ public class UserRestService extends UserBaseRestService{
 		try {
 			
 			userService.confirmUserEmail(idUser);
-			
+			cont.setData("OK");
 		} catch (Exception e) {
 			
 			if(!(e instanceof BusinessException)){
@@ -834,7 +840,7 @@ public class UserRestService extends UserBaseRestService{
 		try {
 			
 			userService.forgotPassword(email);
-			
+			cont.setData("OK");
 		} catch (Exception e) {
 			
 			if(!(e instanceof BusinessException)){
@@ -920,6 +926,40 @@ public class UserRestService extends UserBaseRestService{
 	}
 	
 	
+	@POST
+	@Secured
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+	@Path("/changeStatus")
+	public String changeStatus(User user)  throws Exception{ 
+		
+		String resultStr = null;
+		JsonContainer cont = new JsonContainer();
+		
+		try { 
+			
+			userService.changeStatus(user.getId());
+			cont.setData("OK");
+			
+		} catch (Exception e) {
+			
+			if(!(e instanceof BusinessException)){
+				e.printStackTrace();
+				emailService.sendEmailError(e);
+			}
+			
+			cont.setSuccess(false);
+			cont.setDesc(e.getMessage());
+		}
+		
+		
+		ObjectMapper mapper = new ObjectMapper();
+		resultStr = mapper.writeValueAsString(cont);
+		
+		return resultStr;
+	}
+	
+	
 	@GET
 	@Path("/loadImageByIndex/{idUser}/{index}")
 	@Produces("image/jpeg")
@@ -932,7 +972,7 @@ public class UserRestService extends UserBaseRestService{
 				
 				try {
 					
-					User user = userService.load(idUser);
+					User user = userService.retrieve(idUser);
 					
 					if(user == null){
 						throw new BusinessException("User with id  '" + idUser + "' not found to attach photo");

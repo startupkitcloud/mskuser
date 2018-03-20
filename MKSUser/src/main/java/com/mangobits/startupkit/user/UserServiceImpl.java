@@ -25,6 +25,7 @@ import javax.imageio.ImageIO;
 import javax.inject.Inject;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -38,6 +39,7 @@ import com.mangobits.startupkit.core.configuration.ConfigurationService;
 import com.mangobits.startupkit.core.dao.SearchBuilder;
 import com.mangobits.startupkit.core.exception.ApplicationException;
 import com.mangobits.startupkit.core.exception.BusinessException;
+import com.mangobits.startupkit.core.photo.InfoUrl;
 import com.mangobits.startupkit.core.photo.PhotoUpload;
 import com.mangobits.startupkit.core.photo.PhotoUploadStatusEnum;
 import com.mangobits.startupkit.core.photo.PhotoUploadTypeEnum;
@@ -210,6 +212,10 @@ public class UserServiceImpl implements UserService {
 				user.setPassword(SecUtils.generateHash(user.getSalt(), user.getPassword()));
 			}
 			
+			if(user.getStatus() == null){
+				user.setStatus(UserStatusEnum.ACTIVE);
+			}
+			
 			userDAO.insert(user);
 			
 			sendWelcomeEmail(user);
@@ -277,7 +283,7 @@ public class UserServiceImpl implements UserService {
 
 			User userDB = null;
 			
-			if(user.getPhoneNumber() != null){
+			if(user.getPhoneNumber() != null && user.getPhoneNumber() != 0){
 				
 				Map<String, Object> params = new HashMap<>();
 				params.put("phoneNumber", user.getPhoneNumber());
@@ -347,6 +353,10 @@ public class UserServiceImpl implements UserService {
 				
 				user = userDB;
 				
+				if(userDB.getStatus() != null && userDB.getStatus().equals(UserStatusEnum.BLOCKED)){
+					throw new BusinessException("user_blocked");
+				}
+				
 				createToken(userDB);
 			}
 		} 
@@ -376,6 +386,10 @@ public class UserServiceImpl implements UserService {
 			else{
 				
 				user = userDB;
+				
+				if(userDB.getStatus() != null && userDB.getStatus().equals(UserStatusEnum.BLOCKED)){
+					throw new BusinessException("user_blocked");
+				}
 				
 				createToken(userDB);
 			}
@@ -420,6 +434,10 @@ public class UserServiceImpl implements UserService {
 			
 			user = userDAO.retrieve(new User(id));
 			
+//			if(CollectionUtils.isNotEmpty(user.getListPhotoUpload())){
+//				Collections.sort(user.getListPhotoUpload(), (s1, s2) -> Integer.compare(s1.getIndex(), s2.getIndex()));
+//			}
+			
 			//PENSAR EM UMA SOLUCAO MELHOR DEPOIS
 			createToken(user);
 		} catch (Exception e) {
@@ -428,7 +446,6 @@ public class UserServiceImpl implements UserService {
 		
 		return user;
 	}
-	
 	
 	
 	@Override
@@ -464,6 +481,11 @@ public class UserServiceImpl implements UserService {
 			
 			if(StringUtils.isNotEmpty(user.getType()) && !user.getType().equals(userDB.getType())){
 				throw new BusinessException("invalid_user_Type");
+			}
+			
+			
+			if(userDB.getStatus() != null && userDB.getStatus().equals(UserStatusEnum.BLOCKED)){
+				throw new BusinessException("user_blocked");
 			}
 			
 			String passHash = SecUtils.generateHash(userDB.getSalt(), password);
@@ -801,8 +823,7 @@ public class UserServiceImpl implements UserService {
         photoUpload.setId(idPhoto);
         
         if(photoUpload.getIndex() == null){
-        	int index = user.getListPhotoUpload().isEmpty() ? 0 : user.getListPhotoUpload().get(user.getListPhotoUpload().size() - 1).getIndex() +1;
-        	photoUpload.setIndex(index);
+        	photoUpload.setIndex(createIndexPhotoUpload(user));
         }
 		
         if(!photoUpload.getType().equals(PhotoUploadTypeEnum.YOUTUBE)){
@@ -814,6 +835,9 @@ public class UserServiceImpl implements UserService {
     		}else if(photoUpload.getType().equals(PhotoUploadTypeEnum.VIDEO)){
     			new PhotoUtils().saveVideo(photoUpload, path, idPhoto);
     		}
+        }else{
+        	InfoUrl infoUrl = new PhotoUtils().createInfoUrlYoutube(photoUpload.getUrl());
+        	photoUpload.setInfoUrl(infoUrl);
         }
         
         
@@ -833,6 +857,21 @@ public class UserServiceImpl implements UserService {
 		user.getListPhotoUpload().add(photoUpload);
 	}
 	
+	
+	private int createIndexPhotoUpload(User user){
+		
+		int index = 0;
+		
+		if(CollectionUtils.isNotEmpty(user.getListPhotoUpload())){
+			
+			for(PhotoUpload photoUpload : user.getListPhotoUpload()){
+				index = index > photoUpload.getIndex() ? index : photoUpload.getIndex() +1;
+			}
+			
+		}
+		
+		return index;
+	}
 	
 	
 	@Override
@@ -876,6 +915,8 @@ public class UserServiceImpl implements UserService {
 
 
 
+
+	
 
 	
 	
@@ -1394,5 +1435,45 @@ public class UserServiceImpl implements UserService {
 		return path;
 	}
 	
+	
+	@Override
+	public List<User> listByFieldInfo(String field, String value) throws BusinessException, ApplicationException {
+		
+		List<User> listUser = null;
+		
+		try {
+			
+			listUser = userDAO.listByFieldInfo(field, value);
+			
+		} catch (Exception e) {
+			throw new ApplicationException("Got an error retrieveByFieldInfo", e);
+		}
+		
+		return listUser;
+		
+	}
+	
+	
+
+	@Override
+	public void changeStatus(String idUser) throws BusinessException, ApplicationException {
+		
+		try {
+			
+			User user = retrieve(idUser);
+			
+			if(user.getStatus().equals(UserStatusEnum.ACTIVE)){
+				user.setStatus(UserStatusEnum.BLOCKED);
+			}
+			else{
+				user.setStatus(UserStatusEnum.ACTIVE);
+			}
+			
+			userDAO.update(user);
+			
+		} catch (Exception e) {
+			throw new ApplicationException("got an error changing the user status", e);
+		}
+	}
 
 }
