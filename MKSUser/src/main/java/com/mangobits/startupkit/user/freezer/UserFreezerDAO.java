@@ -1,6 +1,6 @@
 package com.mangobits.startupkit.user.freezer;
 
-import com.mangobits.startupkit.core.utils.AbstractDAO;
+import com.mangobits.startupkit.core.dao.AbstractDAO;
 
 
 public class UserFreezerDAO extends AbstractDAO<UserFreezer> {
@@ -11,7 +11,7 @@ public class UserFreezerDAO extends AbstractDAO<UserFreezer> {
 	
 
 	@Override
-	protected Object getId(UserFreezer obj) {
+	public Object getId(UserFreezer obj) {
 		return obj.getId();
 	}
 }

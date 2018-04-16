@@ -1,11 +1,10 @@
 package com.mangobits.startupkit.user;
 
-import java.util.List;
+import com.mangobits.startupkit.core.dao.AbstractDAO;
+import com.mangobits.startupkit.core.exception.DAOException;
 
 import javax.persistence.NoResultException;
-
-import com.mangobits.startupkit.core.exception.DAOException;
-import com.mangobits.startupkit.core.utils.AbstractDAO;
+import java.util.List;
 
 
 public class UserDAO extends AbstractDAO<User> {
@@ -16,7 +15,7 @@ public class UserDAO extends AbstractDAO<User> {
 	
 
 	@Override
-	protected Object getId(User obj) {
+	public Object getId(User obj) {
 		return obj.getId();
 	}
 

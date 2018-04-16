@@ -1,6 +1,6 @@
 package com.mangobits.startupkit.user.terms;
 
-import com.mangobits.startupkit.core.utils.AbstractDAO;
+import com.mangobits.startupkit.core.dao.AbstractDAO;
 
 
 public class TermsDAO extends AbstractDAO<Terms> {
@@ -11,7 +11,7 @@ public class TermsDAO extends AbstractDAO<Terms> {
 	
 
 	@Override
-	protected Object getId(Terms obj) {
+	public Object getId(Terms obj) {
 		return obj.getLanguage();
 	}
 }
