@@ -1,129 +1,128 @@
 package com.mangobits.startupkit.user;
 
-import java.util.List;
-
-import javax.ejb.Local;
-
 import com.mangobits.startupkit.authkey.UserAuthKey;
-import com.mangobits.startupkit.core.exception.ApplicationException;
-import com.mangobits.startupkit.core.exception.BusinessException;
 import com.mangobits.startupkit.core.photo.PhotoUpload;
 import com.mangobits.startupkit.core.photo.PhotoUploadTypeEnum;
+
+import javax.ejb.Local;
+import java.util.List;
 
 
 @Local
 public interface UserService {
 
+
+	User loginFB(User user) throws Exception;
 	
 	
-	User loginFB(User user) throws BusinessException, ApplicationException;
+	User loginGoogle(User user) throws Exception;
 	
 	
-	User loginGoogle(User user) throws BusinessException, ApplicationException;
+	User login(User user) throws Exception;
+
+
+	User autoLogin(String id, String password) throws Exception;
 	
 	
-	User login(User user) throws BusinessException, ApplicationException;
+	void logout(String idUser) throws Exception;
 	
 	
-	void logout(String idUser) throws BusinessException, ApplicationException;
+	User createNewUser(User user) throws Exception;
 	
 	
-	User createNewUser(User user) throws BusinessException, ApplicationException;
+	void updateFromClient(User user) throws Exception;
 	
 	
-	void updateFromClient(User user) throws BusinessException, ApplicationException;
+	void save(User user) throws Exception;
 	
 	
-	void save(User user) throws BusinessException, ApplicationException;
+	void update(User user) throws Exception;
 	
 	
-	void update(User user) throws BusinessException, ApplicationException;
+	void updatePassword(User user) throws Exception;
 	
 	
-	void updatePassword(User user) throws BusinessException, ApplicationException;
+	User retrieveByEmail(String email) throws Exception;
 	
 	
-	User retrieveByEmail(String email) throws BusinessException, ApplicationException;
+	User retrieveByPhone(Long phoneNumber) throws Exception;
 	
 	
-	User retrieveByPhone(Long phoneNumber) throws BusinessException, ApplicationException;
+	User retrieveByIdFacebook(String idFB) throws Exception;
 	
 	
-	User retrieveByIdFacebook(String idFB) throws BusinessException, ApplicationException;
+	User retrieve(String id) throws Exception;
 	
 	
-	User retrieve(String id) throws BusinessException, ApplicationException;
+	void saveFacebookAvatar(PhotoUpload photoUpload) throws Exception;
+	
+
+	@Deprecated
+	void saveAvatar(PhotoUpload photoUpload) throws Exception;
+
+
+	String pathImage(String idUser) throws Exception;
+	
+
+	@Deprecated
+	String pathImageAvatar(String idUser) throws Exception;
 	
 	
-	User load(String id) throws BusinessException, ApplicationException;
+	List<User> listUserIn(List<String> userIds) throws Exception;
 	
 	
-	void saveFacebookAvatar(PhotoUpload photoUpload) throws BusinessException, ApplicationException;
+	UserCard generateCard(String idUser) throws Exception;
 	
 	
-	void saveAvatar(PhotoUpload photoUpload) throws BusinessException, ApplicationException;
-	
-	
-	String pathImageAvatar(String idUser) throws BusinessException, ApplicationException;
-	
-	
-	User userProfile(String idUserRequest, String idUser, String idTravel) throws BusinessException, ApplicationException;
-	
-	
-	List<User> listUserIn(List<String> userIds) throws BusinessException, ApplicationException;
-	
-	
-	UserCard generateCard(String idUser) throws BusinessException, ApplicationException;
-	
-	
-	UserCard generateCard(User user) throws BusinessException, ApplicationException;
+	UserCard generateCard(User user) throws Exception;
 	
 	
 	void updateStartInfo(UserStartInfo userStartInfo) throws Exception;
 	
 	
-	void confirmUserSMS(String idUser) throws BusinessException, ApplicationException;
+	void confirmUserSMS(String idUser) throws Exception;
 	
 	
-	void confirmUserEmail(String idUser) throws BusinessException, ApplicationException;
+	void confirmUserEmail(String idUser) throws Exception;
 	
 	
-	Boolean validateKey(UserAuthKey key) throws BusinessException, ApplicationException;
+	Boolean validateKey(UserAuthKey key) throws Exception;
 	
 	
-	void forgotPassword(String email) throws BusinessException, ApplicationException;
+	void forgotPassword(String email) throws Exception;
 	
 	
-	List<UserCard> searchByName(String name) throws BusinessException, ApplicationException;
+	List<UserCard> searchByName(String name) throws Exception;
 	
 	
-	List<UserCard> listAll() throws BusinessException, ApplicationException;
+	List<UserCard> listAll() throws Exception;
 	
 	
-	void cancelUser(String idUser) throws BusinessException, ApplicationException;
+	void cancelUser(String idUser) throws Exception;
 	
 	
-	Boolean checkToken(String token) throws ApplicationException, BusinessException;
+	Boolean checkToken(String token) throws Exception;
 	
 	
-	User retrieveByToken(String token) throws BusinessException, ApplicationException;
+	User retrieveByToken(String token) throws Exception;
 	
 	
-	List<User> customersByRadius(Double latitude, Double longitude, Integer distanceKM) throws ApplicationException, BusinessException;
+	List<User> customersByRadius(Double latitude, Double longitude, Integer distanceKM) throws Exception;
 	
 	
-	void testNotification(String idUser, String msg) throws ApplicationException, BusinessException;
+	void testNotification(String idUser, String msg) throws Exception;
 
 
-	void saveGallery(PhotoUpload photoUpload) throws BusinessException, ApplicationException;
+	@Deprecated
+	void saveGallery(PhotoUpload photoUpload) throws Exception;
 
 
-	String pathGallery(String idUser, PhotoUploadTypeEnum photoUploadTypeEnum) throws BusinessException, ApplicationException;
+	@Deprecated
+	String pathGallery(String idUser, PhotoUploadTypeEnum photoUploadTypeEnum) throws Exception;
 
 
-	void changeStatus(String idUser) throws BusinessException, ApplicationException;
+	void changeStatus(String idUser) throws Exception;
 
 
-	List<User> listByFieldInfo(String field, String value) throws BusinessException, ApplicationException;
-
+	List<User> listByFieldInfo(String field, String value) throws Exception;
 }

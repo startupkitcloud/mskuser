@@ -1,5 +1,8 @@
 package com.mangobits.startupkit.user.helper;
 
+import com.mangobits.startupkit.user.util.SecuredUser;
+import com.mangobits.startupkit.user.util.UserBaseRestService;
+
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ws.rs.GET;
@@ -8,11 +11,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
-import com.mangobits.startupkit.service.admin.util.Secured;
-
 @Stateless
 @Path("/userHelper")
-public class UserHelperRestService {
+public class UserHelperRestService extends UserBaseRestService {
 
 	
 	
@@ -22,7 +23,7 @@ public class UserHelperRestService {
 	
 	
 	
-	@Secured
+	@SecuredUser
 	@GET
 	@Path("/excelUsersDatabase")
 	@Produces("application/excel")

@@ -9,8 +9,10 @@ import java.io.RandomAccessFile;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -29,6 +31,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 
+import com.mangobits.startupkit.core.photo.GalleryItem;
+import com.mangobits.startupkit.core.photo.PhotoUtils;
+import com.mangobits.startupkit.service.admin.util.SecuredAdmin;
 import org.apache.commons.collections.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -53,26 +58,21 @@ public class UserRestService extends UserBaseRestService{
 	
 	
 	@EJB
-	private UserService userService;
+	protected UserService userService;
 	
 	
 	
 	@EJB
-	private ConfigurationService configurationService;
+	protected ConfigurationService configurationService;
 	
 
-	
-	@EJB
-	private EmailService emailService;
-	
-	
-	
+
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	@Path("/loginFB")
-	public String loginFB(User usMon)  throws Exception{ 
+	public String loginFB(User usMon) throws Exception{
 		
 		String resultStr = null;
 		JsonContainer cont = new JsonContainer();
@@ -83,17 +83,9 @@ public class UserRestService extends UserBaseRestService{
 			cont.setData(user);
 
 		} catch (Exception e) {
-			
-			if(!(e instanceof BusinessException)){
-				e.printStackTrace();
-				emailService.sendEmailError(e);
-			}
-			
-			cont.setSuccess(false);
-			cont.setDesc(e.getMessage());
+			handleException(cont, e, "login FB");
 		}
-		
-		
+
 		ObjectMapper mapper = new ObjectMapper();
 		resultStr = mapper.writeValueAsString(cont);
 		
@@ -107,7 +99,7 @@ public class UserRestService extends UserBaseRestService{
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	@Path("/loginGoogle")
-	public String loginGoogle(User usMon)  throws Exception{ 
+	public String loginGoogle(User usMon) throws Exception{
 		
 		String resultStr = null;
 		JsonContainer cont = new JsonContainer();
@@ -118,17 +110,9 @@ public class UserRestService extends UserBaseRestService{
 			cont.setData(user);
 
 		} catch (Exception e) {
-			
-			if(!(e instanceof BusinessException)){
-				e.printStackTrace();
-				emailService.sendEmailError(e);
-			}
-			
-			cont.setSuccess(false);
-			cont.setDesc(e.getMessage());
+			handleException(cont, e, "login google");
 		}
-		
-		
+
 		ObjectMapper mapper = new ObjectMapper();
 		resultStr = mapper.writeValueAsString(cont);
 		
@@ -149,19 +133,11 @@ public class UserRestService extends UserBaseRestService{
 		
 		try {
 			
-			User user = userService.load(idUser);
-			
+			User user = userService.retrieve(idUser);
 			cont.setData(user);
 			
 		} catch (Exception e) {
-			
-			if(!(e instanceof BusinessException)){
-				e.printStackTrace();
-				emailService.sendEmailError(e);
-			}
-			
-			cont.setSuccess(false);
-			cont.setDesc(e.getMessage());
+			handleException(cont, e, "loading user");
 		}
 		
 		ObjectMapper mapper = new ObjectMapper();
@@ -188,14 +164,7 @@ public class UserRestService extends UserBaseRestService{
 			cont.setData(user);
 			
 		} catch (Exception e) {
-			
-			if(!(e instanceof BusinessException)){
-				e.printStackTrace();
-				emailService.sendEmailError(e);
-			}
-			
-			cont.setSuccess(false);
-			cont.setDesc(e.getMessage());
+			handleException(cont, e, "logged user");
 		}
 		
 		ObjectMapper mapper = new ObjectMapper();
@@ -204,16 +173,15 @@ public class UserRestService extends UserBaseRestService{
 		return resultStr;
 	}
 	
-	
-	
-	
+
+
 	@SecuredUser
 	@GET
 	@Path("/loggedUserCard")
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	public String loggedUserCard() throws Exception {
 		
-		String resultStr = null;
+		String resultStr;
 		JsonContainer cont = new JsonContainer();
 		
 		try {
@@ -226,14 +194,7 @@ public class UserRestService extends UserBaseRestService{
 			}
 			
 		} catch (Exception e) {
-			
-			if(!(e instanceof BusinessException)){
-				e.printStackTrace();
-				emailService.sendEmailError(e);
-			}
-			
-			cont.setSuccess(false);
-			cont.setDesc(e.getMessage());
+			handleException(cont, e, "logged user card");
 		}
 		
 		ObjectMapper mapper = new ObjectMapper();
@@ -241,17 +202,14 @@ public class UserRestService extends UserBaseRestService{
 		
 		return resultStr;
 	}
-	
-	
-	
-	
+
 	
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	@Path("/login")
-	public String login(User usMon)  throws Exception{ 
+	public String login(User usMon) throws Exception{
 		
 		String resultStr = null;
 		JsonContainer cont = new JsonContainer();
@@ -262,14 +220,7 @@ public class UserRestService extends UserBaseRestService{
 			cont.setData(user);
 
 		} catch (Exception e) {
-			
-			if(!(e instanceof BusinessException)){
-				e.printStackTrace();
-				emailService.sendEmailError(e);
-			}
-			
-			cont.setSuccess(false);
-			cont.setDesc(e.getMessage());
+			handleException(cont, e, "login");
 		}
 		
 		ObjectMapper mapper = new ObjectMapper();
@@ -278,7 +229,6 @@ public class UserRestService extends UserBaseRestService{
 		return resultStr;
 	}
 
-	
 	
 	@SecuredUser
 	@GET
@@ -290,19 +240,11 @@ public class UserRestService extends UserBaseRestService{
 		JsonContainer cont = new JsonContainer();
 		
 		try {
-			
 			userService.logout(idUser);
 			cont.setData("OK");
 			
 		} catch (Exception e) {
-			
-			if(!(e instanceof BusinessException)){
-				e.printStackTrace();
-				emailService.sendEmailError(e);
-			}
-			
-			cont.setSuccess(false);
-			cont.setDesc(e.getMessage());
+			handleException(cont, e, "logout user");
 		}
 		
 		ObjectMapper mapper = new ObjectMapper();
@@ -311,16 +253,15 @@ public class UserRestService extends UserBaseRestService{
 		return resultStr;
 	}
 	
-	
-	
+
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	@Path("/newUser")
-	public String newUser(User usMon)  throws Exception{ 
+	public String newUser(User usMon) throws Exception{
 		
-		String resultStr = null;
+		String resultStr;
 		JsonContainer cont = new JsonContainer();
 		
 		try { 
@@ -329,34 +270,25 @@ public class UserRestService extends UserBaseRestService{
 			cont.setData(usMon);
 
 		} catch (Exception e) {
-			
-			if(!(e instanceof BusinessException)){
-				e.printStackTrace();
-				emailService.sendEmailError(e);
-			}
-			
-			cont.setSuccess(false);
-			cont.setDesc(e.getMessage());
+			handleException(cont, e, "new user");
 		}
-		
-		
+
 		ObjectMapper mapper = new ObjectMapper();
 		resultStr = mapper.writeValueAsString(cont);
 		
 		return resultStr;
 	}
 	
-	
-	
+
 	
 	@SecuredUser
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	@Path("/update")
-	public String update(User usMon)  throws Exception{ 
+	public String update(User usMon) throws Exception{
 		
-		String resultStr = null;
+		String resultStr;
 		JsonContainer cont = new JsonContainer();
 		
 		try { 
@@ -367,17 +299,9 @@ public class UserRestService extends UserBaseRestService{
 			cont.setSuccess(true);
 			
 		} catch (Exception e) {
-			
-			if(!(e instanceof BusinessException)){
-				e.printStackTrace();
-				emailService.sendEmailError(e);
-			}
-			
-			cont.setSuccess(false);
-			cont.setDesc(e.getMessage());
+			handleException(cont, e, "updating a user");
 		}
-		
-		
+
 		ObjectMapper mapper = new ObjectMapper();
 		resultStr = mapper.writeValueAsString(cont);
 		
@@ -390,29 +314,20 @@ public class UserRestService extends UserBaseRestService{
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	@Path("/updatePassword")
-	public String updatePassword(User usMon)  throws Exception{ 
+	public String updatePassword(User usMon) throws Exception{
 		
-		String resultStr = null;
+		String resultStr;
 		JsonContainer cont = new JsonContainer();
 		
 		try { 
 			
 			userService.updatePassword(usMon);
 			cont.setData("OK");
-			cont.setDesc("OK");
 			
 		} catch (Exception e) {
-			
-			if(!(e instanceof BusinessException)){
-				e.printStackTrace();
-				emailService.sendEmailError(e);
-			}
-			
-			cont.setSuccess(false);
-			cont.setDesc(e.getMessage());
+			handleException(cont, e, "updating password");
 		}
-		
-		
+
 		ObjectMapper mapper = new ObjectMapper();
 		resultStr = mapper.writeValueAsString(cont);
 		
@@ -426,9 +341,9 @@ public class UserRestService extends UserBaseRestService{
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	@Path("/updateStartInfo")
-	public String updateStartInfo(UserStartInfo userStartInfo)  throws Exception{ 
+	public String updateStartInfo(UserStartInfo userStartInfo) throws Exception{
 		
-		String resultStr = null;
+		String resultStr;
 		JsonContainer cont = new JsonContainer();
 		
 		try { 
@@ -436,14 +351,7 @@ public class UserRestService extends UserBaseRestService{
 			userService.updateStartInfo(userStartInfo);
 			cont.setData("OK");
 		} catch (Exception e) {
-			
-			if(!(e instanceof BusinessException)){
-				e.printStackTrace();
-				emailService.sendEmailError(e);
-			}
-			
-			cont.setSuccess(false);
-			cont.setDesc(e.getMessage());
+			handleException(cont, e, "updating start info");
 		}
 		
 		
@@ -459,9 +367,8 @@ public class UserRestService extends UserBaseRestService{
 	@POST
 	@Path("/saveFacebookAvatar")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void saveFacebookAvatar(PhotoUpload fotoUpload) throws Exception{
-		
-		
+	public void saveFacebookAvatar(PhotoUpload fotoUpload){
+
 		try {
 			
 			User user = userService.retrieve(fotoUpload.getIdObject());
@@ -473,16 +380,158 @@ public class UserRestService extends UserBaseRestService{
 			userService.saveFacebookAvatar(fotoUpload);
 			
 		} catch (Exception e) {
-			
+
 			if(!(e instanceof BusinessException)){
 				e.printStackTrace();
 			}
 		}
 	}
+
+
+
+	@SecuredUser
+	@POST
+	@Path("/saveUserImage")
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String saveUserImage(PhotoUpload photoUpload) throws Exception{
+
+		String resultStr = null;
+		JsonContainer cont = new JsonContainer();
+
+		try {
+
+			User user = userService.retrieve(photoUpload.getIdObject());
+
+			if(user == null){
+				throw new BusinessException("User with id  '" + photoUpload.getIdObject() + "' not found to attach photo");
+			}
+
+			//get the final size
+			int finalWidth = configurationService.loadByCode("SIZE_DETAIL_MOBILE").getValueAsInt();
+			photoUpload.setFinalWidth(finalWidth);
+			String idPhoto;
+
+			//soh adiciona na galeria se nao tiver idSubObject
+			if(photoUpload.getIdSubObject() == null){
+
+				idPhoto = UUID.randomUUID().toString();
+
+				GalleryItem gi = new GalleryItem();
+				gi.setId(idPhoto);
+
+				if(user.getGallery() == null){
+					user.setGallery(new ArrayList<>());
+				}
+
+				user.getGallery().add(gi);
+			}
+			else{
+
+				idPhoto = photoUpload.getIdSubObject();
+			}
+
+			String path = userService.pathImage(user.getId());
+
+			new PhotoUtils().saveImage(photoUpload, path, idPhoto);
+			userService.save(user);
+
+			cont.setDesc("OK");
+
+		} catch (Exception e) {
+			handleException(cont, e, "saving user image");
+		}
+
+		ObjectMapper mapper = new ObjectMapper();
+		resultStr = mapper.writeValueAsString(cont);
+
+		return resultStr;
+	}
+
+
+
+	@GET
+	@Path("/userImage/{idUser}/{imageType}")
+	@Produces("image/jpeg")
+	public StreamingOutput userImage(final @PathParam("idUser") String idUser, final @PathParam("imageType") String imageType) throws Exception {
+
+		return out -> {
+
+			Configuration configuration = null;
+
+			try {
+
+				configuration = configurationService.loadByCode(ConfigurationEnum.PATH_BASE);
+
+				String base = configuration.getValue();
+
+				String path = base + "/user/" + idUser + "/" + imageType + "_main.jpg";
+
+				ByteArrayInputStream in =  new ByteArrayInputStream(FileUtil.readFile(path));
+
+				byte[] buf = new byte[16384];
+
+				int len = in.read(buf);
+
+				while(len!=-1) {
+
+					out.write(buf,0,len);
+
+					len = in.read(buf);
+				}
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		};
+	}
+
+
+
+
+	@GET
+	@Path("/userImage/{idUser}")
+	@Produces("image/jpeg")
+	public StreamingOutput userImage(final @PathParam("idUser") String idUser) throws Exception {
+
+		return out -> {
+
+			Configuration configuration = null;
+
+			try {
+
+				User user = userService.retrieve(idUser);
+
+				if(user.getGallery() != null && user.getGallery().size() > 0){
+
+					configuration = configurationService.loadByCode(ConfigurationEnum.PATH_BASE);
+
+					String base = configuration.getValue();
+
+					String path = base + "/user/" + idUser + "/" + user.getGallery().get(0).getId() + "_main.jpg";
+
+					ByteArrayInputStream in =  new ByteArrayInputStream(FileUtil.readFile(path));
+
+					byte[] buf = new byte[16384];
+
+					int len = in.read(buf);
+
+					while(len!=-1) {
+
+						out.write(buf,0,len);
+
+						len = in.read(buf);
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		};
+	}
 	
 	
-	
-	
+
+	@Deprecated
 	@SecuredUser
 	@POST
 	@Path("/saveAvatar")
@@ -504,10 +553,7 @@ public class UserRestService extends UserBaseRestService{
 			cont.setData("OK");
 			
 		} catch (Exception e) {
-			
-			if(!(e instanceof BusinessException)){
-				e.printStackTrace();
-			}
+			handleException(cont, e, "saving avatar");
 		}
 		
 		ObjectMapper mapper = new ObjectMapper();
@@ -516,9 +562,9 @@ public class UserRestService extends UserBaseRestService{
 		return resultStr;
 	}
 	
-	
-	
-	
+
+
+	@Deprecated
 	@GET
 	@Path("/showAvatar/{idUser}/{extra}")
 	@Produces("image/jpeg")
@@ -561,7 +607,8 @@ public class UserRestService extends UserBaseRestService{
 	}
 	
 
-	
+
+	@Deprecated
 	@SecuredUser
 	@POST
 	@Path("/saveGallery")
@@ -579,10 +626,7 @@ public class UserRestService extends UserBaseRestService{
 			cont.setData(fotoUpload);
 			
 		} catch (Exception e) {
-			
-			if(!(e instanceof BusinessException)){
-				e.printStackTrace();
-			}
+			handleException(cont, e, "saving gallery");
 		}
 		
 		ObjectMapper mapper = new ObjectMapper();
@@ -591,37 +635,7 @@ public class UserRestService extends UserBaseRestService{
 		return resultStr;
 	}
 	
-	
-	
-	@GET
-	@Path("/test")
-	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-	public String test() throws Exception {
-		
-		String resultStr = null;
-		JsonContainer cont = new JsonContainer();
-		
-		try {
-			
-			cont.setData("Hello Test!");
-			
-		} catch (Exception e) {
-			
-			if(!(e instanceof BusinessException)){
-				e.printStackTrace();
-				emailService.sendEmailError(e);
-			}
-			
-			cont.setSuccess(false);
-			cont.setDesc(e.getMessage());
-		}
-		
-		ObjectMapper mapper = new ObjectMapper();
-		resultStr = mapper.writeValueAsString(cont);
-		
-		return resultStr;
-	}
-	
+
 	
 	@SecuredUser
 	@GET
@@ -629,7 +643,7 @@ public class UserRestService extends UserBaseRestService{
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	public String searchByName(@QueryParam("q") String name) throws Exception {
 		
-		String resultStr = null;
+		String resultStr;
 		JsonContainer cont = new JsonContainer();
 		
 		try {
@@ -639,14 +653,7 @@ public class UserRestService extends UserBaseRestService{
 			cont.setData(list);
 			
 		} catch (Exception e) {
-			
-			if(!(e instanceof BusinessException)){
-				e.printStackTrace();
-				emailService.sendEmailError(e);
-			}
-			
-			cont.setSuccess(false);
-			cont.setDesc(e.getMessage());
+			handleException(cont, e, "searching by name");
 		}
 		
 		ObjectMapper mapper = new ObjectMapper();
@@ -655,16 +662,15 @@ public class UserRestService extends UserBaseRestService{
 		return resultStr;
 	}
 	
+
 	
-	
-	
-	@Secured
+	@SecuredAdmin
 	@GET
 	@Path("/listAll")
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	public String listAll() throws Exception {
 		
-		String resultStr = null;
+		String resultStr;
 		JsonContainer cont = new JsonContainer();
 		
 		try {
@@ -673,14 +679,7 @@ public class UserRestService extends UserBaseRestService{
 			cont.setData(list);
 			
 		} catch (Exception e) {
-			
-			if(!(e instanceof BusinessException)){
-				e.printStackTrace();
-				emailService.sendEmailError(e);
-			}
-			
-			cont.setSuccess(false);
-			cont.setDesc(e.getMessage());
+			handleException(cont, e, "listing all users");
 		}
 		
 		ObjectMapper mapper = new ObjectMapper();
@@ -691,12 +690,12 @@ public class UserRestService extends UserBaseRestService{
 	
 	
 	
-	@Secured
+	@SecuredAdmin
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-	@Path("/save")
-	public String save(User user)  throws Exception{ 
+	@Path("/saveAdmin")
+	public String saveAdmin(User user)  throws Exception{
 		
 		String resultStr = null;
 		JsonContainer cont = new JsonContainer();
@@ -704,23 +703,13 @@ public class UserRestService extends UserBaseRestService{
 		try { 
 			
 			userService.save(user);
-			
 			confirmUserEmail(user.getId());
-			
 			cont.setData(user);
 			
 		} catch (Exception e) {
-			
-			if(!(e instanceof BusinessException)){
-				e.printStackTrace();
-				emailService.sendEmailError(e);
-			}
-			
-			cont.setSuccess(false);
-			cont.setDesc(e.getMessage());
+			handleException(cont, e, "saving a user");
 		}
-		
-		
+
 		ObjectMapper mapper = new ObjectMapper();
 		resultStr = mapper.writeValueAsString(cont);
 		
@@ -734,9 +723,9 @@ public class UserRestService extends UserBaseRestService{
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	@Path("/cancelUser")
-	public String cancelUser(User user)  throws Exception{ 
+	public String cancelUser(User user) throws Exception{
 		
-		String resultStr = null;
+		String resultStr;
 		JsonContainer cont = new JsonContainer();
 		
 		try { 
@@ -745,16 +734,8 @@ public class UserRestService extends UserBaseRestService{
 			cont.setData("OK");
 
 		} catch (Exception e) {
-			
-			if(!(e instanceof BusinessException)){
-				e.printStackTrace();
-				emailService.sendEmailError(e);
-			}
-			
-			cont.setSuccess(false);
-			cont.setDesc(e.getMessage());
+			handleException(cont, e, "canceling a user");
 		}
-		
 		
 		ObjectMapper mapper = new ObjectMapper();
 		resultStr = mapper.writeValueAsString(cont);
@@ -770,7 +751,7 @@ public class UserRestService extends UserBaseRestService{
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	public String confirmUserSMS(@PathParam("idUser") String idUser) throws Exception {
 		
-		String resultStr = null;
+		String resultStr;
 		JsonContainer cont = new JsonContainer();
 		
 		try {
@@ -778,15 +759,7 @@ public class UserRestService extends UserBaseRestService{
 			userService.confirmUserSMS(idUser);
 			cont.setData("OK");
 		} catch (Exception e) {
-			
-			if(!(e instanceof BusinessException)){
-				e.printStackTrace();
-				emailService.sendEmailError(e);
-			}
-			
-			cont.setSuccess(false);
-			cont.setDesc(e.getMessage());
-			
+			handleException(cont, e, "confirming user SMS");
 		}
 		
 		ObjectMapper mapper = new ObjectMapper();
@@ -803,7 +776,7 @@ public class UserRestService extends UserBaseRestService{
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	public String confirmUserEmail(@PathParam("idUser") String idUser) throws Exception {
 		
-		String resultStr = null;
+		String resultStr;
 		JsonContainer cont = new JsonContainer();
 		
 		try {
@@ -811,14 +784,7 @@ public class UserRestService extends UserBaseRestService{
 			userService.confirmUserEmail(idUser);
 			cont.setData("OK");
 		} catch (Exception e) {
-			
-			if(!(e instanceof BusinessException)){
-				e.printStackTrace();
-				emailService.sendEmailError(e);
-			}
-			
-			cont.setSuccess(false);
-			cont.setDesc(e.getMessage());
+			handleException(cont, e, "confirming user email");
 		}
 		
 		ObjectMapper mapper = new ObjectMapper();
@@ -834,7 +800,7 @@ public class UserRestService extends UserBaseRestService{
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	public String forgotPassword(@PathParam("email") String email) throws Exception {
 		
-		String resultStr = null;
+		String resultStr;
 		JsonContainer cont = new JsonContainer();
 		
 		try {
@@ -842,14 +808,7 @@ public class UserRestService extends UserBaseRestService{
 			userService.forgotPassword(email);
 			cont.setData("OK");
 		} catch (Exception e) {
-			
-			if(!(e instanceof BusinessException)){
-				e.printStackTrace();
-				emailService.sendEmailError(e);
-			}
-			
-			cont.setSuccess(false);
-			cont.setDesc(e.getMessage());
+			handleException(cont, e, "forgot password");
 		}
 		
 		ObjectMapper mapper = new ObjectMapper();
@@ -867,7 +826,7 @@ public class UserRestService extends UserBaseRestService{
 	@Path("/validateKey")
 	public String validateKey(UserAuthKey userAuthKey)  throws Exception{ 
 		
-		String resultStr = null;
+		String resultStr;
 		JsonContainer cont = new JsonContainer();
 		
 		try { 
@@ -876,14 +835,7 @@ public class UserRestService extends UserBaseRestService{
 			cont.setData(validated);
 
 		} catch (Exception e) {
-			
-			if(!(e instanceof BusinessException)){
-				e.printStackTrace();
-				emailService.sendEmailError(e);
-			}
-			
-			cont.setSuccess(false);
-			cont.setDesc(e.getMessage());
+			handleException(cont, e, "validating key");
 		}
 		
 		
@@ -900,7 +852,7 @@ public class UserRestService extends UserBaseRestService{
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	public String testNotification(@PathParam("idUser") String idUser, @PathParam("msg") String msg) throws Exception {
 		
-		String resultStr = null;
+		String resultStr;
 		JsonContainer cont = new JsonContainer();
 		
 		try {
@@ -909,14 +861,7 @@ public class UserRestService extends UserBaseRestService{
 			cont.setData("OK");
 			
 		} catch (Exception e) {
-			
-			if(!(e instanceof BusinessException)){
-				e.printStackTrace();
-				emailService.sendEmailError(e);
-			}
-			
-			cont.setSuccess(false);
-			cont.setDesc(e.getMessage());
+			handleException(cont, e, "testing notification");
 		}
 		
 		ObjectMapper mapper = new ObjectMapper();
@@ -927,13 +872,13 @@ public class UserRestService extends UserBaseRestService{
 	
 	
 	@POST
-	@Secured
+	@SecuredAdmin
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	@Path("/changeStatus")
 	public String changeStatus(User user)  throws Exception{ 
 		
-		String resultStr = null;
+		String resultStr;
 		JsonContainer cont = new JsonContainer();
 		
 		try { 
@@ -942,16 +887,8 @@ public class UserRestService extends UserBaseRestService{
 			cont.setData("OK");
 			
 		} catch (Exception e) {
-			
-			if(!(e instanceof BusinessException)){
-				e.printStackTrace();
-				emailService.sendEmailError(e);
-			}
-			
-			cont.setSuccess(false);
-			cont.setDesc(e.getMessage());
+			handleException(cont, e, "changing status");
 		}
-		
 		
 		ObjectMapper mapper = new ObjectMapper();
 		resultStr = mapper.writeValueAsString(cont);
@@ -959,7 +896,8 @@ public class UserRestService extends UserBaseRestService{
 		return resultStr;
 	}
 	
-	
+
+	@Deprecated
 	@GET
 	@Path("/loadImageByIndex/{idUser}/{index}")
 	@Produces("image/jpeg")
@@ -967,59 +905,56 @@ public class UserRestService extends UserBaseRestService{
 		return loadImageByIndex(idUser, index, null);
 	}
 	
-	
+
+	@Deprecated
 	@GET
 	@Path("/loadImageByIndex/{idUser}/{index}/{suffix}")
 	@Produces("image/jpeg")
 	public StreamingOutput loadImageByIndex(final @PathParam("idUser") String idUser, final @PathParam("index") Integer index, final @PathParam("suffix") String suffix) throws Exception {
 		
-		return new StreamingOutput() { 
-			
-			@Override
-			public void write(final OutputStream out) throws IOException {
-				
-				try {
-					
-					User user = userService.retrieve(idUser);
-					
-					if(user == null){
-						throw new BusinessException("User with id  '" + idUser + "' not found to attach photo");
-					}
-					
-					if(CollectionUtils.isNotEmpty(user.getListPhotoUpload())){
-						
-						PhotoUpload photoUpload = user.getListPhotoUpload().stream()
-								.filter(p -> p.getIndex().equals(index))
-								.findFirst()
-								.orElse(null);
-						
-						if(photoUpload != null){
-							
-							String path = userService.pathGallery(idUser, photoUpload.getType());
-							
-							if(suffix != null){
-								path = path + "/" + photoUpload.getId() + "_" + suffix + ".jpg";
-							}else {
-								path = path + "/" + photoUpload.getId() + "_main.jpg";
-							}
-							
-							ByteArrayInputStream in =  new ByteArrayInputStream(FileUtil.readFile(path));
-									
-							byte[] buf = new byte[16384]; 
-							
-							int len = in.read(buf);
-							
-							while(len!=-1) { 
-								
-								out.write(buf,0,len); 
-							
-								len = in.read(buf); 
-							} 
+		return out -> {
+
+			try {
+
+				User user = userService.retrieve(idUser);
+
+				if(user == null){
+					throw new BusinessException("User with id  '" + idUser + "' not found to attach photo");
+				}
+
+				if(CollectionUtils.isNotEmpty(user.getListPhotoUpload())){
+
+					PhotoUpload photoUpload = user.getListPhotoUpload().stream()
+							.filter(p -> p.getIndex().equals(index))
+							.findFirst()
+							.orElse(null);
+
+					if(photoUpload != null){
+
+						String path = userService.pathGallery(idUser, photoUpload.getType());
+
+						if(suffix != null){
+							path = path + "/" + photoUpload.getId() + "_" + suffix + ".jpg";
+						}else {
+							path = path + "/" + photoUpload.getId() + "_main.jpg";
+						}
+
+						ByteArrayInputStream in =  new ByteArrayInputStream(FileUtil.readFile(path));
+
+						byte[] buf = new byte[16384];
+
+						int len = in.read(buf);
+
+						while(len!=-1) {
+
+							out.write(buf,0,len);
+
+							len = in.read(buf);
 						}
 					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}	
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		};
 	}

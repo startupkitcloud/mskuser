@@ -8,8 +8,9 @@ import javax.ws.rs.core.HttpHeaders;
 
 import com.mangobits.startupkit.user.User;
 import com.mangobits.startupkit.user.UserService;
+import com.mangobits.startupkit.ws.BasicRestService;
 
-public class UserBaseRestService {
+public class UserBaseRestService extends BasicRestService {
 
 	@Context
     private HttpServletRequest request;

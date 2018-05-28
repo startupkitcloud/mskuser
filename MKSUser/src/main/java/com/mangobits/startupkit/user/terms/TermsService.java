@@ -8,5 +8,5 @@ import com.mangobits.startupkit.core.exception.BusinessException;
 @Local
 public interface TermsService {
 	
-	Terms retrieveByLanguage(String language) throws ApplicationException, BusinessException;
+	Terms retrieveByLanguage(String language) throws Exception;
 }

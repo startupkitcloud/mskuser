@@ -1,5 +1,7 @@
 package com.mangobits.startupkit.user.terms;
 
+import com.mangobits.startupkit.user.util.UserBaseRestService;
+
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ws.rs.GET;
@@ -11,7 +13,7 @@ import javax.ws.rs.core.MediaType;
 
 @Stateless
 @Path("/terms")
-public class TermsRestService{
+public class TermsRestService extends UserBaseRestService {
 	
 	
 	@EJB

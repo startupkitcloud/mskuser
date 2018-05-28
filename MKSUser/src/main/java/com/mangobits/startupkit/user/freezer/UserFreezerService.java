@@ -10,5 +10,5 @@ import com.mangobits.startupkit.user.User;
 public interface UserFreezerService {
 	
 	
-	void moveToFreezer(User user) throws BusinessException, ApplicationException;
+	void moveToFreezer(User user) throws Exception;
 }
