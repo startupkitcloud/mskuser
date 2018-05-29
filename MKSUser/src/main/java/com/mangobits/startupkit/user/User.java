@@ -57,6 +57,9 @@ public class User implements GeneralUser {
 	
 	@Field
 	private Long phoneNumber;
+
+
+	private String document;
 	
 	
 	private Integer phoneCountryCode;
@@ -451,5 +454,13 @@ public class User implements GeneralUser {
 
 	public void setGallery(List<GalleryItem> gallery) {
 		this.gallery = gallery;
+	}
+
+	public String getDocument() {
+		return document;
+	}
+
+	public void setDocument(String document) {
+		this.document = document;
 	}
 }

@@ -320,25 +320,33 @@ public class UserServiceImpl implements UserService {
 
 	
 	@Override
-	public User autoLogin(String id, String password) throws Exception {
+	public User autoLogin(User user) throws Exception {
 		
-		User user = userDAO.retrieve(new User(id));
+		User userDB = userDAO.retrieve(new User(user.getId()));
 
-		if(user == null){
+		if(userDB == null || (user.getPassword() == null && user.getIdFacebook() == null && user.getIdGoogle() == null)){
 			throw new BusinessException("user_not_found");
 		}
 
-		if(!password.equals(user.getPassword())){
+		if(user.getPassword() != null && (userDB.getPassword() == null || !user.getPassword().equals(userDB.getPassword()))){
 			throw new BusinessException("invalid_user_password");
 		}
 
-		if(user.getStatus() != null && user.getStatus().equals(UserStatusEnum.BLOCKED)){
+		if(user.getIdFacebook() != null && (userDB.getIdFacebook() == null || !user.getIdFacebook().equals(userDB.getIdFacebook()))){
+			throw new BusinessException("invalid_user_password");
+		}
+
+		if(user.getIdGoogle() != null && (userDB.getIdGoogle() == null || !user.getIdGoogle().equals(userDB.getIdGoogle()))){
+			throw new BusinessException("invalid_user_password");
+		}
+
+		if(userDB.getStatus() != null && userDB.getStatus().equals(UserStatusEnum.BLOCKED)){
 			throw new BusinessException("user_blocked");
 		}
 
-		createToken(user);
+		createToken(userDB);
 
-		return user;
+		return userDB;
 	}
 	
 	

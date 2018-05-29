@@ -16,6 +16,8 @@ import java.util.UUID;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -59,6 +61,9 @@ public class UserRestService extends UserBaseRestService{
 	
 	@EJB
 	protected UserService userService;
+	@PersistenceContext
+	private javax.persistence.EntityManager entityManager;
+
 	
 	
 	
@@ -226,6 +231,32 @@ public class UserRestService extends UserBaseRestService{
 		ObjectMapper mapper = new ObjectMapper();
 		resultStr = mapper.writeValueAsString(cont);
 		
+		return resultStr;
+	}
+
+
+
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+	@Path("/autoLogin")
+	public String autoLogin(User usMon) throws Exception{
+
+		String resultStr = null;
+		JsonContainer cont = new JsonContainer();
+
+		try {
+
+			User user = userService.autoLogin(usMon);
+			cont.setData(user);
+
+		} catch (Exception e) {
+			handleException(cont, e, "auto login");
+		}
+
+		ObjectMapper mapper = new ObjectMapper();
+		resultStr = mapper.writeValueAsString(cont);
+
 		return resultStr;
 	}
 

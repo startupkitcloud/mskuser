@@ -21,7 +21,7 @@ public interface UserService {
 	User login(User user) throws Exception;
 
 
-	User autoLogin(String id, String password) throws Exception;
+	User autoLogin(User user) throws Exception;
 	
 	
 	void logout(String idUser) throws Exception;
