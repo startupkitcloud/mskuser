@@ -1,7 +1,7 @@
 package com.mangobits.startupkit.user;
 
-import com.mangobits.startupkit.core.dao.AbstractDAO;
 import com.mangobits.startupkit.core.exception.DAOException;
+import com.mangobits.startupkit.core.utils.AbstractDAO;
 
 import javax.persistence.NoResultException;
 import java.util.List;

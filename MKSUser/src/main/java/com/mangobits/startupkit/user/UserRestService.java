@@ -1,36 +1,5 @@
 package com.mangobits.startupkit.user;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.WritableByteChannel;
-import java.util.Date;
-import java.util.List;
-
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.StreamingOutput;
-
-import org.apache.commons.collections.CollectionUtils;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mangobits.startupkit.authkey.UserAuthKey;
 import com.mangobits.startupkit.core.configuration.Configuration;
@@ -45,6 +14,22 @@ import com.mangobits.startupkit.service.admin.util.Secured;
 import com.mangobits.startupkit.user.util.SecuredUser;
 import com.mangobits.startupkit.user.util.UserBaseRestService;
 import com.mangobits.startupkit.ws.JsonContainer;
+import org.apache.commons.collections.CollectionUtils;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.ws.rs.*;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.StreamingOutput;
+import java.io.*;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.WritableByteChannel;
+import java.util.Date;
+import java.util.List;
 
 
 @Stateless
@@ -64,10 +49,9 @@ public class UserRestService extends UserBaseRestService{
 	
 	@EJB
 	private EmailService emailService;
-	
-	
-	
-	
+
+
+
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -724,6 +708,42 @@ public class UserRestService extends UserBaseRestService{
 		ObjectMapper mapper = new ObjectMapper();
 		resultStr = mapper.writeValueAsString(cont);
 		
+		return resultStr;
+	}
+
+
+
+	@Secured
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+	@Path("/saveByAdmin")
+	public String saveByAdmin(User user)  throws Exception{
+
+		String resultStr = null;
+		JsonContainer cont = new JsonContainer();
+
+		try {
+
+			userService.saveByAdmin(user);
+
+			cont.setData(user);
+
+		} catch (Exception e) {
+
+			if(!(e instanceof BusinessException)){
+				e.printStackTrace();
+				emailService.sendEmailError(e);
+			}
+
+			cont.setSuccess(false);
+			cont.setDesc(e.getMessage());
+		}
+
+
+		ObjectMapper mapper = new ObjectMapper();
+		resultStr = mapper.writeValueAsString(cont);
+
 		return resultStr;
 	}
 	

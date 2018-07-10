@@ -158,6 +158,27 @@ public class UserServiceImpl implements UserService {
 			updateFromClient(user);
 		}
 	}
+
+
+	@Override
+	public void saveByAdmin(User user) throws BusinessException, ApplicationException {
+
+		try {
+
+			boolean sendEmail = user.getId() == null;
+
+			save(user);
+
+//			if(sendEmail){
+//				forgotPassword(user);
+//			}
+		}
+		catch (BusinessException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new ApplicationException("Got an error saving an user by admin", e);
+		}
+	}
 	
 	
 	
@@ -1154,48 +1175,64 @@ public class UserServiceImpl implements UserService {
 			
 			User user = retrieveByEmail(email);
 			
+			forgotPassword(user);
+			
+		} catch (BusinessException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new ApplicationException("Got an error creating a forgot password access", e);
+		}
+	}
+
+
+
+
+	private void forgotPassword(User user) throws BusinessException, ApplicationException {
+
+		try {
+
 			if(user == null){
 				throw new BusinessException("user_not_found");
 			}
-			
+
 			UserAuthKey key = userAuthKeyService.createKey(user.getId(), UserAuthKeyTypeEnum.EMAIL);
-			
+
 			String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.confirm.email.forgot.title");
-			
-			String configKeyLang = user.getLanguage() == null ? "" : "_"+user.getLanguage().toUpperCase(); 
-			
+
+			String configKeyLang = user.getLanguage() == null ? "" : "_"+user.getLanguage().toUpperCase();
+
 			final int emailTemplateId = configurationService.loadByCode("USER_EMAIL_FORGOT_ID" + configKeyLang).getValueAsInt();
-			
+
 			final String link = configurationService.loadByCode("USER_EMAIL_FORGOT_LINK").getValue()
 					.replaceAll("__LANGUAGE__", user.getLanguage())
 					.replaceAll("__KEY__", key.getKey())
 					.replaceAll("__USER__", user.getId())
 					.replaceAll("__TYPE__", key.getType().toString());
-			
+
 			notificationService.sendNotification(new NotificationBuilder()
 					.setTo(user)
 					.setTypeSending(TypeSendingNotificationEnum.EMAIL)
 					.setTitle(title)
 					.setFgAlertOnly(true)
 					.setEmailDataTemplate(new EmailDataTemplate() {
-						
+
 						@Override
 						public Integer getTemplateId() {
 							return emailTemplateId;
 						}
-						
+
 						@Override
 						public Map<String, String> getData() {
-							
+
 							Map<String, String> params = new HashMap<>();
 							params.put("user_name", user.getName());
 							params.put("confirmation_link", link);
-							
+
 							return params;
 						}
 					})
 					.build());
-			
+
 		} catch (BusinessException e) {
 			throw e;
 		} catch (Exception e) {

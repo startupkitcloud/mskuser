@@ -17,7 +17,7 @@ public class UserBaseRestService {
 	
 	
 	@EJB
-	private UserService userService;
+	private UserService userExtService;
 	
 	
 	
@@ -34,7 +34,7 @@ public class UserBaseRestService {
         // Extract the token from the HTTP Authorization header
         String token = authorizationHeader.substring("Bearer".length()).trim();
         
-        User user = userService.retrieveByToken(token);
+        User user = userExtService.retrieveByToken(token);
         
         return user;
 	}

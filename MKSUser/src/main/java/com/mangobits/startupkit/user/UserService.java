@@ -35,8 +35,11 @@ public interface UserService {
 	
 	
 	void save(User user) throws BusinessException, ApplicationException;
-	
-	
+
+
+	void saveByAdmin(User user) throws BusinessException, ApplicationException;
+
+
 	void update(User user) throws BusinessException, ApplicationException;
 	
 	

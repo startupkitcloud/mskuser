@@ -1,6 +1,6 @@
 package com.mangobits.startupkit.user.freezer;
 
-import com.mangobits.startupkit.core.dao.AbstractDAO;
+import com.mangobits.startupkit.core.utils.AbstractDAO;
 
 
 public class UserFreezerDAO extends AbstractDAO<UserFreezer> {
