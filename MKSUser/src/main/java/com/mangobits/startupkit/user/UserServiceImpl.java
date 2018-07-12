@@ -169,9 +169,11 @@ public class UserServiceImpl implements UserService {
 
 			save(user);
 
-//			if(sendEmail){
-//				forgotPassword(user);
-//			}
+			Thread.sleep(1000);
+
+			if(sendEmail){
+				forgotPassword(user);
+			}
 		}
 		catch (BusinessException e) {
 			throw e;
