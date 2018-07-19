@@ -29,7 +29,7 @@ import com.mangobits.startupkit.core.address.AddressInfo;
 import com.mangobits.startupkit.core.photo.PhotoUpload;
 import com.mangobits.startupkit.core.user.GeneralUser;
 
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@JsonIgnoreProperties(value={"hibernateLazyInitializer", "handler"}, ignoreUnknown=true)
 @Entity(name="user")
 @Indexed
 public class User implements GeneralUser {
