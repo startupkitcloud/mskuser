@@ -428,6 +428,10 @@ public class UserServiceImpl implements UserService {
 				userBase.setEmail(user.getEmail());
 			}
 
+			if(user.getType() != null){
+				userBase.setType(user.getType());
+			}
+
 			if(user.getGender() != null){
 				userBase.setGender(user.getGender());
 			}

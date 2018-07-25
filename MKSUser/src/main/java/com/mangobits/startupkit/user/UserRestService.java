@@ -97,9 +97,7 @@ public class UserRestService extends UserBaseRestService{
 		return resultStr;
 	}
 	
-	
-	
-	
+
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -718,8 +716,6 @@ public class UserRestService extends UserBaseRestService{
 		
 		return resultStr;
 	}
-	
-	
 	
 	@SecuredAdmin
 	@POST
