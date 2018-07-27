@@ -106,9 +106,7 @@ public class UserServiceImpl implements UserService {
 		return user;
 	}
 	
-	
-	
-	
+
 	@Override
 	public User retrieveByPhone(Long phoneNumber) throws Exception{
 
@@ -120,9 +118,7 @@ public class UserServiceImpl implements UserService {
 		return user;
 	}
 	
-	
-	
-	
+
 	@Override
 	public void save(User user) throws Exception {
 	
@@ -487,14 +483,12 @@ public class UserServiceImpl implements UserService {
 	}
 	
 
-
 	@Override
 	public void update(User user) throws Exception {
 		userDAO.update(user);
 	}
 	
-	
-	
+
 	@Override
 	public void updatePassword(User user) throws Exception {
 
@@ -524,7 +518,7 @@ public class UserServiceImpl implements UserService {
 		BufferedImage image = ImageIO.read(url);
 
 		Configuration confPath = configurationService.loadByCode(ConfigurationEnum.PATH_BASE);
-		File folder = new File(confPath.getValue() + "/user/" + photoUpload.getId());
+		File folder = new File(confPath.getValue() + "/user/" + photoUpload.getIdObject());
 		folder.mkdirs();
 
 		File destiny = new File(folder, "/original.jpg");
@@ -538,7 +532,6 @@ public class UserServiceImpl implements UserService {
 		FileInputStream fis = new FileInputStream(destiny);
 		new ImageUtil().mudarTamanhoImagemProporcinal(reduced, fis, folder, confSize.getValueAsInt(), -1, false);
 	}
-	
 	
 
 	@Deprecated
