@@ -396,7 +396,10 @@ public class UserRestService extends UserBaseRestService{
 	@POST
 	@Path("/saveFacebookAvatar")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void saveFacebookAvatar(PhotoUpload fotoUpload){
+	public String saveFacebookAvatar(PhotoUpload fotoUpload) throws Exception{
+
+		String resultStr = null;
+		JsonContainer cont = new JsonContainer();
 
 		try {
 			
@@ -407,6 +410,8 @@ public class UserRestService extends UserBaseRestService{
 			}
 			
 			userService.saveFacebookAvatar(fotoUpload);
+
+			cont.setData("OK");
 			
 		} catch (Exception e) {
 
@@ -414,6 +419,11 @@ public class UserRestService extends UserBaseRestService{
 				e.printStackTrace();
 			}
 		}
+
+		ObjectMapper mapper = new ObjectMapper();
+		resultStr = mapper.writeValueAsString(cont);
+
+		return resultStr;
 	}
 
 
