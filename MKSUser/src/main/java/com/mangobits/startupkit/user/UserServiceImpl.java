@@ -1072,4 +1072,53 @@ public class UserServiceImpl implements UserService {
 
 		userDAO.update(user);
 	}
+
+	@Override
+	public void saveByAdmin(User user) throws Exception {
+
+
+			boolean sendEmail = user.getId() == null;
+
+			save(user);
+
+			Thread.sleep(2000);
+
+			if(sendEmail){
+
+				if (user.getEmail() == null){
+					throw new BusinessException("missing_user_email");
+				}
+				forgotPassword(user);
+			}
+
+	}
+
+	@Override
+	public void forgotPassword(User user) throws Exception {
+
+
+			if(user == null){
+				throw new BusinessException("user_not_found");
+			}
+
+			UserAuthKey key = userAuthKeyService.createKey(user.getId(), UserAuthKeyTypeEnum.EMAIL);
+
+			String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.confirm.email.forgot.title");
+
+			String configKeyLang = user.getLanguage() == null ? "" : "_"+user.getLanguage().toUpperCase();
+
+			final int emailTemplateId = configurationService.loadByCode("USER_EMAIL_FORGOT_ID" + configKeyLang).getValueAsInt();
+
+			final String link = configurationService.loadByCode("USER_EMAIL_FORGOT_LINK").getValue()
+					.replaceAll("__LANGUAGE__", user.getLanguage())
+					.replaceAll("__KEY__", key.getKey())
+					.replaceAll("__USER__", user.getId())
+					.replaceAll("__TYPE__", key.getType().toString());
+
+			sendNotification(user, title, emailTemplateId, link);
+
+
+	}
+
+
 }

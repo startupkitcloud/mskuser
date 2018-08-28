@@ -125,4 +125,8 @@ public interface UserService {
 
 
 	List<User> listByFieldInfo(String field, String value) throws Exception;
+
+	void saveByAdmin(User user) throws Exception;
+
+	void forgotPassword(User user) throws Exception;
 }
