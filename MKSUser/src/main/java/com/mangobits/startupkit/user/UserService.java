@@ -128,5 +128,5 @@ public interface UserService {
 
 	void saveByAdmin(User user) throws Exception;
 
-	void forgotPassword(User user) throws Exception;
+//	void forgotPassword(User user) throws Exception;
 }

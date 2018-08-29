@@ -1073,37 +1073,27 @@ public class UserServiceImpl implements UserService {
 		userDAO.update(user);
 	}
 
+
 	@Override
 	public void saveByAdmin(User user) throws Exception {
 
 
-			boolean sendEmail = user.getId() == null;
+		boolean sendEmail = user.getId() == null;
 
-			save(user);
+		save(user);
 
-			Thread.sleep(2000);
+//		Thread.sleep(2000);
 
-			if(sendEmail){
+		if(sendEmail){
 
-				if (user.getEmail() == null){
-					throw new BusinessException("missing_user_email");
-				}
-				forgotPassword(user);
+			if (user.getEmail() == null){
+				throw new BusinessException("missing_user_email");
 			}
 
-	}
-
-	@Override
-	public void forgotPassword(User user) throws Exception {
-
-
-			if(user == null){
-				throw new BusinessException("user_not_found");
-			}
-
+			//forgotPassword(user);
 			UserAuthKey key = userAuthKeyService.createKey(user.getId(), UserAuthKeyTypeEnum.EMAIL);
 
-			String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.confirm.email.forgot.title");
+			String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.register.password.title");
 
 			String configKeyLang = user.getLanguage() == null ? "" : "_"+user.getLanguage().toUpperCase();
 
@@ -1116,9 +1106,10 @@ public class UserServiceImpl implements UserService {
 					.replaceAll("__TYPE__", key.getType().toString());
 
 			sendNotification(user, title, emailTemplateId, link);
-
+		}
 
 	}
+
 
 
 }

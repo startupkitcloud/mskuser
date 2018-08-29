@@ -9,10 +9,7 @@ import java.io.RandomAccessFile;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -33,6 +30,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 
+import com.mangobits.startupkit.admin.user.UserB;
 import com.mangobits.startupkit.core.photo.GalleryItem;
 import com.mangobits.startupkit.core.photo.PhotoUtils;
 import com.mangobits.startupkit.service.admin.util.SecuredAdmin;
@@ -69,10 +67,13 @@ public class UserRestService extends UserBaseRestService{
 	
 	@EJB
 	protected ConfigurationService configurationService;
-	
+
+	@EJB
+	private EmailService emailService;
 
 
-	
+
+
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -1101,4 +1102,52 @@ public class UserRestService extends UserBaseRestService{
 	        return length;
 	    }
 	}
+
+	@POST
+	@SecuredAdmin
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+	@Path("/saveByAdmin")
+	public String saveByAdmin(User user)  throws Exception{
+
+		String resultStr = null;
+		JsonContainer cont = new JsonContainer();
+
+		try {
+
+//			String authorizationHeader = this.request.getHeader("Authorization");
+//			String token = authorizationHeader.substring("Bearer".length()).trim();
+//			UserB userB = this.userBService.retrieveByToken(token);
+//
+//			if(userB != null){
+//
+//				if(user.getInfo() == null){
+//					user.setInfo(new HashMap<>());
+//				}
+//
+//				user.getInfo().put("idCompany", userB.getInfo().get("idCompany"));
+//			}
+
+			userService.saveByAdmin(user);
+
+			cont.setData(user);
+
+		} catch (Exception e) {
+
+			if(!(e instanceof BusinessException)){
+				e.printStackTrace();
+				emailService.sendEmailError(e);
+			}
+
+			cont.setSuccess(false);
+			cont.setDesc(e.getMessage());
+		}
+
+
+		ObjectMapper mapper = new ObjectMapper();
+		resultStr = mapper.writeValueAsString(cont);
+
+		return resultStr;
+	}
+
 }
