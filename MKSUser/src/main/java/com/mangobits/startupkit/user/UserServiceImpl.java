@@ -117,6 +117,23 @@ public class UserServiceImpl implements UserService {
 
 		return user;
 	}
+
+	@Override
+	public User saveByPhone(User user) throws Exception{
+
+		if (user.getPhoneNumber() == null){
+			throw new BusinessException("missing_phone");
+		}
+
+		User userBase = retrieveByPhone(user.getPhoneNumber());
+
+		if (userBase == null){
+			user = createNewUser(user);
+			return user;
+		}else {
+			return  userBase;
+		}
+	}
 	
 
 	@Override
