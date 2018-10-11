@@ -1174,4 +1174,30 @@ public class UserRestService extends UserBaseRestService{
 		return resultStr;
 	}
 
+
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+	@Path("/search")
+	public String search(UserSearch userSearch)  throws Exception{
+
+		String resultStr;
+		JsonContainer cont = new JsonContainer();
+
+		try {
+
+			List<UserCard> list = userService.search(userSearch);
+			cont.setData(list);
+
+		} catch (Exception e) {
+			handleException(cont, e, "searching users");
+		}
+
+
+		ObjectMapper mapper = new ObjectMapper();
+		resultStr = mapper.writeValueAsString(cont);
+
+		return resultStr;
+	}
+
 }

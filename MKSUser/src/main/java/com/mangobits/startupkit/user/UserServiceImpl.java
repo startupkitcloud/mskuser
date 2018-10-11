@@ -25,6 +25,7 @@ import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.ws.rs.DELETE;
 
+import com.mangobits.startupkit.core.status.SimpleStatusEnum;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
@@ -55,14 +56,17 @@ import com.mangobits.startupkit.notification.email.data.EmailDataTemplate;
 import com.mangobits.startupkit.user.freezer.UserFreezerService;
 
 import net.coobird.thumbnailator.Thumbnails;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
 
 
 @Stateless
 @TransactionManagement(TransactionManagementType.CONTAINER)
 public class UserServiceImpl implements UserService {
-	
-	
-	
+
+	private static final int TOTAL_PAGE = 10;
+
+
 	@EJB
 	private ConfigurationService configurationService;
 	
@@ -1124,9 +1128,32 @@ public class UserServiceImpl implements UserService {
 
 			sendNotification(user, title, emailTemplateId, link);
 		}
-
 	}
 
+	@Override
+	public List<UserCard> search(UserSearch search) throws Exception {
 
+		SearchBuilder searchBuilder = new SearchBuilder();
+		searchBuilder.appendParam("status", UserStatusEnum.ACTIVE);
+		if (search.getQueryString() != null && StringUtils.isNotEmpty(search.getQueryString().trim())) {
+			searchBuilder.appendParam("name", search.getQueryString());
+		}
+		searchBuilder.setFirst(TOTAL_PAGE * (search.getPage() -1));
+		searchBuilder.setMaxResults(TOTAL_PAGE);
+//		Sort sort = new Sort(new SortField("creationDate", SortField.Type.LONG, true));
+//		searchBuilder.setSort(sort);
+
+		//ordena
+		List<UserCard> list = null;
+		List<User> listUsers = this.userDAO.search(searchBuilder.build());
+		if(listUsers != null){
+			list = new ArrayList<>();
+
+			for(User user : listUsers){
+				list.add(generateCard(user));
+			}
+		}
+		return list;
+	}
 
 }

@@ -78,8 +78,8 @@ public class PreferenceServiceImpl implements PreferenceService {
         SearchBuilder builder = new SearchBuilder();
         builder.appendParam("status", SimpleStatusEnum.ACTIVE);
 
-        Sort sort = new Sort(new SortField("name", SortField.Type.STRING, false));
-        builder.setSort(sort);
+//        Sort sort = new Sort(new SortField("name", SortField.Type.STRING, false));
+//        builder.setSort(sort);
 
         List<Preference> list = preferenceDAO.search(builder.build());
 
@@ -94,8 +94,8 @@ public class PreferenceServiceImpl implements PreferenceService {
         SearchBuilder builder = new SearchBuilder();
         builder.appendParam("status", SimpleStatusEnum.ACTIVE);
 
-        Sort sort = new Sort(new SortField("name", SortField.Type.STRING, false));
-        builder.setSort(sort);
+//        Sort sort = new Sort(new SortField("name", SortField.Type.STRING, false));
+//        builder.setSort(sort);
 
         list = preferenceDAO.search(builder.build());
 

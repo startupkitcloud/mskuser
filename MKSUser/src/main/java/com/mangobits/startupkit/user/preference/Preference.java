@@ -41,7 +41,7 @@ public class Preference {
     private String desc;
 
 
-    @Field
+    @Transient
     private Boolean selected;
 
 

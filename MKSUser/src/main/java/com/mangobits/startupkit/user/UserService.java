@@ -11,6 +11,7 @@ import java.util.List;
 @Local
 public interface UserService {
 
+	List<UserCard> search(UserSearch search) throws Exception;
 
 	User loginFB(User user) throws Exception;
 	
