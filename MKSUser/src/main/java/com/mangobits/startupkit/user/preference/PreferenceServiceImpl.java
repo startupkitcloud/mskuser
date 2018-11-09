@@ -19,6 +19,7 @@ import javax.enterprise.inject.New;
 import javax.inject.Inject;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Stateless
 @TransactionManagement(TransactionManagementType.CONTAINER)
@@ -78,10 +79,11 @@ public class PreferenceServiceImpl implements PreferenceService {
         SearchBuilder builder = new SearchBuilder();
         builder.appendParam("status", SimpleStatusEnum.ACTIVE);
 
-//        Sort sort = new Sort(new SortField("name", SortField.Type.STRING, false));
-//        builder.setSort(sort);
-
         List<Preference> list = preferenceDAO.search(builder.build());
+
+        list = list.stream()
+                .sorted((e1, e2) -> e1.getName().compareToIgnoreCase(e2.getName()))
+                .collect(Collectors.toList());
 
         return list;
     }
@@ -94,10 +96,11 @@ public class PreferenceServiceImpl implements PreferenceService {
         SearchBuilder builder = new SearchBuilder();
         builder.appendParam("status", SimpleStatusEnum.ACTIVE);
 
-//        Sort sort = new Sort(new SortField("name", SortField.Type.STRING, false));
-//        builder.setSort(sort);
-
         list = preferenceDAO.search(builder.build());
+
+        list = list.stream()
+                .sorted((e1, e2) -> e1.getName().compareToIgnoreCase(e2.getName()))
+                .collect(Collectors.toList());
 
         if (list!= null && list.size() > 0){
             UserPreferences userPreferences = userPreferencesDAO.retrieve(new UserPreferences(idUser));
