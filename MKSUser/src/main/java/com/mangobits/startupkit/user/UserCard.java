@@ -3,6 +3,7 @@ package com.mangobits.startupkit.user;
 import javax.persistence.Embeddable;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
 
@@ -11,7 +12,8 @@ import org.hibernate.search.annotations.Indexed;
 @Embeddable
 public class UserCard {
 
-	
+
+	@Field
 	private String id;
 	
 	
