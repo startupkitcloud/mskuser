@@ -138,7 +138,7 @@ public class PreferenceRestService extends UserBaseRestService {
             cont.setData("OK");
 
         } catch (Exception e) {
-            handleException(cont, e, "changing preference status");
+            handleException(cont, e, "saving user preferences");
         }
 
         ObjectMapper mapper = new ObjectMapper();

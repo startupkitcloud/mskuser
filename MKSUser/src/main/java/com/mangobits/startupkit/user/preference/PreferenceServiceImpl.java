@@ -17,6 +17,7 @@ import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
 import javax.enterprise.inject.New;
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -121,12 +122,26 @@ public class PreferenceServiceImpl implements PreferenceService {
     }
 
     @Override
+    public List<Preference> listByUser (String idUser) throws Exception {
+
+        List<Preference> list = new ArrayList<>();
+        UserPreferences userPreferences = userPreferencesDAO.retrieve(new UserPreferences(idUser));
+        if (userPreferences != null && userPreferences.getListPreferences() != null){
+            list = userPreferences.getListPreferences();
+
+        }
+        return list;
+    }
+
+    @Override
     public Preference retrieve(String idPreference) throws Exception {
 
         Preference preference = preferenceDAO.retrieve(new Preference(idPreference));
 
         return preference;
     }
+
+
 
     @Override
     public void saveUserPreferences(UserPreferences userPreferences) throws Exception {
