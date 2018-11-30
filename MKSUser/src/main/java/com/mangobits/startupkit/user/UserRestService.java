@@ -332,6 +332,31 @@ public class UserRestService extends UserBaseRestService{
 
 		return resultStr;
 	}
+
+
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+	@Path("/updatePhoneUser")
+	public String updatePhoneUser(User usMon) throws Exception{
+
+		String resultStr;
+		JsonContainer cont = new JsonContainer();
+
+		try {
+
+			User user = userService.updatePhoneUser(usMon);
+			cont.setData(user);
+
+		} catch (Exception e) {
+			handleException(cont, e, "update phone user");
+		}
+
+		ObjectMapper mapper = new ObjectMapper();
+		resultStr = mapper.writeValueAsString(cont);
+
+		return resultStr;
+	}
 	
 
 	
@@ -387,8 +412,7 @@ public class UserRestService extends UserBaseRestService{
 		
 		return resultStr;
 	}
-	
-	
+
 	
 	@SecuredUser
 	@POST

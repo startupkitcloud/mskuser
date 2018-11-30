@@ -507,6 +507,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void update(User user) throws Exception {
 		userDAO.update(user);
+
 	}
 	
 
@@ -779,7 +780,22 @@ public class UserServiceImpl implements UserService {
 		userDAO.update(user);
 	}
 
+	public User updatePhoneUser (User user) throws Exception {
 
+		User userBase = null;
+
+		userBase = userDAO.retrieve(new User(user.getId()));
+
+		if(userBase != null){
+
+			userBase.setPhoneNumber(user.getPhoneNumber());
+
+			userBase.setPhone(user.getPhone());
+
+			userDAO.update(userBase);
+		}
+		return userBase;
+	}
 
 	@Override
 	public void confirmUserSMS(String idUser) throws Exception {

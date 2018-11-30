@@ -131,5 +131,7 @@ public interface UserService {
 
 	User saveByPhone(User user) throws Exception;
 
+	User updatePhoneUser (User user) throws Exception;
+
 //	void forgotPassword(User user) throws Exception;
 }
