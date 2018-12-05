@@ -1,5 +1,7 @@
 package com.mangobits.startupkit.user.preference;
 
+import com.mangobits.startupkit.admin.user.UserB;
+import com.mangobits.startupkit.admin.user.UserBService;
 import com.mangobits.startupkit.core.configuration.ConfigurationService;
 import com.mangobits.startupkit.core.dao.SearchBuilder;
 import com.mangobits.startupkit.core.exception.BusinessException;
@@ -40,6 +42,9 @@ public class PreferenceServiceImpl implements PreferenceService {
 
     @EJB
     private UserService userService;
+
+    @EJB
+    private UserBService userBService;
 
 
     @Override
@@ -152,6 +157,28 @@ public class PreferenceServiceImpl implements PreferenceService {
         User user = userService.retrieve(userPreferences.getId());
         if(user == null){
             throw new BusinessException("user_not_found");
+        }
+
+        UserPreferences userInfoBase = userPreferencesDAO.retrieve(new UserPreferences(userPreferences.getId()));
+
+        if (userInfoBase == null){
+            userPreferences.setCreationDate(new Date());
+            userPreferencesDAO.insert(userPreferences);
+        }else {
+            new BusinessUtils<UserPreferences>(userPreferencesDAO).basicSave(userPreferences);
+
+        }
+    }
+
+    @Override
+    public void saveUserBPreferences(UserPreferences userPreferences) throws Exception {
+
+        if(userPreferences.getId() == null){
+            throw new BusinessException("missing_idUserB");
+        }
+        UserB userB = userBService.retrieve(userPreferences.getId());
+        if(userB == null){
+            throw new BusinessException("userb_not_found");
         }
 
         UserPreferences userInfoBase = userPreferencesDAO.retrieve(new UserPreferences(userPreferences.getId()));

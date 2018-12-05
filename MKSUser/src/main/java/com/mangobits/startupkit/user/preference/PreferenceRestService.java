@@ -33,7 +33,6 @@ public class PreferenceRestService extends UserBaseRestService {
     @EJB
     private EmailService emailService;
 
-    @SecuredUser
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -98,7 +97,6 @@ public class PreferenceRestService extends UserBaseRestService {
         return resultStr;
     }
 
-    @SecuredUser
     @GET
     @Path("/changeStatus/{id}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -122,7 +120,6 @@ public class PreferenceRestService extends UserBaseRestService {
         return resultStr;
     }
 
-    @SecuredUser
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -148,7 +145,6 @@ public class PreferenceRestService extends UserBaseRestService {
 
     }
 
-    @SecuredUser
     @GET
     @Path("/listAllByIdUser/{idUser}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -171,5 +167,30 @@ public class PreferenceRestService extends UserBaseRestService {
 
         return resultStr;
     }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    @Path("/saveUserBPreferences")
+    public String saveUserBPreferences(UserPreferences userPreferences) throws Exception {
+
+        String resultStr;
+        JsonContainer cont = new JsonContainer();
+
+        try {
+
+            preferenceService.saveUserBPreferences(userPreferences);
+            cont.setData("OK");
+
+        } catch (Exception e) {
+            handleException(cont, e, "saving user preferences");
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        resultStr = mapper.writeValueAsString(cont);
+
+        return resultStr;
+    }
+
 
 }

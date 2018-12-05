@@ -20,4 +20,6 @@ public interface PreferenceService {
 
     List<Preference> listByUser (String idUser) throws Exception;
 
+    void saveUserBPreferences(UserPreferences userPreferences) throws Exception;
+
 }
