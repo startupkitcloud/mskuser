@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.ws.rs.DELETE;
 
 import com.mangobits.startupkit.core.status.SimpleStatusEnum;
+import com.mangobits.startupkit.core.utils.BusinessUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
@@ -69,26 +70,26 @@ public class UserServiceImpl implements UserService {
 
 	@EJB
 	private ConfigurationService configurationService;
-	
-	
-	
+
+
+
 	@EJB
 	private UserAuthKeyService userAuthKeyService;
-	
-	
-	
+
+
+
 	@EJB
 	private NotificationService notificationService;
-	
-	
+
+
 	@EJB
 	private UserFreezerService userFreezerService;
-	
-	
+
+
 	@Inject
 	@New
 	private UserDAO userDAO;
-	
+
 
 
 	//evita o mongo de gerar log
@@ -96,9 +97,9 @@ public class UserServiceImpl implements UserService {
 	public void pos(){
 		java.util.logging.Logger.getLogger("org.mongodb.driver").setLevel(Level.SEVERE);
 	}
-	
-	
-	
+
+
+
 	@Override
 	public User retrieveByEmail(String email) throws Exception{
 
@@ -106,10 +107,10 @@ public class UserServiceImpl implements UserService {
 		params.put("email", email);
 
 		User user = userDAO.retrieve(params);
-		
+
 		return user;
 	}
-	
+
 
 	@Override
 	public User retrieveByPhone(Long phoneNumber) throws Exception{
@@ -138,11 +139,11 @@ public class UserServiceImpl implements UserService {
 			return  userBase;
 		}
 	}
-	
+
 
 	@Override
 	public void save(User user) throws Exception {
-	
+
 		if(user.getId() == null){
 			createNewUser(user);
 		}
@@ -150,9 +151,9 @@ public class UserServiceImpl implements UserService {
 			updateFromClient(user);
 		}
 	}
-	
-	
-	
+
+
+
 	@Override
 	public User createNewUser(User user) throws Exception {
 
@@ -208,15 +209,51 @@ public class UserServiceImpl implements UserService {
 			user.setStatus(UserStatusEnum.ACTIVE);
 		}
 
-		userDAO.insert(user);
+
+		if(user.getInfo() != null && user.getInfo().containsKey("idUserAnonymous") && user.getType().equals("anonymous")){
+
+			user.setType("user");
+
+			user.setId(user.getInfo().get("idUserAnonymous"));
+
+			new BusinessUtils<>(userDAO).basicSave(user);
+
+		}else{
+			userDAO.insert(user);
+		}
 
 		sendWelcomeEmail(user);
-		
+
 		return user;
 	}
-	
-	
-	
+
+	@Override
+	public User saveAnonymous(User user) throws Exception {
+
+		if(user.getId() == null){
+
+			user.setCreationDate(new Date());
+			user.setType("anonymous");
+
+			userDAO.insert(user);
+
+			if(StringUtils.isNotEmpty(user.getKeyAndroid()) || StringUtils.isNotEmpty(user.getKeyIOS())){
+
+				user.setInfo(new HashMap<>());
+
+				if(StringUtils.isNotEmpty(user.getKeyAndroid())){
+					user.getInfo().put("keyAndroid", user.getKeyAndroid());
+				}else{
+					user.getInfo().put("keyIOS", user.getKeyIOS());
+				}
+
+				new BusinessUtils<>(userDAO).basicSave(user);
+			}
+		}
+
+		return user;
+	}
+
 	private void sendWelcomeEmail(User user) throws Exception{
 
 		String configKeyLang = user.getLanguage() == null ? "" : "_"+user.getLanguage().toUpperCase();
@@ -253,8 +290,8 @@ public class UserServiceImpl implements UserService {
 					.build());
 		}
 	}
-	
-	
+
+
 	private void validateUser(User user) throws Exception{
 
 		User userDB = null;
@@ -282,17 +319,17 @@ public class UserServiceImpl implements UserService {
 				throw new BusinessException("email_exists");
 			}
 		}
-	} 
-	
+	}
+
 
 	@Override
 	public User retrieveByIdFacebook(String idFacebook) throws Exception{
-		
+
 		User user = userDAO.retrieveByIdFacebook(idFacebook);
 		return user;
 	}
 
-	
+
 
 	@Override
 	public User loginFB(User user) throws Exception{
@@ -301,7 +338,7 @@ public class UserServiceImpl implements UserService {
 		return user;
 	}
 
-	
+
 	@Override
 	public User loginGoogle(User user) throws Exception{
 		User userDB = userDAO.retrieveByIdGoogle(user.getIdGoogle());
@@ -330,15 +367,15 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public User retrieve(String id) throws Exception {
-		
+
 		User user = userDAO.retrieve(new User(id));
 		return user;
 	}
 
-	
+
 	@Override
 	public User autoLogin(User user) throws Exception {
-		
+
 		User userDB = userDAO.retrieve(new User(user.getId()));
 
 		if(userDB == null || (user.getPassword() == null && user.getIdFacebook() == null && user.getIdGoogle() == null)){
@@ -365,13 +402,13 @@ public class UserServiceImpl implements UserService {
 
 		return userDB;
 	}
-	
-	
+
+
 	@Override
 	public User login(User user) throws Exception{
 		return login(user, user.getPassword());
 	}
-	
+
 
 
 	private User login(User user, String password) throws Exception{
@@ -402,11 +439,11 @@ public class UserServiceImpl implements UserService {
 			user = userDB;
 			createToken(userDB);
 		}
-		
+
 		return user;
 	}
-	
-	
+
+
 
 	@Override
 	public void logout(String idUser) throws Exception{
@@ -417,8 +454,8 @@ public class UserServiceImpl implements UserService {
 
 		update(user);
 	}
-	
-	
+
+
 
 	@Override
 	public void updateFromClient(User user) throws Exception {
@@ -502,14 +539,14 @@ public class UserServiceImpl implements UserService {
 			userDAO.update(userBase);
 		}
 	}
-	
+
 
 	@Override
 	public void update(User user) throws Exception {
 		userDAO.update(user);
 
 	}
-	
+
 
 	@Override
 	public void updatePassword(User user) throws Exception {
@@ -554,7 +591,7 @@ public class UserServiceImpl implements UserService {
 		FileInputStream fis = new FileInputStream(destiny);
 		new ImageUtil().mudarTamanhoImagemProporcinal(reduced, fis, folder, confSize.getValueAsInt(), -1, false);
 	}
-	
+
 
 	@Deprecated
 	@Override
@@ -621,22 +658,22 @@ public class UserServiceImpl implements UserService {
 
 	@Deprecated
 	private void createGalleryPhotoUpload (PhotoUpload photoUpload, User user) throws Exception {
-		
+
 		//get the final size
         int finalWidth = configurationService.loadByCode("SIZE_DETAIL_MOBILE").getValueAsInt();
         photoUpload.setFinalWidth(finalWidth);
-        
+
         String idPhoto = photoUpload.getId() != null ? photoUpload.getId() : UUID.randomUUID().toString();
         photoUpload.setId(idPhoto);
-        
+
         if(photoUpload.getIndex() == null){
         	photoUpload.setIndex(createIndexPhotoUpload(user));
         }
-		
+
         if(!photoUpload.getType().equals(PhotoUploadTypeEnum.YOUTUBE)){
-        	
+
         	String path = pathGallery(photoUpload.getIdObject(), photoUpload.getType());
-    		
+
     		if(photoUpload.getType().equals(PhotoUploadTypeEnum.IMAGE)){
     			new PhotoUtils().saveImage(photoUpload, path, idPhoto);
     		}else if(photoUpload.getType().equals(PhotoUploadTypeEnum.VIDEO)){
@@ -646,45 +683,45 @@ public class UserServiceImpl implements UserService {
         	InfoUrl infoUrl = new PhotoUtils().createInfoUrlYoutube(photoUpload.getUrl());
         	photoUpload.setInfoUrl(infoUrl);
         }
-        
-        
+
+
 		PhotoUpload photoUploadBase = user.getListPhotoUpload().stream()
 				.filter(p -> p.getIndex().equals(photoUpload.getIndex()))
 				.findFirst()
 				.orElse(null);
-		
+
 		if(photoUploadBase != null){
 			user.getListPhotoUpload().remove(photoUploadBase);
 		}
-		
+
 		if(photoUpload.getStatus() == null){
 			photoUpload.setStatus(PhotoUploadStatusEnum.ACTIVE);
 		}
-		
+
 		user.getListPhotoUpload().add(photoUpload);
 	}
-	
+
 
 	@Deprecated
 	private int createIndexPhotoUpload(User user){
-		
+
 		int index = 0;
-		
+
 		if(CollectionUtils.isNotEmpty(user.getListPhotoUpload())){
-			
+
 			for(PhotoUpload photoUpload : user.getListPhotoUpload()){
 				index = index > photoUpload.getIndex() ? index : photoUpload.getIndex() +1;
 			}
 		}
-		
+
 		return index;
 	}
-	
+
 
 	@Deprecated
 	@Override
 	public String pathImageAvatar(String idUser){
-		
+
 		String path = "/user/" + idUser + "/reduced.jpg";
 		return path;
 	}
@@ -698,11 +735,11 @@ public class UserServiceImpl implements UserService {
 		return path;
 	}
 
-	
-	
+
+
 	@Override
 	public List<User> listUserIn(List<String> userIds) throws Exception {
-		
+
 		List<User> users = null;
 
 		if(userIds != null && userIds.size() > 0){
@@ -712,9 +749,9 @@ public class UserServiceImpl implements UserService {
 
 			users = userDAO.search(params);
 		}
-		
+
 		return users;
-	}	
+	}
 
 
 
@@ -726,18 +763,18 @@ public class UserServiceImpl implements UserService {
 		return card;
 	}
 
-	
+
 	@Override
 	public UserCard generateCard(User user){
-	
+
 		UserCard card = new UserCard();
 		generateCard(user, card);
 
 		return card;
 	}
 
-	
-	
+
+
 	private void generateCard(User user, UserCard card){
 
 		card.setId(user.getId());
@@ -751,32 +788,32 @@ public class UserServiceImpl implements UserService {
 	@Asynchronous
 	@Override
 	public void updateStartInfo(UserStartInfo userStartInfo) throws Exception {
-		
+
 		User user = userDAO.retrieve(new User(userStartInfo.getIdUser()));
 		user.setLastLogin(new Date());
-		
+
 		if(userStartInfo.getKeyIOS() != null){
 			user.setKeyIOS(userStartInfo.getKeyIOS());
 		}
-		
+
 		if(userStartInfo.getKeyAndroid() != null){
 			user.setKeyAndroid(userStartInfo.getKeyAndroid());
 		}
-		
+
 		if(userStartInfo.getLanguage() != null){
 			user.setLanguage(userStartInfo.getLanguage());
 		}
-		
+
 		if(userStartInfo.getLatitude() != null){
-			
+
 			if(user.getLastAddress() == null){
 				user.setLastAddress(new AddressInfo());
 			}
-			
+
 			user.getLastAddress().setLatitude(userStartInfo.getLatitude());
 			user.getLastAddress().setLongitude(userStartInfo.getLongitude());
 		}
-		
+
 		userDAO.update(user);
 	}
 
@@ -842,7 +879,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Boolean validateKey(UserAuthKey key)throws Exception {
-		
+
 		boolean validate = userAuthKeyService.validateKey(key);
 
 		if(validate){
@@ -858,30 +895,30 @@ public class UserServiceImpl implements UserService {
 
 			userDAO.update(user);
 		}
-		
+
 		return validate;
 	}
 
 
 	@Override
 	public void forgotPassword(String email) throws Exception {
-		
+
 		try {
-			
+
 			User user = retrieveByEmail(email);
-			
+
 			if(user == null){
 				throw new BusinessException("user_not_found");
 			}
-			
+
 			UserAuthKey key = userAuthKeyService.createKey(user.getId(), UserAuthKeyTypeEnum.EMAIL);
-			
+
 			String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.confirm.email.forgot.title");
-			
-			String configKeyLang = user.getLanguage() == null ? "" : "_"+user.getLanguage().toUpperCase(); 
-			
+
+			String configKeyLang = user.getLanguage() == null ? "" : "_"+user.getLanguage().toUpperCase();
+
 			final int emailTemplateId = configurationService.loadByCode("USER_EMAIL_FORGOT_ID" + configKeyLang).getValueAsInt();
-			
+
 			final String link = configurationService.loadByCode("USER_EMAIL_FORGOT_LINK").getValue()
 					.replaceAll("__LANGUAGE__", user.getLanguage())
 					.replaceAll("__KEY__", key.getKey())
@@ -927,7 +964,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public List<UserCard> searchByName(String name) throws Exception {
-		
+
 		List<UserCard> list = null;
 
 		Map<String, Object> params = new HashMap<>();
@@ -942,7 +979,7 @@ public class UserServiceImpl implements UserService {
 				list.add(generateCard(user));
 			}
 		}
-		
+
 		return list;
 	}
 
@@ -950,7 +987,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public List<UserCard> listAll() throws Exception {
-		
+
 		List<UserCard> list = null;
 		List<User> listUsers = userDAO.listAll();
 
@@ -973,23 +1010,23 @@ public class UserServiceImpl implements UserService {
 		User user = retrieve(idUser);
 		userFreezerService.moveToFreezer(user);
 	}
-	
-	
-	
+
+
+
 	@Override
 	public Boolean checkToken(String token) throws Exception {
-		
+
 		Boolean validated = true;
 		User user = retrieveByToken(token);
 
 		if(user == null || user.getToken() == null || !user.getToken().equals(token) || user.getTokenExpirationDate().before(new Date())){
 			validated = false;
 		}
-		
+
 		return validated;
 	}
-	
-	
+
+
 
 	@Override
 	public User retrieveByToken(String token) throws Exception {
@@ -998,12 +1035,12 @@ public class UserServiceImpl implements UserService {
 		params.put("token", token);
 
 		User user = userDAO.retrieve(params);
-		
+
 		return user;
 	}
-	
-	
-	
+
+
+
 	private void createToken(User userDB) throws Exception{
 
 		userDB.setToken(UUID.randomUUID().toString());
@@ -1019,11 +1056,11 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public List<User> customersByRadius(Double latitude, Double longitude, Integer distanceKM) throws Exception {
-	
+
 		List<User> list = userDAO.search(new SearchBuilder()
 				.appendParam("geo:lastAddress", new Double[]{latitude, longitude, new Double(distanceKM)})
 				.build());
-		
+
 		return list;
 	}
 
@@ -1065,12 +1102,12 @@ public class UserServiceImpl implements UserService {
 
 		notificationService.sendNotification(builder.build());
 	}
-	
+
 
 
 	@Override
 	public String pathGallery(String idUser, PhotoUploadTypeEnum photoUploadTypeEnum) throws Exception {
-		
+
 		String path = null;
 
 		if(photoUploadTypeEnum == null){
@@ -1083,17 +1120,17 @@ public class UserServiceImpl implements UserService {
 
 		return path;
 	}
-	
-	
+
+
 	@Override
 	public List<User> listByFieldInfo(String field, String value) throws Exception {
-		
+
 		List<User> listUser = userDAO.listByFieldInfo(field, value);
 
 		return listUser;
-		
+
 	}
-	
+
 
 	@Override
 	public void changeStatus(String idUser) throws Exception {

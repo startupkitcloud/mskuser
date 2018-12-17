@@ -47,9 +47,11 @@ public interface UserService {
 	
 	
 	User retrieveByPhone(Long phoneNumber) throws Exception;
-	
-	
-	User retrieveByIdFacebook(String idFB) throws Exception;
+
+
+	User saveAnonymous(User user) throws Exception;
+
+    User retrieveByIdFacebook(String idFB) throws Exception;
 	
 	
 	User retrieve(String id) throws Exception;
