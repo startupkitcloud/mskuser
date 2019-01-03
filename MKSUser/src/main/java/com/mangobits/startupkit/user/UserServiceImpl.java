@@ -224,6 +224,8 @@ public class UserServiceImpl implements UserService {
 
 		sendWelcomeEmail(user);
 
+		createToken(user);
+
 		return user;
 	}
 
