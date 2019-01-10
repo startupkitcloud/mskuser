@@ -538,6 +538,14 @@ public class UserServiceImpl implements UserService {
 				userBase.setIdGoogle(user.getIdGoogle());
 			}
 
+			if(user.getDocument() != null){
+				userBase.setDocument(user.getDocument());
+			}
+
+			if(user.getLastAddress() != null){
+				userBase.setLastAddress(user.getLastAddress());
+			}
+
 			userDAO.update(userBase);
 		}
 	}
