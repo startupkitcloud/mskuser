@@ -23,9 +23,7 @@ import javax.ejb.TransactionManagementType;
 import javax.enterprise.inject.New;
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
-import javax.ws.rs.DELETE;
 
-import com.mangobits.startupkit.core.status.SimpleStatusEnum;
 import com.mangobits.startupkit.core.utils.BusinessUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections.CollectionUtils;
@@ -57,8 +55,7 @@ import com.mangobits.startupkit.notification.email.data.EmailDataTemplate;
 import com.mangobits.startupkit.user.freezer.UserFreezerService;
 
 import net.coobird.thumbnailator.Thumbnails;
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
+
 
 
 @Stateless
@@ -281,9 +278,9 @@ public class UserServiceImpl implements UserService {
 						}
 
 						@Override
-						public Map<String, String> getData() {
+						public Map<String, Object> getData() {
 
-							Map<String, String> params = new HashMap<>();
+							Map<String, Object> params = new HashMap<>();
 							params.put("user_name", user.getName());
 
 							return params;
@@ -961,9 +958,9 @@ public class UserServiceImpl implements UserService {
 					}
 
 					@Override
-					public Map<String, String> getData() {
+					public Map<String, Object> getData() {
 
-						Map<String, String> params = new HashMap<>();
+						Map<String, Object> params = new HashMap<>();
 						params.put("user_name", user.getName());
 						params.put("confirmation_link", link);
 
@@ -1101,9 +1098,9 @@ public class UserServiceImpl implements UserService {
 				}
 
 				@Override
-				public Map<String, String> getData() {
+				public Map<String, Object> getData() {
 
-					Map<String, String> params = new HashMap<>();
+					Map<String, Object> params = new HashMap<>();
 					params.put("user_name", user.getName());
 					params.put("msg", msg);
 
