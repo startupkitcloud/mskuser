@@ -579,6 +579,12 @@ public class UserRestService extends UserBaseRestService{
 
 				String path = base + "/user/" + idUser + "/" + imageType + "_main.jpg";
 
+				File file = new File(path);
+
+				if(!file.exists()){
+					path = base + "/user/" + "default" + "/" + "placeholder" + ".jpg";
+				}
+
 				ByteArrayInputStream in =  new ByteArrayInputStream(FileUtil.readFile(path));
 
 				byte[] buf = new byte[16384];

@@ -739,9 +739,11 @@ public class UserServiceImpl implements UserService {
 
 
 	@Override
-	public String pathImage(String idUser){
+	public String pathImage(String idUser) throws BusinessException, ApplicationException {
 
-		String path = "/user/" + idUser;
+		Configuration confPath = configurationService.loadByCode(ConfigurationEnum.PATH_BASE);
+
+		String path = confPath.getValue() + "/user/" + idUser;
 		return path;
 	}
 
