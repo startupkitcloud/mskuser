@@ -922,6 +922,10 @@ public class UserServiceImpl implements UserService {
 
 			UserAuthKey key = userAuthKeyService.createKey(user.getId(), UserAuthKeyTypeEnum.EMAIL);
 
+			if(user.getLanguage() == null){
+				user.setLanguage("PT_BR");
+			}
+
 			String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.confirm.email.forgot.title");
 
 			String configKeyLang = user.getLanguage() == null ? "" : "_"+user.getLanguage().toUpperCase();
