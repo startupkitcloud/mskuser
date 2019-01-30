@@ -68,6 +68,10 @@ public class User implements GeneralUser {
 	
 	@Field
 	private String name;
+
+
+	@Field
+	private String code;
 	
 		
 	
@@ -462,5 +466,14 @@ public class User implements GeneralUser {
 
 	public void setDocument(String document) {
 		this.document = document;
+	}
+
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 }
