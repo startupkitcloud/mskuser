@@ -87,6 +87,8 @@ public interface UserService {
 	
 	
 	void confirmUserEmail(String idUser) throws Exception;
+
+	void sendWelcomeEmail(User user) throws Exception;
 	
 	
 	Boolean validateKey(UserAuthKey key) throws Exception;
@@ -134,6 +136,7 @@ public interface UserService {
 	User saveByPhone(User user) throws Exception;
 
 	User updatePhoneUser (User user) throws Exception;
+
 
 //	void forgotPassword(User user) throws Exception;
 }

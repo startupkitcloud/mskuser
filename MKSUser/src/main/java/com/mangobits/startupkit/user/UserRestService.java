@@ -134,6 +134,9 @@ public class UserRestService extends UserBaseRestService{
 		
 		String resultStr = null;
 		JsonContainer cont = new JsonContainer();
+
+		System.out.println("OK lala sdfsdf  ");
+
 		
 		try {
 			
@@ -158,7 +161,7 @@ public class UserRestService extends UserBaseRestService{
 	@Path("/loggedUser/{token}")
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	public String loggedUser(@PathParam("token") String token) throws Exception {
-		
+
 		String resultStr = null;
 		JsonContainer cont = new JsonContainer();
 		
@@ -1253,5 +1256,7 @@ public class UserRestService extends UserBaseRestService{
 
 		return resultStr;
 	}
+
+
 
 }

@@ -1,35 +1,5 @@
 package com.mangobits.startupkit.user;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.logging.Level;
-
-import javax.annotation.PostConstruct;
-import javax.ejb.Asynchronous;
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionManagement;
-import javax.ejb.TransactionManagementType;
-import javax.enterprise.inject.New;
-import javax.imageio.ImageIO;
-import javax.inject.Inject;
-
-import com.mangobits.startupkit.core.utils.BusinessUtils;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-
 import com.mangobits.startupkit.authkey.UserAuthKey;
 import com.mangobits.startupkit.authkey.UserAuthKeyService;
 import com.mangobits.startupkit.authkey.UserAuthKeyTypeEnum;
@@ -40,11 +10,8 @@ import com.mangobits.startupkit.core.configuration.ConfigurationService;
 import com.mangobits.startupkit.core.dao.SearchBuilder;
 import com.mangobits.startupkit.core.exception.ApplicationException;
 import com.mangobits.startupkit.core.exception.BusinessException;
-import com.mangobits.startupkit.core.photo.InfoUrl;
-import com.mangobits.startupkit.core.photo.PhotoUpload;
-import com.mangobits.startupkit.core.photo.PhotoUploadStatusEnum;
-import com.mangobits.startupkit.core.photo.PhotoUploadTypeEnum;
-import com.mangobits.startupkit.core.photo.PhotoUtils;
+import com.mangobits.startupkit.core.photo.*;
+import com.mangobits.startupkit.core.utils.BusinessUtils;
 import com.mangobits.startupkit.core.utils.ImageUtil;
 import com.mangobits.startupkit.core.utils.MessageUtils;
 import com.mangobits.startupkit.core.utils.SecUtils;
@@ -53,8 +20,24 @@ import com.mangobits.startupkit.notification.NotificationService;
 import com.mangobits.startupkit.notification.TypeSendingNotificationEnum;
 import com.mangobits.startupkit.notification.email.data.EmailDataTemplate;
 import com.mangobits.startupkit.user.freezer.UserFreezerService;
-
 import net.coobird.thumbnailator.Thumbnails;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+
+import javax.annotation.PostConstruct;
+import javax.ejb.*;
+import javax.enterprise.inject.New;
+import javax.imageio.ImageIO;
+import javax.inject.Inject;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.net.URL;
+import java.util.*;
+import java.util.logging.Level;
 
 
 
@@ -253,7 +236,9 @@ public class UserServiceImpl implements UserService {
 		return user;
 	}
 
-	private void sendWelcomeEmail(User user) throws Exception{
+
+	@Override
+	public void sendWelcomeEmail(User user) throws Exception{
 
 		String configKeyLang = user.getLanguage() == null ? "" : "_"+user.getLanguage().toUpperCase();
 
@@ -471,80 +456,87 @@ public class UserServiceImpl implements UserService {
 
 		validateUser(user);
 
-		if(userBase != null){
+//		if(userBase != null){
+//
+//			if(user.getBirthDate() != null){
+//				userBase.setBirthDate(user.getBirthDate());
+//			}
+//
+//			if(user.getEmail() != null){
+//				userBase.setEmail(user.getEmail());
+//			}
+//
+//			if(user.getType() != null){
+//				userBase.setType(user.getType());
+//			}
+//
+//			if(user.getGender() != null){
+//				userBase.setGender(user.getGender());
+//			}
+//
+//			if(user.getLanguage() != null){
+//				userBase.setLanguage(user.getLanguage());
+//			}
+//
+//			if(user.getName() != null){
+//				userBase.setName(user.getName());
+//			}
+//
+//			if(user.getInfo() != null){
+//				userBase.setInfo(user.getInfo());
+//			}
+//
+//			if(user.getPassword() != null && user.getPassword().length() != 88){
+//
+//				userBase.setSalt(SecUtils.getSalt());
+//				userBase.setPassword(SecUtils.generateHash(userBase.getSalt(), user.getPassword()));
+//			}
+//
+//			if(user.getPhone() != null){
+//				userBase.setPhone(user.getPhone());
+//			}
+//
+//			if(user.getPhoneCountryCode() != null){
+//				userBase.setPhoneCountryCode(user.getPhoneCountryCode());
+//			}
+//
+//			if(user.getPhoneNumber() != null){
+//				userBase.setPhoneNumber(user.getPhoneNumber());
+//			}
+//
+//			if(user.getKeyAndroid() != null){
+//				userBase.setKeyAndroid(user.getKeyAndroid());
+//			}
+//
+//			if(user.getKeyIOS() != null){
+//				userBase.setKeyIOS(user.getKeyIOS());
+//			}
+//
+//			if(user.getIdFacebook() != null){
+//				userBase.setIdFacebook(user.getIdFacebook());
+//			}
+//
+//			if(user.getIdGoogle() != null){
+//				userBase.setIdGoogle(user.getIdGoogle());
+//			}
+//
+//			if(user.getDocument() != null){
+//				userBase.setDocument(user.getDocument());
+//			}
+//
+//			if(user.getLastAddress() != null){
+//				userBase.setLastAddress(user.getLastAddress());
+//			}
+//
+//			if(user.getStatus() != null){
+//				userBase.setStatus(user.getStatus());
+//			}
+//
+//			userDAO.update(userBase);
+//		}
 
-			if(user.getBirthDate() != null){
-				userBase.setBirthDate(user.getBirthDate());
-			}
+		(new BusinessUtils(this.userDAO)).basicSave(user);
 
-			if(user.getEmail() != null){
-				userBase.setEmail(user.getEmail());
-			}
-
-			if(user.getType() != null){
-				userBase.setType(user.getType());
-			}
-
-			if(user.getGender() != null){
-				userBase.setGender(user.getGender());
-			}
-
-			if(user.getLanguage() != null){
-				userBase.setLanguage(user.getLanguage());
-			}
-
-			if(user.getName() != null){
-				userBase.setName(user.getName());
-			}
-
-			if(user.getInfo() != null){
-				userBase.setInfo(user.getInfo());
-			}
-
-			if(user.getPassword() != null && user.getPassword().length() != 88){
-
-				userBase.setSalt(SecUtils.getSalt());
-				userBase.setPassword(SecUtils.generateHash(userBase.getSalt(), user.getPassword()));
-			}
-
-			if(user.getPhone() != null){
-				userBase.setPhone(user.getPhone());
-			}
-
-			if(user.getPhoneCountryCode() != null){
-				userBase.setPhoneCountryCode(user.getPhoneCountryCode());
-			}
-
-			if(user.getPhoneNumber() != null){
-				userBase.setPhoneNumber(user.getPhoneNumber());
-			}
-
-			if(user.getKeyAndroid() != null){
-				userBase.setKeyAndroid(user.getKeyAndroid());
-			}
-
-			if(user.getKeyIOS() != null){
-				userBase.setKeyIOS(user.getKeyIOS());
-			}
-
-			if(user.getIdFacebook() != null){
-				userBase.setIdFacebook(user.getIdFacebook());
-			}
-
-			if(user.getIdGoogle() != null){
-				userBase.setIdGoogle(user.getIdGoogle());
-			}
-
-			if(user.getDocument() != null){
-				userBase.setDocument(user.getDocument());
-			}
-
-			if(user.getLastAddress() != null){
-				userBase.setLastAddress(user.getLastAddress());
-			}
-
-			userDAO.update(userBase);
-		}
 	}
 
 
@@ -1220,6 +1212,12 @@ public class UserServiceImpl implements UserService {
 			}
 		}
 		return list;
+
+
 	}
+
+
+
+
 
 }
