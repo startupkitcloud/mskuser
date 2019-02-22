@@ -62,16 +62,11 @@ public class UserRestService extends UserBaseRestService{
 	@PersistenceContext
 	private javax.persistence.EntityManager entityManager;
 
-	
-	
-	
 	@EJB
 	protected ConfigurationService configurationService;
 
 	@EJB
 	private EmailService emailService;
-
-
 
 
 	@POST
@@ -427,8 +422,8 @@ public class UserRestService extends UserBaseRestService{
 		
 		try { 
 			
-			userService.updatePassword(usMon);
-			cont.setData("OK");
+			String password = userService.updatePassword(usMon);
+			cont.setData(password);
 			
 		} catch (Exception e) {
 			handleException(cont, e, "updating password");

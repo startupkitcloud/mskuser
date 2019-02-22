@@ -38,9 +38,9 @@ public interface UserService {
 	
 	
 	void update(User user) throws Exception;
-	
-	
-	void updatePassword(User user) throws Exception;
+
+
+	String updatePassword(User user) throws Exception;
 	
 	
 	User retrieveByEmail(String email) throws Exception;

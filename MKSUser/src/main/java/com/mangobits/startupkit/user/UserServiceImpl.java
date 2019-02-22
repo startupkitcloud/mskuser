@@ -548,7 +548,7 @@ public class UserServiceImpl implements UserService {
 
 
 	@Override
-	public void updatePassword(User user) throws Exception {
+	public String updatePassword(User user) throws Exception {
 
 		User userBase = null;
 
@@ -565,7 +565,9 @@ public class UserServiceImpl implements UserService {
 			userBase.setPassword(SecUtils.generateHash(userBase.getSalt(), user.getPassword()));
 
 			userDAO.update(userBase);
+
 		}
+		return  userBase.getPassword();
 	}
 
 
