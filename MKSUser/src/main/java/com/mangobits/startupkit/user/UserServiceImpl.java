@@ -1218,8 +1218,25 @@ public class UserServiceImpl implements UserService {
 
 	}
 
+    @Override
+    public List<UserCard> listActives() throws Exception {
 
+        List<User> listUsers = null;
 
+		SearchBuilder searchBuilder = new SearchBuilder();
+		searchBuilder.appendParam("status", UserStatusEnum.ACTIVE);
 
+		listUsers = userDAO.search(searchBuilder.build());
+		List<UserCard> list = null;
+		if(listUsers != null){
+			list = new ArrayList<>();
+
+			for(User user : listUsers){
+				list.add(generateCard(user));
+			}
+		}
+
+        return list;
+    }
 
 }
