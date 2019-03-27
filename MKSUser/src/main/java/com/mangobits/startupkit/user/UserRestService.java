@@ -13,7 +13,6 @@ import java.util.*;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -30,7 +29,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 
-import com.mangobits.startupkit.admin.user.UserB;
+import com.mangobits.startupkit.core.configuration.ConfigurationService;
 import com.mangobits.startupkit.core.photo.GalleryItem;
 import com.mangobits.startupkit.core.photo.PhotoUtils;
 import com.mangobits.startupkit.service.admin.util.SecuredAdmin;
@@ -40,13 +39,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mangobits.startupkit.authkey.UserAuthKey;
 import com.mangobits.startupkit.core.configuration.Configuration;
 import com.mangobits.startupkit.core.configuration.ConfigurationEnum;
-import com.mangobits.startupkit.core.configuration.ConfigurationService;
 import com.mangobits.startupkit.core.exception.BusinessException;
 import com.mangobits.startupkit.core.photo.PhotoUpload;
 import com.mangobits.startupkit.core.photo.PhotoUploadTypeEnum;
 import com.mangobits.startupkit.core.utils.FileUtil;
 import com.mangobits.startupkit.notification.email.EmailService;
-import com.mangobits.startupkit.service.admin.util.Secured;
 import com.mangobits.startupkit.user.util.SecuredUser;
 import com.mangobits.startupkit.user.util.UserBaseRestService;
 import com.mangobits.startupkit.ws.JsonContainer;
@@ -59,11 +56,12 @@ public class UserRestService extends UserBaseRestService{
 	
 	@EJB
 	protected UserService userService;
+
 	@PersistenceContext
 	private javax.persistence.EntityManager entityManager;
 
 	@EJB
-	protected ConfigurationService configurationService;
+	private ConfigurationService configurationService;
 
 	@EJB
 	private EmailService emailService;
@@ -90,6 +88,25 @@ public class UserRestService extends UserBaseRestService{
 		ObjectMapper mapper = new ObjectMapper();
 		resultStr = mapper.writeValueAsString(cont);
 		
+		return resultStr;
+	}
+
+	@POST
+	@Consumes({"application/json"})
+	@Produces({"application/json;charset=utf-8"})
+	@Path("/searchAdmin")
+	public String searchAdmin(UserSearch userSearch) throws Exception {
+		JsonContainer cont = new JsonContainer();
+
+		try {
+			UserResultSearch result = this.userService.searchAdmin(userSearch);
+			cont.setData(result);
+		} catch (Exception var5) {
+			this.handleException(cont, var5, "searching admin");
+		}
+
+		ObjectMapper mapper = new ObjectMapper();
+		String resultStr = mapper.writeValueAsString(cont);
 		return resultStr;
 	}
 	

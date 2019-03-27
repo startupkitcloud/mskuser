@@ -1,5 +1,7 @@
 package com.mangobits.startupkit.user;
 
+import java.util.Date;
+
 public class UserSearch {
 
     private String queryString;
@@ -9,6 +11,29 @@ public class UserSearch {
     private Double log;
 
     private Integer page;
+
+    private String type;
+
+
+    private String status;
+
+    private Date creationDate;
+
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public Integer getPageItensNumber() {
+        return pageItensNumber;
+    }
+
+    public void setPageItensNumber(Integer pageItensNumber) {
+        this.pageItensNumber = pageItensNumber;
+    }
+
+    private Integer pageItensNumber;
+
+
 
     public Double getLat() {
         return lat;
@@ -41,5 +66,30 @@ public class UserSearch {
     public void setQueryString(String queryString) {
         this.queryString = queryString;
     }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDateDate(Date creationDate) {
+        this.creationDate = creationDate;
+    }
+
 
 }

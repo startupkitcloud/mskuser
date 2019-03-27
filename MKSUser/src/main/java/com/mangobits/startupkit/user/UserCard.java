@@ -1,10 +1,14 @@
 package com.mangobits.startupkit.user;
 
 import javax.persistence.Embeddable;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+
+import java.util.Date;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -18,8 +22,22 @@ public class UserCard {
 	
 	
 	private String name;
-	
-	
+
+	private String nameObj;
+
+
+
+	private String type;
+
+	@Enumerated(EnumType.STRING)
+	private UserStatusEnum status;
+
+	private Date creationDate;
+
+
+	private String idObj;
+
+
 	private String email;
 	
 	
@@ -64,7 +82,44 @@ public class UserCard {
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
-	
-	
+
+	public String getNameObj() {
+		return nameObj;
+	}
+
+	public void setNameObj(String nameObj) {
+		this.nameObj = nameObj;
+	}
+
+	public String getIdObj() {
+		return idObj;
+	}
+
+	public void setIdObj(String idObj) {
+		this.idObj = idObj;
+	}
+
+	public Date getCreationDate() {
+		return creationDate;
+	}
+
+	public void setCreationDate(Date creationDate) {
+		this.creationDate = creationDate;
+	}
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public UserStatusEnum getStatus() {
+		return status;
+	}
+
+	public void setStatus(UserStatusEnum status) {
+		this.status = status;
+	}
 	
 }

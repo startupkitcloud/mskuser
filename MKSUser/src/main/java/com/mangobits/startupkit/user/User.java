@@ -69,6 +69,12 @@ public class User implements GeneralUser {
 	@Field
 	private String name;
 
+	@Field
+	private String idObj;
+
+	@Field
+	private String nameObj;
+
 
 	@Field
 	private String code;
@@ -475,5 +481,21 @@ public class User implements GeneralUser {
 
 	public void setCode(String code) {
 		this.code = code;
+	}
+
+	public String getIdObj() {
+		return idObj;
+	}
+
+	public void setIdObj(String idObj) {
+		this.idObj = idObj;
+	}
+
+	public String getNameObj() {
+		return nameObj;
+	}
+
+	public void setNameObj(String nameObj) {
+		this.nameObj = nameObj;
 	}
 }

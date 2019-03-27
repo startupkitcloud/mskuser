@@ -140,4 +140,6 @@ public interface UserService {
 	List<UserCard> listActives() throws Exception;
 
 //	void forgotPassword(User user) throws Exception;
+
+	UserResultSearch searchAdmin(UserSearch userSearch) throws Exception;
 }
