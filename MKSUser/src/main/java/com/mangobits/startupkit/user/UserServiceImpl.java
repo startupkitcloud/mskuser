@@ -1252,64 +1252,6 @@ public class UserServiceImpl implements UserService {
         return list;
     }
 
-//	@Override
-//	public UserResultSearch searchAdmin(UserSearch userSearch) throws Exception {
-//		if (userSearch.getPage() == null) {
-//			throw new BusinessException("missing_page");
-//		} else {
-//			SearchBuilder sb = this.userDAO.createBuilder();
-//			BooleanQuery.Builder qb = new BooleanQuery.Builder();
-//			if (userSearch.getStatus() != null) {
-//				qb.add(sb.getQueryBuilder().phrase().onField("status").sentence(userSearch.getStatus()).createQuery(), BooleanClause.Occur.MUST);
-//			} else {
-//				qb.add(sb.getQueryBuilder().phrase().onField("status").sentence("ACTIVE").createQuery(), BooleanClause.Occur.SHOULD);
-//				qb.add(sb.getQueryBuilder().phrase().onField("status").sentence("BLOCKED").createQuery(), BooleanClause.Occur.SHOULD);
-//				qb.add(sb.getQueryBuilder().phrase().onField("status").sentence("PENDING").createQuery(), BooleanClause.Occur.SHOULD);
-//			}
-//
-//			if (userSearch.getType() != null) {
-//				qb.add(sb.getQueryBuilder().phrase().onField("type").sentence(userSearch.getType()).createQuery(), BooleanClause.Occur.MUST);
-//			}
-//
-//			if (userSearch.getQueryString() != null && !userSearch.getQueryString().isEmpty()) {
-//				qb.add(sb.getQueryBuilder().phrase().onField("name").andField("nameObj").sentence(userSearch.getQueryString()).createQuery(), BooleanClause.Occur.MUST);
-//			}
-//
-//			sb.setQuery(qb.build());
-//			if (userSearch.getPageItensNumber() != null && userSearch.getPageItensNumber() > 0) {
-//				sb.setFirst(userSearch.getPageItensNumber() * (userSearch.getPage() - 1));
-//				sb.setMaxResults(userSearch.getPageItensNumber());
-//			} else {
-//				sb.setFirst(10 * (userSearch.getPage() - 1));
-//				sb.setMaxResults(10);
-//			}
-//
-//			Sort sort = new Sort(new SortField("name", SortField.Type.STRING, false));
-//			sb.setSort(sort);
-//			List<User> listUsers = this.userDAO.search(sb.build());
-//			int totalAmount = this.totalAmount(sb);
-//			int pageQuantity;
-//			if (userSearch.getPageItensNumber() != null && userSearch.getPageItensNumber() > 0) {
-//				pageQuantity = this.pageQuantity(userSearch.getPageItensNumber(), totalAmount);
-//			} else {
-//				pageQuantity = this.pageQuantity(10, totalAmount);
-//			}
-//
-//			List<UserCard> list = new ArrayList<>();
-//
-//			if (listUsers != null && !listUsers.isEmpty()){
-//				for(User user : listUsers){
-//					list.add(generateCard(user));
-//				}
-//			}
-//
-//			UserResultSearch result = new UserResultSearch();
-//			result.setList(list);
-//			result.setTotalAmount(totalAmount);
-//			result.setPageQuantity(pageQuantity);
-//			return result;
-//		}
-//	}
 
 	@Override
 	public UserResultSearch searchAdmin(UserSearch userSearch) throws Exception {
@@ -1319,6 +1261,8 @@ public class UserServiceImpl implements UserService {
 			SearchBuilder sb = this.userDAO.createBuilder();
 			if (userSearch.getStatus() != null) {
 				sb.appendParamQuery("status", userSearch.getStatus());
+			}else {
+				sb.appendParamQuery("status", UserStatusEnum.values(), OperationEnum.IN);
 			}
 
 			if (userSearch.getType() != null) {
@@ -1326,9 +1270,7 @@ public class UserServiceImpl implements UserService {
 			}
 
 			if (userSearch.getQueryString() != null && !userSearch.getQueryString().isEmpty()) {
-				sb.appendParamQuery("name", userSearch.getQueryString(), OperationEnum.LIKE);
-//				sb.appendParamQuery("nameObj", userSearch.getQueryString(), OperationEnum.LIKE);
-
+				sb.appendParamQuery("name|nameObj", userSearch.getQueryString(), OperationEnum.OR_FIELDS);
 			}
 
 			if (userSearch.getCreationDate() != null){

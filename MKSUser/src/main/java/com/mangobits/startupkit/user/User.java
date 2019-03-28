@@ -63,9 +63,9 @@ public class User implements GeneralUser {
 	
 	
 	private Integer phoneCountryCode;
-	
-	
-	
+
+
+	@SortableField
 	@Field
 	private String name;
 
