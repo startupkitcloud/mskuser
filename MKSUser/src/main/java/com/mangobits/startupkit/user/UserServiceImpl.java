@@ -207,6 +207,10 @@ public class UserServiceImpl implements UserService {
 			userDAO.insert(user);
 		}
 
+		if(user.getPhone() != null && configurationService.loadByCode("CHECK_PHONE") != null && configurationService.loadByCode("CHECK_PHONE").getValueAsBoolean()){
+			confirmUserSMS(user.getId());
+		}
+
 		sendWelcomeEmail(user);
 
 		createToken(user);
@@ -460,6 +464,12 @@ public class UserServiceImpl implements UserService {
 		}
 
 		validateUser(user);
+
+		if(user.getPhone() != null && !userBase.getPhone().equals(user.getPhone())){
+			if(configurationService.loadByCode("CHECK_PHONE") != null && configurationService.loadByCode("CHECK_PHONE").getValueAsBoolean()){
+				confirmUserSMS(user.getId());
+			}
+		}
 
 //		if(userBase != null){
 //
