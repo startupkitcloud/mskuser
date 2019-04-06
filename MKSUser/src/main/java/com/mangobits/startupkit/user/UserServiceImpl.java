@@ -9,7 +9,6 @@ import com.mangobits.startupkit.core.configuration.ConfigurationEnum;
 import com.mangobits.startupkit.core.configuration.ConfigurationService;
 import com.mangobits.startupkit.core.dao.OperationEnum;
 import com.mangobits.startupkit.core.dao.SearchBuilder;
-import com.mangobits.startupkit.core.exception.ApplicationException;
 import com.mangobits.startupkit.core.exception.BusinessException;
 import com.mangobits.startupkit.core.photo.*;
 import com.mangobits.startupkit.core.utils.BusinessUtils;
@@ -26,8 +25,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 
@@ -745,7 +742,7 @@ public class UserServiceImpl implements UserService {
 
 
 	@Override
-	public String pathImage(String idUser) throws BusinessException, ApplicationException {
+	public String pathImage(String idUser) throws Exception {
 
 		Configuration confPath = configurationService.loadByCode(ConfigurationEnum.PATH_BASE);
 
@@ -929,39 +926,31 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void forgotPassword(String email) throws Exception {
 
-		try {
+		User user = retrieveByEmail(email);
 
-			User user = retrieveByEmail(email);
-
-			if(user == null){
-				throw new BusinessException("user_not_found");
-			}
-
-			UserAuthKey key = userAuthKeyService.createKey(user.getId(), UserAuthKeyTypeEnum.EMAIL);
-
-			if(user.getLanguage() == null){
-				user.setLanguage("PT_BR");
-			}
-
-			String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.confirm.email.forgot.title");
-
-			String configKeyLang = user.getLanguage() == null ? "" : "_"+user.getLanguage().toUpperCase();
-
-			final int emailTemplateId = configurationService.loadByCode("USER_EMAIL_FORGOT_ID" + configKeyLang).getValueAsInt();
-
-			final String link = configurationService.loadByCode("USER_EMAIL_FORGOT_LINK").getValue()
-					.replaceAll("__LANGUAGE__", user.getLanguage())
-					.replaceAll("__KEY__", key.getKey())
-					.replaceAll("__USER__", user.getId())
-					.replaceAll("__TYPE__", key.getType().toString());
-
-			sendNotification(user, title, emailTemplateId, link);
-
-		} catch (BusinessException e) {
-			throw e;
-		} catch (Exception e) {
-			throw new ApplicationException("Got an error creating a forgot password access", e);
+		if(user == null){
+			throw new BusinessException("user_not_found");
 		}
+
+		UserAuthKey key = userAuthKeyService.createKey(user.getId(), UserAuthKeyTypeEnum.EMAIL);
+
+		if(user.getLanguage() == null){
+			user.setLanguage("PT_BR");
+		}
+
+		String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.confirm.email.forgot.title");
+
+		String configKeyLang = user.getLanguage() == null ? "" : "_"+user.getLanguage().toUpperCase();
+
+		final int emailTemplateId = configurationService.loadByCode("USER_EMAIL_FORGOT_ID" + configKeyLang).getValueAsInt();
+
+		final String link = configurationService.loadByCode("USER_EMAIL_FORGOT_LINK").getValue()
+				.replaceAll("__LANGUAGE__", user.getLanguage())
+				.replaceAll("__KEY__", key.getKey())
+				.replaceAll("__USER__", user.getId())
+				.replaceAll("__TYPE__", key.getType().toString());
+
+		sendNotification(user, title, emailTemplateId, link);
 	}
 
 

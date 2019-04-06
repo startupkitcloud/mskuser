@@ -1,10 +1,8 @@
 package com.mangobits.startupkit.user.freezer;
 
-import javax.ejb.Local;
-
-import com.mangobits.startupkit.core.exception.ApplicationException;
-import com.mangobits.startupkit.core.exception.BusinessException;
 import com.mangobits.startupkit.user.User;
+
+import javax.ejb.Local;
 
 @Local
 public interface UserFreezerService {
