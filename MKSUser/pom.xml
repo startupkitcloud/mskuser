@@ -3,7 +3,7 @@
   	<modelVersion>4.0.0</modelVersion>
     <groupId>com.mangobits.startupkit.user</groupId>
     <artifactId>MSKUser</artifactId>
-    <version>1.1.48</version>
+    <version>1.1.49</version>
     <packaging>ejb</packaging>
  
     <name>${project.groupId}:${project.artifactId}</name>
@@ -203,7 +203,7 @@
 	<distributionManagement>
 		<repository>
 			<id>mangobits-startupkit-repository</id>
-			<url>http://dev.mangobits.net:8081/artifactory/libs-release-local/</url>
+			<url>http://artifactory.mangobits.com/artifactory/startupkit</url>
 		</repository>
 	</distributionManagement>
 </project>

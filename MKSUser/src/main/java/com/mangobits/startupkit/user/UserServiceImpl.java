@@ -883,7 +883,9 @@ public class UserServiceImpl implements UserService {
 
 		UserAuthKey key = userAuthKeyService.createKey(idUser, UserAuthKeyTypeEnum.EMAIL);
 
-		String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.confirm.email.title");
+		final String projectName = configurationService.loadByCode("PROJECT_NAME").getValue();
+
+		String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.confirm.email.title", projectName);
 
 		String configKeyLang = user.getLanguage() == null ? "" : "_"+user.getLanguage().toUpperCase();
 
@@ -938,7 +940,9 @@ public class UserServiceImpl implements UserService {
 			user.setLanguage("PT_BR");
 		}
 
-		String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.confirm.email.forgot.title");
+		final String projectName = configurationService.loadByCode("PROJECT_NAME").getValue();
+
+		String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.confirm.email.forgot.title", projectName);
 
 		String configKeyLang = user.getLanguage() == null ? "" : "_"+user.getLanguage().toUpperCase();
 
@@ -1186,7 +1190,9 @@ public class UserServiceImpl implements UserService {
 			//forgotPassword(user);
 			UserAuthKey key = userAuthKeyService.createKey(user.getId(), UserAuthKeyTypeEnum.EMAIL);
 
-			String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.register.password.title");
+			final String projectName = configurationService.loadByCode("PROJECT_NAME").getValue();
+
+			String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.register.password.title", projectName);
 
 			String configKeyLang = user.getLanguage() == null ? "" : "_"+user.getLanguage().toUpperCase();
 
