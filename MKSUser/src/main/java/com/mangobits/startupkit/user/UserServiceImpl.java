@@ -1274,6 +1274,10 @@ public class UserServiceImpl implements UserService {
 				sb.appendParamQuery("type", userSearch.getType());
 			}
 
+			if (userSearch.getTypeIn() != null) {
+				sb.appendParamQuery("typeIn", userSearch.getTypeIn(), OperationEnum.IN);
+			}
+
 			if (userSearch.getQueryString() != null && !userSearch.getQueryString().isEmpty()) {
 				sb.appendParamQuery("name|nameObj", userSearch.getQueryString(), OperationEnum.OR_FIELDS);
 			}

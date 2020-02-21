@@ -1,7 +1,10 @@
 package com.mangobits.startupkit.user;
 
+import javax.persistence.Embeddable;
 import java.util.Date;
+import java.util.List;
 
+@Embeddable
 public class UserSearch {
 
     private String queryString;
@@ -13,6 +16,8 @@ public class UserSearch {
     private Integer page;
 
     private String type;
+
+    private List<String> typeIn;
 
 
     private String status;
@@ -91,5 +96,11 @@ public class UserSearch {
         this.creationDate = creationDate;
     }
 
+    public List<String> getTypeIn() {
+        return typeIn;
+    }
 
+    public void setTypeIn(List<String> typeIn) {
+        this.typeIn = typeIn;
+    }
 }

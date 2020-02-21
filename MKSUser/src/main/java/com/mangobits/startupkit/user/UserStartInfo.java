@@ -2,6 +2,9 @@ package com.mangobits.startupkit.user;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
+import javax.persistence.Embeddable;
+
+@Embeddable
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserStartInfo {
 

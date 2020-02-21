@@ -3,7 +3,7 @@
   	<modelVersion>4.0.0</modelVersion>
     <groupId>com.mangobits.startupkit.user</groupId>
     <artifactId>MSKUser</artifactId>
-    <version>1.1.49</version>
+    <version>1.1.52</version>
     <packaging>ejb</packaging>
  
     <name>${project.groupId}:${project.artifactId}</name>
@@ -31,12 +31,12 @@
         <developerConnection>scm:git:git@github.com:IDRSolutions/maven-OpenViewerFX-src.git</developerConnection>
         <url>git@github.com:IDRSolutions/maven-OpenViewerFX-src.git</url>
     </scm> -->
- 
- 
- 	<repositories>
+
+
+	<repositories>
 		<repository>
-    		<id>mangobits-startupkit-repository</id>
-    		<url>http://dev.mangobits.net:8081/artifactory/libs-release-local/</url>
+			<id>mangobits-startupkit-repository</id>
+			<url>http://artifactory.mangobits.com/artifactory/startupkit</url>
 		</repository>
 	</repositories>
  
