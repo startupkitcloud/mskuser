@@ -29,10 +29,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 
+import com.mangobits.startupkit.admin.util.SecuredAdmin;
 import com.mangobits.startupkit.core.configuration.ConfigurationService;
 import com.mangobits.startupkit.core.photo.GalleryItem;
 import com.mangobits.startupkit.core.photo.PhotoUtils;
-import com.mangobits.startupkit.service.admin.util.SecuredAdmin;
 import org.apache.commons.collections.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;

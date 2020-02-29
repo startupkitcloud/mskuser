@@ -1,7 +1,7 @@
 package com.mangobits.startupkit.user.preference;
 
-import com.mangobits.startupkit.admin.user.UserB;
-import com.mangobits.startupkit.admin.user.UserBService;
+import com.mangobits.startupkit.admin.userb.UserB;
+import com.mangobits.startupkit.admin.userb.UserBService;
 import com.mangobits.startupkit.core.configuration.ConfigurationService;
 import com.mangobits.startupkit.core.dao.SearchBuilder;
 import com.mangobits.startupkit.core.exception.BusinessException;
@@ -10,8 +10,6 @@ import com.mangobits.startupkit.core.utils.BusinessUtils;
 import com.mangobits.startupkit.user.User;
 import com.mangobits.startupkit.user.UserService;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
