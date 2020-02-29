@@ -484,6 +484,7 @@ public class UserRestService extends UserBaseRestService{
 	@POST
 	@Path("/saveFacebookAvatar")
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	public String saveFacebookAvatar(PhotoUpload fotoUpload) throws Exception{
 
 		String resultStr = null;
@@ -502,10 +503,7 @@ public class UserRestService extends UserBaseRestService{
 			cont.setData("OK");
 			
 		} catch (Exception e) {
-
-			if(!(e instanceof BusinessException)){
-				e.printStackTrace();
-			}
+			handleException(cont, e, "saving a facebook avatar");
 		}
 
 		ObjectMapper mapper = new ObjectMapper();
