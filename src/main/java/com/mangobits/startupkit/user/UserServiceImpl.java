@@ -944,11 +944,12 @@ public class UserServiceImpl implements UserService {
 
 		String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.confirm.email.forgot.title", projectName);
 
-		String configKeyLang = user.getLanguage() == null ? "" : "_"+user.getLanguage().toUpperCase();
+		final int emailTemplateId = configurationService.loadByCode("USER_EMAIL_FORGOT_ID").getValueAsInt();
 
-		final int emailTemplateId = configurationService.loadByCode("USER_EMAIL_FORGOT_ID" + configKeyLang).getValueAsInt();
+		String baseLink = "__BASE__/email_forgot_password_user?l=__LANGUAGE__&k=__KEY__&u=__USER__&t=__TYPE__";
 
-		final String link = configurationService.loadByCode("USER_EMAIL_FORGOT_LINK").getValue()
+		final String link = baseLink
+				.replaceAll("__BASE__", configurationService.loadByCode("PROJECT_URL").getValue())
 				.replaceAll("__LANGUAGE__", user.getLanguage())
 				.replaceAll("__KEY__", key.getKey())
 				.replaceAll("__USER__", user.getId())
