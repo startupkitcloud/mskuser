@@ -960,6 +960,10 @@ public class UserServiceImpl implements UserService {
 
 
 	private void sendNotification(User user, String title, int emailTemplateId, String link) throws Exception {
+
+		final String projectName = configurationService.loadByCode("PROJECT_NAME").getValue();
+		final String projectLogo = configurationService.loadByCode("PROJECT_LOGO_URL").getValue();
+
 		notificationService.sendNotification(new NotificationBuilder()
 				.setTo(user)
 				.setTypeSending(TypeSendingNotificationEnum.EMAIL)
@@ -978,6 +982,8 @@ public class UserServiceImpl implements UserService {
 						Map<String, Object> params = new HashMap<>();
 						params.put("user_name", user.getName());
 						params.put("confirmation_link", link);
+						params.put("project_name", projectName);
+						params.put("project_logo", projectLogo);
 
 						return params;
 					}
