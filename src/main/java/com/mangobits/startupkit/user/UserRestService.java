@@ -1206,19 +1206,6 @@ public class UserRestService extends UserBaseRestService{
 
 		try {
 
-//			String authorizationHeader = this.request.getHeader("Authorization");
-//			String token = authorizationHeader.substring("Bearer".length()).trim();
-//			UserB userB = this.userBService.retrieveByToken(token);
-//
-//			if(userB != null){
-//
-//				if(user.getInfo() == null){
-//					user.setInfo(new HashMap<>());
-//				}
-//
-//				user.getInfo().put("idCompany", userB.getInfo().get("idCompany"));
-//			}
-
 			userService.saveByAdmin(user);
 
 			cont.setData(user);
