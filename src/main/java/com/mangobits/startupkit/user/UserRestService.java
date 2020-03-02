@@ -521,7 +521,7 @@ public class UserRestService extends UserBaseRestService{
 	@Consumes(MediaType.APPLICATION_JSON)
 	public String saveUserImage(PhotoUpload photoUpload) throws Exception{
 
-		String resultStr = null;
+		String resultStr;
 		JsonContainer cont = new JsonContainer();
 
 		try {

@@ -1099,6 +1099,9 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void testNotification(String idUser, String msg) throws Exception {
 
+		final String projectName = configurationService.loadByCode("PROJECT_NAME").getValue();
+		final String projectLogo = configurationService.loadByCode("PROJECT_LOGO_URL").getValue();
+
 		User user = retrieve(idUser);
 
 		NotificationBuilder builder = new NotificationBuilder()
@@ -1124,6 +1127,8 @@ public class UserServiceImpl implements UserService {
 					Map<String, Object> params = new HashMap<>();
 					params.put("user_name", user.getName());
 					params.put("msg", msg);
+					params.put("project_name", projectName);
+					params.put("project_logo", projectLogo);
 
 					return params;
 				}
