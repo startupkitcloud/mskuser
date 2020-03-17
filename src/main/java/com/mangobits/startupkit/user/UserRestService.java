@@ -637,35 +637,7 @@ public class UserRestService extends UserBaseRestService{
 		};
 	}
 
-	@Deprecated
-	@SecuredUser
-	@POST
-	@Path("/saveGallery")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public String saveGallery(PhotoUpload fotoUpload) throws Exception{
-		
-		String resultStr = null;
-		JsonContainer cont = new JsonContainer();
-		
-		try {
-			
-			userService.saveGallery(fotoUpload);
-			fotoUpload.setPhotoBytes(null);
-			
-			cont.setData(fotoUpload);
-			
-		} catch (Exception e) {
-			handleException(cont, e, "saving gallery");
-		}
-		
-		ObjectMapper mapper = new ObjectMapper();
-		resultStr = mapper.writeValueAsString(cont);
-		
-		return resultStr;
-	}
-	
 
-	
 	@SecuredUser
 	@GET
 	@Path("/searchByName")
