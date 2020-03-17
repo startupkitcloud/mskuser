@@ -34,10 +34,6 @@ public class PreferenceServiceImpl implements PreferenceService {
     @Inject
     private UserPreferencesDAO userPreferencesDAO;
 
-
-    @EJB
-    private ConfigurationService configurationService;
-
     @EJB
     private UserService userService;
 
