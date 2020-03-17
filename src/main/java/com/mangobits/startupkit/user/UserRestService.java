@@ -16,7 +16,6 @@ import com.mangobits.startupkit.notification.email.EmailService;
 import com.mangobits.startupkit.user.util.SecuredUser;
 import com.mangobits.startupkit.user.util.UserBaseRestService;
 import com.mangobits.startupkit.ws.JsonContainer;
-import org.apache.commons.collections.CollectionUtils;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -350,6 +349,7 @@ public class UserRestService extends UserBaseRestService{
 	}
 
 
+	@SecuredUser
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
