@@ -119,9 +119,6 @@ public class UserRestService extends UserBaseRestService{
 		return resultStr;
 	}
 	
-	
-	
-	
 
 	@GET
 	@Path("/load/{idUser}")
@@ -130,9 +127,6 @@ public class UserRestService extends UserBaseRestService{
 		
 		String resultStr = null;
 		JsonContainer cont = new JsonContainer();
-
-		System.out.println("OK lala sdfsdf  ");
-
 		
 		try {
 			
@@ -149,9 +143,7 @@ public class UserRestService extends UserBaseRestService{
 		return resultStr;
 	}
 	
-	
-	
-	
+
 	@SecuredUser
 	@GET
 	@Path("/loggedUser/{token}")
