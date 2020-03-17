@@ -528,22 +528,6 @@ public class UserServiceImpl implements UserService {
 
 
 	@Deprecated
-	private int createIndexPhotoUpload(User user){
-
-		int index = 0;
-
-		if(CollectionUtils.isNotEmpty(user.getListPhotoUpload())){
-
-			for(PhotoUpload photoUpload : user.getListPhotoUpload()){
-				index = index > photoUpload.getIndex() ? index : photoUpload.getIndex() +1;
-			}
-		}
-
-		return index;
-	}
-
-
-	@Deprecated
 	@Override
 	public String pathImageAvatar(String idUser){
 
