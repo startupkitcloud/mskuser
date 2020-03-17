@@ -528,41 +528,6 @@ public class UserServiceImpl implements UserService {
 
 
 	@Deprecated
-	@Override
-	public void saveGallery(PhotoUpload photoUpload) throws Exception{
-
-		User user = retrieve(photoUpload.getIdObject());
-
-		if(user == null){
-			throw new BusinessException("User with id  '" + photoUpload.getIdObject() + "' not found to attach PhotoUpload");
-		}else if(photoUpload.getType() == null){
-			throw new BusinessException("TypeFile is required");
-		}
-
-		if(photoUpload.getStatus() == null || !photoUpload.getStatus().equals(PhotoUploadStatusEnum.BLOCKED)){
-
-			if(user.getListPhotoUpload() == null){
-				user.setListPhotoUpload(new ArrayList<>());
-			}
-
-			createGalleryPhotoUpload(photoUpload, user);
-
-		}else{
-
-			PhotoUpload photoUploadBase = user.getListPhotoUpload().stream()
-					.filter(p -> p.getIndex().equals(photoUpload.getIndex()))
-					.findFirst()
-					.orElse(null);
-
-			if(photoUploadBase != null){
-				user.getListPhotoUpload().remove(photoUploadBase);
-			}
-		}
-
-		save(user);
-	}
-
-	@Deprecated
 	private void createGalleryPhotoUpload (PhotoUpload photoUpload, User user) throws Exception {
 
 		//get the final size

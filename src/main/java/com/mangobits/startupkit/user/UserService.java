@@ -113,11 +113,6 @@ public interface UserService {
 	
 	void testNotification(String idUser, String msg) throws Exception;
 
-
-	@Deprecated
-	void saveGallery(PhotoUpload photoUpload) throws Exception;
-
-
 	@Deprecated
 	String pathGallery(String idUser, PhotoUploadTypeEnum photoUploadTypeEnum) throws Exception;
 
