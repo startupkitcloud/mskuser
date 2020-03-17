@@ -636,40 +636,6 @@ public class UserRestService extends UserBaseRestService{
 			}
 		};
 	}
-	
-	
-
-	@Deprecated
-	@SecuredUser
-	@POST
-	@Path("/saveAvatar")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public String saveAvatar(PhotoUpload fotoUpload) throws Exception{
-		
-		String resultStr = null;
-		JsonContainer cont = new JsonContainer();
-		
-		try {
-			
-			User user = userService.retrieve(fotoUpload.getIdObject());
-			
-			if(user == null){
-				throw new BusinessException("User with id  '" + fotoUpload.getIdObject() + "' not found to attach photo");
-			}
-			
-			userService.saveAvatar(fotoUpload);
-			cont.setData("OK");
-			
-		} catch (Exception e) {
-			handleException(cont, e, "saving avatar");
-		}
-		
-		ObjectMapper mapper = new ObjectMapper();
-		resultStr = mapper.writeValueAsString(cont);
-		
-		return resultStr;
-	}
-	
 
 
 	@Deprecated
