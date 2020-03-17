@@ -898,15 +898,6 @@ public class UserRestService extends UserBaseRestService{
 
 	@Deprecated
 	@GET
-	@Path("/loadImageByIndex/{idUser}/{index}")
-	@Produces("image/jpeg")
-	public StreamingOutput loadImageByIndex(final @PathParam("idUser") String idUser, final @PathParam("index") Integer index) throws Exception {
-		return loadImageByIndex(idUser, index, null);
-	}
-	
-
-	@Deprecated
-	@GET
 	@Path("/loadImageByIndex/{idUser}/{index}/{suffix}")
 	@Produces("image/jpeg")
 	public StreamingOutput loadImageByIndex(final @PathParam("idUser") String idUser, final @PathParam("index") Integer index, final @PathParam("suffix") String suffix) throws Exception {
