@@ -120,6 +120,7 @@ public class UserRestService extends UserBaseRestService{
 	}
 	
 
+	@SecuredUser
 	@GET
 	@Path("/load/{idUser}")
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
