@@ -895,61 +895,6 @@ public class UserRestService extends UserBaseRestService{
 		return resultStr;
 	}
 	
-
-	@Deprecated
-	@GET
-	@Path("/loadImageByIndex/{idUser}/{index}/{suffix}")
-	@Produces("image/jpeg")
-	public StreamingOutput loadImageByIndex(final @PathParam("idUser") String idUser, final @PathParam("index") Integer index, final @PathParam("suffix") String suffix) throws Exception {
-		
-		return out -> {
-
-			try {
-
-				User user = userService.retrieve(idUser);
-
-				if(user == null){
-					throw new BusinessException("User with id  '" + idUser + "' not found to attach photo");
-				}
-
-				if(CollectionUtils.isNotEmpty(user.getListPhotoUpload())){
-
-					PhotoUpload photoUpload = user.getListPhotoUpload().stream()
-							.filter(p -> p.getIndex().equals(index))
-							.findFirst()
-							.orElse(null);
-
-					if(photoUpload != null){
-
-						String path = userService.pathGallery(idUser, photoUpload.getType());
-
-						if(suffix != null){
-							path = path + "/" + photoUpload.getId() + "_" + suffix + ".jpg";
-						}else {
-							path = path + "/" + photoUpload.getId() + "_main.jpg";
-						}
-
-						ByteArrayInputStream in =  new ByteArrayInputStream(FileUtil.readFile(path));
-
-						byte[] buf = new byte[16384];
-
-						int len = in.read(buf);
-
-						while(len!=-1) {
-
-							out.write(buf,0,len);
-
-							len = in.read(buf);
-						}
-					}
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		};
-	}
-	
-	
 	@GET
 	@Path("/video/{idUser}/{name}")
 	@Produces("video/mp4")
