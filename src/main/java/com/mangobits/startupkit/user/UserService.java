@@ -62,10 +62,6 @@ public interface UserService {
 
 	String pathImage(String idUser) throws Exception;
 	
-
-	@Deprecated
-	String pathImageAvatar(String idUser) throws Exception;
-	
 	
 	List<User> listUserIn(List<String> userIds) throws Exception;
 	

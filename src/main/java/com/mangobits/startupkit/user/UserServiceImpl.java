@@ -527,15 +527,6 @@ public class UserServiceImpl implements UserService {
 	}
 
 
-	@Deprecated
-	@Override
-	public String pathImageAvatar(String idUser){
-
-		String path = "/user/" + idUser + "/reduced.jpg";
-		return path;
-	}
-
-
 
 	@Override
 	public String pathImage(String idUser) throws Exception {
