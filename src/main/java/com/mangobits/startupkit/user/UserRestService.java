@@ -536,7 +536,7 @@ public class UserRestService extends UserBaseRestService{
 			String path = userService.pathImage(user.getId());
 
 			new PhotoUtils().saveImage(photoUpload, path, idPhoto);
-			userService.save(user);
+			userService.update(user);
 
 			cont.setDesc("OK");
 
