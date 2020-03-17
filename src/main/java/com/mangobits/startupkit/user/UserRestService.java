@@ -637,51 +637,6 @@ public class UserRestService extends UserBaseRestService{
 		};
 	}
 
-
-	@Deprecated
-	@GET
-	@Path("/showAvatar/{idUser}/{extra}")
-	@Produces("image/jpeg")
-	public StreamingOutput showAvatar(final @PathParam("idUser") String idUser, final @PathParam("extra") String extra) throws Exception {
-		
-		return new StreamingOutput() { 
-			
-			@Override
-			public void write(final OutputStream out) throws IOException {
-				
-				Configuration config = null;
-				
-				try {
-					
-					config = configurationService.loadByCode(ConfigurationEnum.PATH_BASE);
-					
-					String base = config.getValue();
-					
-					String path = base + userService.pathImageAvatar(idUser);
-					
-					if(!new File(path).exists()){
-						path = base + "/user/default.png";
-					}
-					
-					ByteArrayInputStream in =  new ByteArrayInputStream(FileUtil.readFile(path));
-							
-					byte[] buf = new byte[16384]; 
-					
-					int len = in.read(buf);
-					
-					while(len!=-1) { 
-						out.write(buf,0,len); 
-						len = in.read(buf); 
-					} 
-				} catch (Exception e) {
-					
-				}	
-			}
-		};
-	}
-	
-
-
 	@Deprecated
 	@SecuredUser
 	@POST
