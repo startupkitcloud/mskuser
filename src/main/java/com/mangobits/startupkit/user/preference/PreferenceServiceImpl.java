@@ -2,7 +2,6 @@ package com.mangobits.startupkit.user.preference;
 
 import com.mangobits.startupkit.admin.userb.UserB;
 import com.mangobits.startupkit.admin.userb.UserBService;
-import com.mangobits.startupkit.core.configuration.ConfigurationService;
 import com.mangobits.startupkit.core.dao.SearchBuilder;
 import com.mangobits.startupkit.core.exception.BusinessException;
 import com.mangobits.startupkit.core.status.SimpleStatusEnum;
