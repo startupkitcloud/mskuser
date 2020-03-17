@@ -529,34 +529,6 @@ public class UserServiceImpl implements UserService {
 
 	@Deprecated
 	@Override
-	public void saveAvatar(PhotoUpload photoUpload) throws Exception{
-
-		Configuration confPath = configurationService.loadByCode(ConfigurationEnum.PATH_BASE);
-
-		File folder = new File(confPath.getValue() + "/user/" + photoUpload.getIdObject());
-		folder.mkdirs();
-
-		File destiny = new File(folder, "/original.jpg");
-
-		//processa a imagem
-		byte[] data = Base64.decodeBase64(photoUpload.getPhoto());
-		//escreve o original do disco
-		FileOutputStream output = new FileOutputStream(destiny);
-		IOUtils.write(data, output);
-
-		//escreve a versao reduzida
-		Configuration confSize = configurationService.loadByCode("SIZE_DETAIL_MOBILE");
-		File destinyReduced = new File(folder, "/reduced.jpg");
-
-		Thumbnails.of(destiny)
-				.size(confSize.getValueAsInt(), confSize.getValueAsInt())
-				.outputFormat("jpg")
-				.toFile(destinyReduced);
-	}
-
-
-	@Deprecated
-	@Override
 	public void saveGallery(PhotoUpload photoUpload) throws Exception{
 
 		User user = retrieve(photoUpload.getIdObject());

@@ -58,10 +58,6 @@ public interface UserService {
 	
 	
 	void saveFacebookAvatar(PhotoUpload photoUpload) throws Exception;
-	
-
-	@Deprecated
-	void saveAvatar(PhotoUpload photoUpload) throws Exception;
 
 
 	String pathImage(String idUser) throws Exception;
