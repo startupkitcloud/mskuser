@@ -528,52 +528,6 @@ public class UserServiceImpl implements UserService {
 
 
 	@Deprecated
-	private void createGalleryPhotoUpload (PhotoUpload photoUpload, User user) throws Exception {
-
-		//get the final size
-        int finalWidth = configurationService.loadByCode("SIZE_DETAIL_MOBILE").getValueAsInt();
-        photoUpload.setFinalWidth(finalWidth);
-
-        String idPhoto = photoUpload.getId() != null ? photoUpload.getId() : UUID.randomUUID().toString();
-        photoUpload.setId(idPhoto);
-
-        if(photoUpload.getIndex() == null){
-        	photoUpload.setIndex(createIndexPhotoUpload(user));
-        }
-
-        if(!photoUpload.getType().equals(PhotoUploadTypeEnum.YOUTUBE)){
-
-        	String path = pathGallery(photoUpload.getIdObject(), photoUpload.getType());
-
-    		if(photoUpload.getType().equals(PhotoUploadTypeEnum.IMAGE)){
-    			new PhotoUtils().saveImage(photoUpload, path, idPhoto);
-    		}else if(photoUpload.getType().equals(PhotoUploadTypeEnum.VIDEO)){
-    			new PhotoUtils().saveVideo(photoUpload, path, idPhoto);
-    		}
-        }else{
-        	InfoUrl infoUrl = new PhotoUtils().createInfoUrlYoutube(photoUpload.getUrl());
-        	photoUpload.setInfoUrl(infoUrl);
-        }
-
-
-		PhotoUpload photoUploadBase = user.getListPhotoUpload().stream()
-				.filter(p -> p.getIndex().equals(photoUpload.getIndex()))
-				.findFirst()
-				.orElse(null);
-
-		if(photoUploadBase != null){
-			user.getListPhotoUpload().remove(photoUploadBase);
-		}
-
-		if(photoUpload.getStatus() == null){
-			photoUpload.setStatus(PhotoUploadStatusEnum.ACTIVE);
-		}
-
-		user.getListPhotoUpload().add(photoUpload);
-	}
-
-
-	@Deprecated
 	private int createIndexPhotoUpload(User user){
 
 		int index = 0;
