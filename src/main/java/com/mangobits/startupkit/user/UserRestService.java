@@ -1,52 +1,38 @@
 package com.mangobits.startupkit.user;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.WritableByteChannel;
-import java.util.*;
-
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import javax.persistence.PersistenceContext;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.StreamingOutput;
-
-import com.mangobits.startupkit.admin.util.SecuredAdmin;
-import com.mangobits.startupkit.core.configuration.ConfigurationService;
-import com.mangobits.startupkit.core.photo.GalleryItem;
-import com.mangobits.startupkit.core.photo.PhotoUtils;
-import org.apache.commons.collections.CollectionUtils;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mangobits.startupkit.admin.util.SecuredAdmin;
 import com.mangobits.startupkit.authkey.UserAuthKey;
 import com.mangobits.startupkit.core.configuration.Configuration;
 import com.mangobits.startupkit.core.configuration.ConfigurationEnum;
+import com.mangobits.startupkit.core.configuration.ConfigurationService;
 import com.mangobits.startupkit.core.exception.BusinessException;
+import com.mangobits.startupkit.core.photo.GalleryItem;
 import com.mangobits.startupkit.core.photo.PhotoUpload;
 import com.mangobits.startupkit.core.photo.PhotoUploadTypeEnum;
+import com.mangobits.startupkit.core.photo.PhotoUtils;
 import com.mangobits.startupkit.core.utils.FileUtil;
 import com.mangobits.startupkit.notification.email.EmailService;
 import com.mangobits.startupkit.user.util.SecuredUser;
 import com.mangobits.startupkit.user.util.UserBaseRestService;
 import com.mangobits.startupkit.ws.JsonContainer;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.ws.rs.*;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.StreamingOutput;
+import java.io.*;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.WritableByteChannel;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 
 @Stateless
@@ -56,9 +42,6 @@ public class UserRestService extends UserBaseRestService{
 	
 	@EJB
 	protected UserService userService;
-
-	@PersistenceContext
-	private javax.persistence.EntityManager entityManager;
 
 	@EJB
 	private ConfigurationService configurationService;
@@ -91,6 +74,7 @@ public class UserRestService extends UserBaseRestService{
 		return resultStr;
 	}
 
+	@SecuredAdmin
 	@POST
 	@Consumes({"application/json"})
 	@Produces({"application/json;charset=utf-8"})
@@ -135,10 +119,8 @@ public class UserRestService extends UserBaseRestService{
 		return resultStr;
 	}
 	
-	
-	
-	
 
+	@SecuredUser
 	@GET
 	@Path("/load/{idUser}")
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -146,9 +128,6 @@ public class UserRestService extends UserBaseRestService{
 		
 		String resultStr = null;
 		JsonContainer cont = new JsonContainer();
-
-		System.out.println("OK lala sdfsdf  ");
-
 		
 		try {
 			
@@ -165,9 +144,7 @@ public class UserRestService extends UserBaseRestService{
 		return resultStr;
 	}
 	
-	
-	
-	
+
 	@SecuredUser
 	@GET
 	@Path("/loggedUser/{token}")
@@ -373,6 +350,7 @@ public class UserRestService extends UserBaseRestService{
 	}
 
 
+	@SecuredUser
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -427,7 +405,7 @@ public class UserRestService extends UserBaseRestService{
 	}
 	
 	
-	
+	@SecuredUser
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -559,7 +537,7 @@ public class UserRestService extends UserBaseRestService{
 			String path = userService.pathImage(user.getId());
 
 			new PhotoUtils().saveImage(photoUpload, path, idPhoto);
-			userService.save(user);
+			userService.update(user);
 
 			cont.setDesc("OK");
 
@@ -659,120 +637,13 @@ public class UserRestService extends UserBaseRestService{
 			}
 		};
 	}
-	
-	
-
-	@Deprecated
-	@SecuredUser
-	@POST
-	@Path("/saveAvatar")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public String saveAvatar(PhotoUpload fotoUpload) throws Exception{
-		
-		String resultStr = null;
-		JsonContainer cont = new JsonContainer();
-		
-		try {
-			
-			User user = userService.retrieve(fotoUpload.getIdObject());
-			
-			if(user == null){
-				throw new BusinessException("User with id  '" + fotoUpload.getIdObject() + "' not found to attach photo");
-			}
-			
-			userService.saveAvatar(fotoUpload);
-			cont.setData("OK");
-			
-		} catch (Exception e) {
-			handleException(cont, e, "saving avatar");
-		}
-		
-		ObjectMapper mapper = new ObjectMapper();
-		resultStr = mapper.writeValueAsString(cont);
-		
-		return resultStr;
-	}
-	
 
 
-	@Deprecated
-	@GET
-	@Path("/showAvatar/{idUser}/{extra}")
-	@Produces("image/jpeg")
-	public StreamingOutput showAvatar(final @PathParam("idUser") String idUser, final @PathParam("extra") String extra) throws Exception {
-		
-		return new StreamingOutput() { 
-			
-			@Override
-			public void write(final OutputStream out) throws IOException {
-				
-				Configuration config = null;
-				
-				try {
-					
-					config = configurationService.loadByCode(ConfigurationEnum.PATH_BASE);
-					
-					String base = config.getValue();
-					
-					String path = base + userService.pathImageAvatar(idUser);
-					
-					if(!new File(path).exists()){
-						path = base + "/user/default.png";
-					}
-					
-					ByteArrayInputStream in =  new ByteArrayInputStream(FileUtil.readFile(path));
-							
-					byte[] buf = new byte[16384]; 
-					
-					int len = in.read(buf);
-					
-					while(len!=-1) { 
-						out.write(buf,0,len); 
-						len = in.read(buf); 
-					} 
-				} catch (Exception e) {
-					
-				}	
-			}
-		};
-	}
-	
-
-
-	@Deprecated
-	@SecuredUser
-	@POST
-	@Path("/saveGallery")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public String saveGallery(PhotoUpload fotoUpload) throws Exception{
-		
-		String resultStr = null;
-		JsonContainer cont = new JsonContainer();
-		
-		try {
-			
-			userService.saveGallery(fotoUpload);
-			fotoUpload.setPhotoBytes(null);
-			
-			cont.setData(fotoUpload);
-			
-		} catch (Exception e) {
-			handleException(cont, e, "saving gallery");
-		}
-		
-		ObjectMapper mapper = new ObjectMapper();
-		resultStr = mapper.writeValueAsString(cont);
-		
-		return resultStr;
-	}
-	
-
-	
 	@SecuredUser
 	@GET
-	@Path("/searchByName")
+	@Path("/searchByName/{nameUser}")
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-	public String searchByName(@QueryParam("q") String name) throws Exception {
+	public String searchByName(final @PathParam("nameUser") String name) throws Exception {
 		
 		String resultStr;
 		JsonContainer cont = new JsonContainer();
@@ -1024,70 +895,6 @@ public class UserRestService extends UserBaseRestService{
 		
 		return resultStr;
 	}
-	
-
-	@Deprecated
-	@GET
-	@Path("/loadImageByIndex/{idUser}/{index}")
-	@Produces("image/jpeg")
-	public StreamingOutput loadImageByIndex(final @PathParam("idUser") String idUser, final @PathParam("index") Integer index) throws Exception {
-		return loadImageByIndex(idUser, index, null);
-	}
-	
-
-	@Deprecated
-	@GET
-	@Path("/loadImageByIndex/{idUser}/{index}/{suffix}")
-	@Produces("image/jpeg")
-	public StreamingOutput loadImageByIndex(final @PathParam("idUser") String idUser, final @PathParam("index") Integer index, final @PathParam("suffix") String suffix) throws Exception {
-		
-		return out -> {
-
-			try {
-
-				User user = userService.retrieve(idUser);
-
-				if(user == null){
-					throw new BusinessException("User with id  '" + idUser + "' not found to attach photo");
-				}
-
-				if(CollectionUtils.isNotEmpty(user.getListPhotoUpload())){
-
-					PhotoUpload photoUpload = user.getListPhotoUpload().stream()
-							.filter(p -> p.getIndex().equals(index))
-							.findFirst()
-							.orElse(null);
-
-					if(photoUpload != null){
-
-						String path = userService.pathGallery(idUser, photoUpload.getType());
-
-						if(suffix != null){
-							path = path + "/" + photoUpload.getId() + "_" + suffix + ".jpg";
-						}else {
-							path = path + "/" + photoUpload.getId() + "_main.jpg";
-						}
-
-						ByteArrayInputStream in =  new ByteArrayInputStream(FileUtil.readFile(path));
-
-						byte[] buf = new byte[16384];
-
-						int len = in.read(buf);
-
-						while(len!=-1) {
-
-							out.write(buf,0,len);
-
-							len = in.read(buf);
-						}
-					}
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		};
-	}
-	
 	
 	@GET
 	@Path("/video/{idUser}/{name}")
