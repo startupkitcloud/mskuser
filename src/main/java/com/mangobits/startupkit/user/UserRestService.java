@@ -640,9 +640,9 @@ public class UserRestService extends UserBaseRestService{
 
 	@SecuredUser
 	@GET
-	@Path("/searchByName")
+	@Path("/searchByName/{nameUser}")
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-	public String searchByName(@QueryParam("q") String name) throws Exception {
+	public String searchByName(final @PathParam("nameUser") String name) throws Exception {
 		
 		String resultStr;
 		JsonContainer cont = new JsonContainer();
