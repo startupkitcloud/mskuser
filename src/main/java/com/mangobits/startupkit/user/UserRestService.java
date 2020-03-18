@@ -74,6 +74,7 @@ public class UserRestService extends UserBaseRestService{
 		return resultStr;
 	}
 
+	@SecuredAdmin
 	@POST
 	@Consumes({"application/json"})
 	@Produces({"application/json;charset=utf-8"})
