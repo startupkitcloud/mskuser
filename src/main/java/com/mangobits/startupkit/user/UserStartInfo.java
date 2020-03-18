@@ -1,6 +1,6 @@
 package com.mangobits.startupkit.user;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.Embeddable;
 

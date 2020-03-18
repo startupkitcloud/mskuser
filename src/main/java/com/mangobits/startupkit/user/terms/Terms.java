@@ -1,10 +1,10 @@
 package com.mangobits.startupkit.user.terms;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.search.annotations.Indexed;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
-
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.hibernate.search.annotations.Indexed;
 
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity(name="terms")

@@ -58,17 +58,9 @@ public interface UserService {
 	
 	
 	void saveFacebookAvatar(PhotoUpload photoUpload) throws Exception;
-	
-
-	@Deprecated
-	void saveAvatar(PhotoUpload photoUpload) throws Exception;
 
 
 	String pathImage(String idUser) throws Exception;
-	
-
-	@Deprecated
-	String pathImageAvatar(String idUser) throws Exception;
 	
 	
 	List<User> listUserIn(List<String> userIds) throws Exception;
@@ -116,11 +108,6 @@ public interface UserService {
 	
 	
 	void testNotification(String idUser, String msg) throws Exception;
-
-
-	@Deprecated
-	void saveGallery(PhotoUpload photoUpload) throws Exception;
-
 
 	@Deprecated
 	String pathGallery(String idUser, PhotoUploadTypeEnum photoUploadTypeEnum) throws Exception;
