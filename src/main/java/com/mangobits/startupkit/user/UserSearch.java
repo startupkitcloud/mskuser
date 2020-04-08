@@ -16,16 +16,18 @@ public class UserSearch {
     private Integer page;
 
     private String type;
-
+    private String code;
     private List<String> typeIn;
-
-
     private String status;
-
     private Date creationDate;
+    private Integer pageItensNumber;
 
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public Integer getPageItensNumber() {
@@ -35,10 +37,6 @@ public class UserSearch {
     public void setPageItensNumber(Integer pageItensNumber) {
         this.pageItensNumber = pageItensNumber;
     }
-
-    private Integer pageItensNumber;
-
-
 
     public Double getLat() {
         return lat;
@@ -90,6 +88,10 @@ public class UserSearch {
 
     public Date getCreationDate() {
         return creationDate;
+    }
+
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
     }
 
     public void setCreationDateDate(Date creationDate) {
