@@ -42,1101 +42,1077 @@ import java.util.*;
 import java.util.logging.Level;
 
 
-
 @Stateless
 @TransactionManagement(TransactionManagementType.CONTAINER)
 public class UserServiceImpl implements UserService {
 
-	private static final int TOTAL_PAGE = 10;
+    private static final int TOTAL_PAGE = 10;
 
 
-	@EJB
-	private ConfigurationService configurationService;
+    @EJB
+    private ConfigurationService configurationService;
 
 
+    @EJB
+    private UserAuthKeyService userAuthKeyService;
 
-	@EJB
-	private UserAuthKeyService userAuthKeyService;
 
+    @EJB
+    private NotificationService notificationService;
 
 
-	@EJB
-	private NotificationService notificationService;
+    @EJB
+    private UserFreezerService userFreezerService;
 
 
-	@EJB
-	private UserFreezerService userFreezerService;
+    @Inject
+    @New
+    private UserDAO userDAO;
 
 
-	@Inject
-	@New
-	private UserDAO userDAO;
+    //evita o mongo de gerar log
+    @PostConstruct
+    public void pos() {
+        java.util.logging.Logger.getLogger("org.mongodb.driver").setLevel(Level.SEVERE);
+    }
 
 
+    @Override
+    public User retrieveByEmail(String email) throws Exception {
 
-	//evita o mongo de gerar log
-	@PostConstruct
-	public void pos(){
-		java.util.logging.Logger.getLogger("org.mongodb.driver").setLevel(Level.SEVERE);
-	}
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("email", email);
 
+        User user = userDAO.retrieve(params);
 
+        return user;
+    }
 
-	@Override
-	public User retrieveByEmail(String email) throws Exception{
 
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("email", email);
+    @Override
+    public User retrieveByPhone(Long phoneNumber) throws Exception {
 
-		User user = userDAO.retrieve(params);
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("phoneNumber", phoneNumber);
 
-		return user;
-	}
+        User user = userDAO.retrieve(params);
 
+        return user;
+    }
 
-	@Override
-	public User retrieveByPhone(Long phoneNumber) throws Exception{
+    @Override
+    public User saveByPhone(User user) throws Exception {
 
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("phoneNumber", phoneNumber);
+        if (user.getPhoneNumber() == null) {
+            throw new BusinessException("missing_phone");
+        }
 
-		User user = userDAO.retrieve(params);
+        User userBase = retrieveByPhone(user.getPhoneNumber());
 
-		return user;
-	}
+        if (userBase == null) {
+            user = createNewUser(user);
+            return user;
+        } else {
+            return userBase;
+        }
+    }
 
-	@Override
-	public User saveByPhone(User user) throws Exception{
 
-		if (user.getPhoneNumber() == null){
-			throw new BusinessException("missing_phone");
-		}
+    @Override
+    public void save(User user) throws Exception {
 
-		User userBase = retrieveByPhone(user.getPhoneNumber());
+        if (user.getId() == null) {
+            createNewUser(user);
+        } else {
+            updateFromClient(user);
+        }
+    }
 
-		if (userBase == null){
-			user = createNewUser(user);
-			return user;
-		}else {
-			return  userBase;
-		}
-	}
 
+    @Override
+    public User createNewUser(User user) throws Exception {
 
-	@Override
-	public void save(User user) throws Exception {
+        User userDB = null;
+        boolean fgPhoneError = false;
 
-		if(user.getId() == null){
-			createNewUser(user);
-		}
-		else{
-			updateFromClient(user);
-		}
-	}
+        if (user.getEmail() != null && !user.getEmail().equals("")) {
+            userDB = retrieveByEmail(user.getEmail());
+        }
 
+        if (userDB == null && user.getPhoneNumber() != null && user.getPhoneNumber() != 0) {
+            userDB = retrieveByPhone(user.getPhoneNumber());
+            fgPhoneError = true;
+        }
 
+        if (userDB != null) {
 
-	@Override
-	public User createNewUser(User user) throws Exception {
+            if (user.getIdFacebook() != null && !user.getIdFacebook().equals("") && (userDB.getIdFacebook() == null
+                    || userDB.getIdFacebook().equals(""))) {
 
-		User userDB = null;
-		boolean fgPhoneError = false;
+                userDB.setIdFacebook(user.getIdFacebook());
+                userDAO.update(userDB);
 
-		if(user.getEmail() != null && !user.getEmail().equals("")){
-			userDB = retrieveByEmail(user.getEmail());
-		}
+                return userDB;
+            }
 
-		if(userDB == null && user.getPhoneNumber() != null && user.getPhoneNumber() != 0){
-			userDB = retrieveByPhone(user.getPhoneNumber());
-			fgPhoneError = true;
-		}
+            if (user.getIdGoogle() != null && !user.getIdGoogle().equals("") && (userDB.getIdGoogle() == null
+                    || userDB.getIdGoogle().equals(""))) {
 
-		if(userDB != null){
+                userDB.setIdGoogle(user.getIdGoogle());
+                userDAO.update(userDB);
 
-			if(user.getIdFacebook() != null && !user.getIdFacebook().equals("") && (userDB.getIdFacebook() == null
-					|| userDB.getIdFacebook().equals(""))){
+                return userDB;
+            }
 
-				userDB.setIdFacebook(user.getIdFacebook());
-				userDAO.update(userDB);
+            if (fgPhoneError) {
+                throw new BusinessException("phone_exists");
+            } else {
+                throw new BusinessException("email_exists");
+            }
+        }
 
-				return userDB;
-			}
+        user.setCreationDate(new Date());
+        user.setId(null);
 
-			if(user.getIdGoogle() != null && !user.getIdGoogle().equals("") && (userDB.getIdGoogle() == null
-					|| userDB.getIdGoogle().equals(""))){
+        if (user.getPassword() != null) {
+            user.setSalt(SecUtils.getSalt());
+            user.setPassword(SecUtils.generateHash(user.getSalt(), user.getPassword()));
+        }
 
-				userDB.setIdGoogle(user.getIdGoogle());
-				userDAO.update(userDB);
+        if (user.getStatus() == null) {
+            user.setStatus(UserStatusEnum.ACTIVE);
+        }
 
-				return userDB;
-			}
 
-			if(fgPhoneError){
-				throw new BusinessException("phone_exists");
-			}
-			else{
-				throw new BusinessException("email_exists");
-			}
-		}
+        if (user.getInfo() != null && user.getInfo().containsKey("idUserAnonymous") && user.getType().equals("anonymous")) {
 
-		user.setCreationDate(new Date());
-		user.setId(null);
+            user.setType("user");
 
-		if(user.getPassword() != null){
-			user.setSalt(SecUtils.getSalt());
-			user.setPassword(SecUtils.generateHash(user.getSalt(), user.getPassword()));
-		}
+            user.setId(user.getInfo().get("idUserAnonymous"));
 
-		if(user.getStatus() == null){
-			user.setStatus(UserStatusEnum.ACTIVE);
-		}
+            new BusinessUtils<>(userDAO).basicSave(user);
 
+        } else {
+            userDAO.insert(user);
+        }
 
-		if(user.getInfo() != null && user.getInfo().containsKey("idUserAnonymous") && user.getType().equals("anonymous")){
+        if (user.getPhone() != null && configurationService.loadByCode("CHECK_PHONE") != null && configurationService.loadByCode("CHECK_PHONE").getValueAsBoolean()) {
+            confirmUserSMS(user.getId());
+        }
 
-			user.setType("user");
+        sendWelcomeEmail(user);
 
-			user.setId(user.getInfo().get("idUserAnonymous"));
+        createToken(user);
 
-			new BusinessUtils<>(userDAO).basicSave(user);
+        return user;
+    }
 
-		}else{
-			userDAO.insert(user);
-		}
+    @Override
+    public User saveAnonymous(User user) throws Exception {
 
-		if(user.getPhone() != null && configurationService.loadByCode("CHECK_PHONE") != null && configurationService.loadByCode("CHECK_PHONE").getValueAsBoolean()){
-			confirmUserSMS(user.getId());
-		}
+        if (user.getId() == null) {
 
-		sendWelcomeEmail(user);
+            user.setCreationDate(new Date());
+            user.setType("anonymous");
 
-		createToken(user);
+            userDAO.insert(user);
 
-		return user;
-	}
+            if (StringUtils.isNotEmpty(user.getKeyAndroid()) || StringUtils.isNotEmpty(user.getKeyIOS())) {
 
-	@Override
-	public User saveAnonymous(User user) throws Exception {
+                user.setInfo(new HashMap<>());
 
-		if(user.getId() == null){
+                if (StringUtils.isNotEmpty(user.getKeyAndroid())) {
+                    user.getInfo().put("keyAndroid", user.getKeyAndroid());
+                } else {
+                    user.getInfo().put("keyIOS", user.getKeyIOS());
+                }
 
-			user.setCreationDate(new Date());
-			user.setType("anonymous");
+                new BusinessUtils<>(userDAO).basicSave(user);
+            }
+        }
 
-			userDAO.insert(user);
+        return user;
+    }
 
-			if(StringUtils.isNotEmpty(user.getKeyAndroid()) || StringUtils.isNotEmpty(user.getKeyIOS())){
 
-				user.setInfo(new HashMap<>());
+    @Override
+    public void sendWelcomeEmail(User user) throws Exception {
 
-				if(StringUtils.isNotEmpty(user.getKeyAndroid())){
-					user.getInfo().put("keyAndroid", user.getKeyAndroid());
-				}else{
-					user.getInfo().put("keyIOS", user.getKeyIOS());
-				}
+        String configKeyLang = user.getLanguage() == null ? "" : "_" + user.getLanguage().toUpperCase();
 
-				new BusinessUtils<>(userDAO).basicSave(user);
-			}
-		}
+        Configuration confEmailId = configurationService.loadByCode("EMAIL_USER_WELCOME" + configKeyLang);
 
-		return user;
-	}
+        if (confEmailId != null) {
 
+            String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.email.welcome.title");
 
-	@Override
-	public void sendWelcomeEmail(User user) throws Exception{
+            final int emailTemplateId = confEmailId.getValueAsInt();
 
-		String configKeyLang = user.getLanguage() == null ? "" : "_"+user.getLanguage().toUpperCase();
+            notificationService.sendNotification(new NotificationBuilder()
+                    .setTo(user)
+                    .setTypeSending(TypeSendingNotificationEnum.EMAIL)
+                    .setTitle(title)
+                    .setFgAlertOnly(true)
+                    .setEmailDataTemplate(new EmailDataTemplate() {
 
-		Configuration confEmailId = configurationService.loadByCode("EMAIL_USER_WELCOME" + configKeyLang);
+                        @Override
+                        public Integer getTemplateId() {
+                            return emailTemplateId;
+                        }
 
-		if(confEmailId != null){
+                        @Override
+                        public Map<String, Object> getData() {
 
-			String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.email.welcome.title");
+                            Map<String, Object> params = new HashMap<>();
+                            params.put("user_name", user.getName());
 
-			final int emailTemplateId = confEmailId.getValueAsInt();
+                            return params;
+                        }
+                    })
+                    .build());
+        }
+    }
 
-			notificationService.sendNotification(new NotificationBuilder()
-					.setTo(user)
-					.setTypeSending(TypeSendingNotificationEnum.EMAIL)
-					.setTitle(title)
-					.setFgAlertOnly(true)
-					.setEmailDataTemplate(new EmailDataTemplate() {
 
-						@Override
-						public Integer getTemplateId() {
-							return emailTemplateId;
-						}
+    private void validateUser(User user) throws Exception {
 
-						@Override
-						public Map<String, Object> getData() {
+        User userDB = null;
 
-							Map<String, Object> params = new HashMap<>();
-							params.put("user_name", user.getName());
+        if (user.getPhoneNumber() != null && user.getPhoneNumber() != 0) {
 
-							return params;
-						}
-					})
-					.build());
-		}
-	}
+            Map<String, Object> params = new HashMap<>();
+            params.put("phoneNumber", user.getPhoneNumber());
 
+            userDB = userDAO.retrieve(params);
 
-	private void validateUser(User user) throws Exception{
+            if (userDB != null && !userDB.getId().equals(user.getId())) {
+                throw new BusinessException("phone_exists");
+            }
+        }
 
-		User userDB = null;
+        if (user.getEmail() != null) {
 
-		if(user.getPhoneNumber() != null && user.getPhoneNumber() != 0){
+            Map<String, Object> params = new HashMap<>();
+            params.put("email", user.getEmail());
 
-			Map<String, Object> params = new HashMap<>();
-			params.put("phoneNumber", user.getPhoneNumber());
+            userDB = userDAO.retrieve(params);
 
-			userDB = userDAO.retrieve(params);
+            if (userDB != null && !userDB.getId().equals(user.getId())) {
+                throw new BusinessException("email_exists");
+            }
+        }
+    }
 
-			if(userDB != null && !userDB.getId().equals(user.getId())){
-				throw new BusinessException("phone_exists");
-			}
-		}
 
-		if(user.getEmail() != null){
+    @Override
+    public User retrieveByIdFacebook(String idFacebook) throws Exception {
 
-			Map<String, Object> params = new HashMap<>();
-			params.put("email", user.getEmail());
+        User user = userDAO.retrieveByIdFacebook(idFacebook);
+        return user;
+    }
 
-			userDB = userDAO.retrieve(params);
 
-			if(userDB != null && !userDB.getId().equals(user.getId())){
-				throw new BusinessException("email_exists");
-			}
-		}
-	}
+    @Override
+    public User loginFB(User user) throws Exception {
+        User userDB = userDAO.retrieveByIdFacebook(user.getIdFacebook());
+        user = loginSocial(user, userDB);
+        return user;
+    }
 
 
-	@Override
-	public User retrieveByIdFacebook(String idFacebook) throws Exception{
+    @Override
+    public User loginGoogle(User user) throws Exception {
+        User userDB = userDAO.retrieveByIdGoogle(user.getIdGoogle());
+        user = loginSocial(user, userDB);
+        return user;
+    }
 
-		User user = userDAO.retrieveByIdFacebook(idFacebook);
-		return user;
-	}
 
+    private User loginSocial(User user, User userDB) throws Exception {
 
+        if (userDB == null) {
+            user = createNewUser(user);
+        } else {
+            user = userDB;
 
-	@Override
-	public User loginFB(User user) throws Exception{
-		User userDB = userDAO.retrieveByIdFacebook(user.getIdFacebook());
-		user = loginSocial(user, userDB);
-		return user;
-	}
+            if (userDB.getStatus() != null && userDB.getStatus().equals(UserStatusEnum.BLOCKED)) {
+                throw new BusinessException("user_blocked");
+            }
 
+            createToken(userDB);
+        }
+        return user;
+    }
 
-	@Override
-	public User loginGoogle(User user) throws Exception{
-		User userDB = userDAO.retrieveByIdGoogle(user.getIdGoogle());
-		user = loginSocial(user, userDB);
-		return user;
-	}
 
+    @Override
+    public User retrieve(String id) throws Exception {
 
-	private User loginSocial(User user, User userDB) throws Exception {
+        User user = userDAO.retrieve(new User(id));
+        return user;
+    }
 
-		if(userDB == null){
-			user = createNewUser(user);
-		}
-		else{
-			user = userDB;
 
-			if(userDB.getStatus() != null && userDB.getStatus().equals(UserStatusEnum.BLOCKED)){
-				throw new BusinessException("user_blocked");
-			}
+    @Override
+    public User autoLogin(User user) throws Exception {
 
-			createToken(userDB);
-		}
-		return user;
-	}
+        User userDB = userDAO.retrieve(new User(user.getId()));
 
+        if (userDB == null || (user.getPassword() == null && user.getIdFacebook() == null && user.getIdGoogle() == null)) {
+            throw new BusinessException("user_not_found");
+        }
 
-	@Override
-	public User retrieve(String id) throws Exception {
+        if (user.getPassword() != null && (userDB.getPassword() == null || !user.getPassword().equals(userDB.getPassword()))) {
+            throw new BusinessException("invalid_user_password");
+        }
 
-		User user = userDAO.retrieve(new User(id));
-		return user;
-	}
+        if (user.getIdFacebook() != null && (userDB.getIdFacebook() == null || !user.getIdFacebook().equals(userDB.getIdFacebook()))) {
+            throw new BusinessException("invalid_user_password");
+        }
 
+        if (user.getIdGoogle() != null && (userDB.getIdGoogle() == null || !user.getIdGoogle().equals(userDB.getIdGoogle()))) {
+            throw new BusinessException("invalid_user_password");
+        }
 
-	@Override
-	public User autoLogin(User user) throws Exception {
+        if (userDB.getStatus() != null && userDB.getStatus().equals(UserStatusEnum.BLOCKED)) {
+            throw new BusinessException("user_blocked");
+        }
 
-		User userDB = userDAO.retrieve(new User(user.getId()));
+        createToken(userDB);
 
-		if(userDB == null || (user.getPassword() == null && user.getIdFacebook() == null && user.getIdGoogle() == null)){
-			throw new BusinessException("user_not_found");
-		}
+        return userDB;
+    }
 
-		if(user.getPassword() != null && (userDB.getPassword() == null || !user.getPassword().equals(userDB.getPassword()))){
-			throw new BusinessException("invalid_user_password");
-		}
 
-		if(user.getIdFacebook() != null && (userDB.getIdFacebook() == null || !user.getIdFacebook().equals(userDB.getIdFacebook()))){
-			throw new BusinessException("invalid_user_password");
-		}
+    @Override
+    public User login(User user) throws Exception {
+        return login(user, user.getPassword());
+    }
 
-		if(user.getIdGoogle() != null && (userDB.getIdGoogle() == null || !user.getIdGoogle().equals(userDB.getIdGoogle()))){
-			throw new BusinessException("invalid_user_password");
-		}
 
-		if(userDB.getStatus() != null && userDB.getStatus().equals(UserStatusEnum.BLOCKED)){
-			throw new BusinessException("user_blocked");
-		}
+    private User login(User user, String password) throws Exception {
 
-		createToken(userDB);
+        User userDB = retrieveByEmail(user.getEmail());
 
-		return userDB;
-	}
+        if (userDB == null || password == null) {
+            throw new BusinessException("invalid_user_password");
+        }
 
+        if (StringUtils.isNotEmpty(user.getType()) && !user.getType().equals(userDB.getType())) {
+            throw new BusinessException("invalid_user_Type");
+        }
 
-	@Override
-	public User login(User user) throws Exception{
-		return login(user, user.getPassword());
-	}
 
+        if (userDB.getStatus() != null && userDB.getStatus().equals(UserStatusEnum.BLOCKED)) {
+            throw new BusinessException("user_blocked");
+        }
 
+        String passHash = SecUtils.generateHash(userDB.getSalt(), password);
 
-	private User login(User user, String password) throws Exception{
+        if (!userDB.getPassword().equals(passHash)) {
 
-		User userDB = retrieveByEmail(user.getEmail());
+            throw new BusinessException("invalid_user_password");
+        } else {
 
-		if(userDB == null || password == null){
-			throw new BusinessException("invalid_user_password");
-		}
+            user = userDB;
+            createToken(userDB);
+        }
 
-		if(StringUtils.isNotEmpty(user.getType()) && !user.getType().equals(userDB.getType())){
-			throw new BusinessException("invalid_user_Type");
-		}
+        return user;
+    }
 
 
-		if(userDB.getStatus() != null && userDB.getStatus().equals(UserStatusEnum.BLOCKED)){
-			throw new BusinessException("user_blocked");
-		}
+    @Override
+    public void logout(String idUser) throws Exception {
 
-		String passHash = SecUtils.generateHash(userDB.getSalt(), password);
+        User user = retrieve(idUser);
+        user.setToken(null);
+        user.setTokenExpirationDate(null);
 
-		if(!userDB.getPassword().equals(passHash)){
+        update(user);
+    }
 
-			throw new BusinessException("invalid_user_password");
-		}
-		else{
 
-			user = userDB;
-			createToken(userDB);
-		}
+    @Override
+    public void updateFromClient(User user) throws Exception {
 
-		return user;
-	}
+        if (user.getId() == null) {
+            throw new BusinessException("user_id_required");
+        }
 
+        User userBase = userDAO.retrieve(user);
 
+        if (userBase == null) {
+            throw new BusinessException("user_not_found");
+        }
 
-	@Override
-	public void logout(String idUser) throws Exception{
+        validateUser(user);
 
-		User user = retrieve(idUser);
-		user.setToken(null);
-		user.setTokenExpirationDate(null);
+        if (user.getPhone() != null && !userBase.getPhone().equals(user.getPhone())) {
+            if (configurationService.loadByCode("CHECK_PHONE") != null && configurationService.loadByCode("CHECK_PHONE").getValueAsBoolean()) {
+                confirmUserSMS(user.getId());
+            }
+        }
 
-		update(user);
-	}
+        (new BusinessUtils(this.userDAO)).basicSave(user);
 
+    }
 
 
-	@Override
-	public void updateFromClient(User user) throws Exception {
+    @Override
+    public void update(User user) throws Exception {
+        userDAO.update(user);
 
-		if(user.getId() == null){
-			throw new BusinessException("user_id_required");
-		}
+    }
 
-		User userBase = userDAO.retrieve(user);
 
-		if(userBase == null){
-			throw new BusinessException("user_not_found");
-		}
+    @Override
+    public String updatePassword(User user) throws Exception {
 
-		validateUser(user);
+        User userBase = null;
 
-		if(user.getPhone() != null && !userBase.getPhone().equals(user.getPhone())){
-			if(configurationService.loadByCode("CHECK_PHONE") != null && configurationService.loadByCode("CHECK_PHONE").getValueAsBoolean()){
-				confirmUserSMS(user.getId());
-			}
-		}
+        if (user.getOldPassword() != null) {
+            userBase = login(user, user.getOldPassword());
+        } else {
+            userBase = userDAO.retrieve(new User(user.getId()));
+        }
 
-		(new BusinessUtils(this.userDAO)).basicSave(user);
+        if (userBase != null) {
 
-	}
+            userBase.setSalt(SecUtils.getSalt());
+            userBase.setPassword(SecUtils.generateHash(userBase.getSalt(), user.getPassword()));
 
+            userDAO.update(userBase);
 
-	@Override
-	public void update(User user) throws Exception {
-		userDAO.update(user);
+        }
+        return userBase.getPassword();
+    }
 
-	}
 
+    @Override
+    public void saveFacebookAvatar(PhotoUpload photoUpload) throws Exception {
 
-	@Override
-	public String updatePassword(User user) throws Exception {
+        URL url = new URL(photoUpload.getUrl());
+        BufferedImage image = ImageIO.read(url);
 
-		User userBase = null;
+        Configuration confPath = configurationService.loadByCode(ConfigurationEnum.PATH_BASE);
+        File folder = new File(confPath.getValue() + "/user/" + photoUpload.getIdObject());
+        folder.mkdirs();
 
-		if(user.getOldPassword() != null){
-			userBase = login(user, user.getOldPassword());
-		}
-		else{
-			userBase = userDAO.retrieve(new User(user.getId()));
-		}
+        File destiny = new File(folder, "/original.jpg");
+        ImageIO.write(image, "jpg", destiny);
 
-		if(userBase != null){
+        //escreve a versao reduzida
+        Configuration confSize = configurationService.loadByCode("SIZE_DETAIL_MOBILE");
 
-			userBase.setSalt(SecUtils.getSalt());
-			userBase.setPassword(SecUtils.generateHash(userBase.getSalt(), user.getPassword()));
+        String reduced = "reduced.jpg";
 
-			userDAO.update(userBase);
+        FileInputStream fis = new FileInputStream(destiny);
+        new ImageUtil().mudarTamanhoImagemProporcinal(reduced, fis, folder, confSize.getValueAsInt(), -1, false);
+    }
 
-		}
-		return  userBase.getPassword();
-	}
 
+    @Override
+    public String pathImage(String idUser) throws Exception {
 
-	@Override
-	public void saveFacebookAvatar(PhotoUpload photoUpload) throws Exception{
+        Configuration confPath = configurationService.loadByCode(ConfigurationEnum.PATH_BASE);
 
-		URL url = new URL(photoUpload.getUrl());
-		BufferedImage image = ImageIO.read(url);
+        String path = confPath.getValue() + "/user/" + idUser;
+        return path;
+    }
 
-		Configuration confPath = configurationService.loadByCode(ConfigurationEnum.PATH_BASE);
-		File folder = new File(confPath.getValue() + "/user/" + photoUpload.getIdObject());
-		folder.mkdirs();
 
-		File destiny = new File(folder, "/original.jpg");
-		ImageIO.write(image, "jpg", destiny);
+    @Override
+    public List<User> listUserIn(List<String> userIds) throws Exception {
 
-		//escreve a versao reduzida
-		Configuration confSize = configurationService.loadByCode("SIZE_DETAIL_MOBILE");
+        List<User> users = null;
 
-		String reduced = "reduced.jpg";
+        if (userIds != null && userIds.size() > 0) {
 
-		FileInputStream fis = new FileInputStream(destiny);
-		new ImageUtil().mudarTamanhoImagemProporcinal(reduced, fis, folder, confSize.getValueAsInt(), -1, false);
-	}
+            Map<String, Object> params = new HashMap<>();
+            params.put("in:id", userIds);
 
+            users = userDAO.search(params);
+        }
 
+        return users;
+    }
 
-	@Override
-	public String pathImage(String idUser) throws Exception {
 
-		Configuration confPath = configurationService.loadByCode(ConfigurationEnum.PATH_BASE);
+    @Override
+    public UserCard generateCard(String idUser) throws Exception {
 
-		String path = confPath.getValue() + "/user/" + idUser;
-		return path;
-	}
+        User user = userDAO.retrieve(new User(idUser));
+        UserCard card = generateCard(user);
+        return card;
+    }
 
 
+    @Override
+    public UserCard generateCard(User user) {
 
-	@Override
-	public List<User> listUserIn(List<String> userIds) throws Exception {
+        UserCard card = new UserCard();
+        generateCard(user, card);
 
-		List<User> users = null;
+        return card;
+    }
 
-		if(userIds != null && userIds.size() > 0){
 
-			Map<String, Object> params = new HashMap<>();
-			params.put("in:id", userIds);
+    private void generateCard(User user, UserCard card) {
 
-			users = userDAO.search(params);
-		}
+        card.setId(user.getId());
+        card.setName(user.getName());
+        card.setEmail(user.getEmail());
+        card.setPhone(user.getPhone());
+        card.setIdObj(user.getIdObj());
+        card.setNameObj(user.getNameObj());
+        card.setCreationDate(user.getCreationDate());
+        card.setStatus(user.getStatus());
+        card.setType(user.getType());
 
-		return users;
-	}
 
+    }
 
 
-	@Override
-	public UserCard generateCard(String idUser) throws Exception {
+    @Asynchronous
+    @Override
+    public void updateStartInfo(UserStartInfo userStartInfo) throws Exception {
 
-		User user = userDAO.retrieve(new User(idUser));
-		UserCard card = generateCard(user);
-		return card;
-	}
+        User user = userDAO.retrieve(new User(userStartInfo.getIdUser()));
+        user.setLastLogin(new Date());
 
+        if (userStartInfo.getKeyIOS() != null) {
+            user.setKeyIOS(userStartInfo.getKeyIOS());
+        }
 
-	@Override
-	public UserCard generateCard(User user){
+        if (userStartInfo.getKeyAndroid() != null) {
+            user.setKeyAndroid(userStartInfo.getKeyAndroid());
+        }
 
-		UserCard card = new UserCard();
-		generateCard(user, card);
+        if (userStartInfo.getLanguage() != null) {
+            user.setLanguage(userStartInfo.getLanguage());
+        }
 
-		return card;
-	}
+        if (userStartInfo.getLatitude() != null) {
 
+            if (user.getLastAddress() == null) {
+                user.setLastAddress(new AddressInfo());
+            }
 
+            user.getLastAddress().setLatitude(userStartInfo.getLatitude());
+            user.getLastAddress().setLongitude(userStartInfo.getLongitude());
+        }
 
-	private void generateCard(User user, UserCard card){
+        userDAO.update(user);
+    }
 
-		card.setId(user.getId());
-		card.setName(user.getName());
-		card.setEmail(user.getEmail());
-		card.setPhone(user.getPhone());
-		card.setIdObj(user.getIdObj());
-		card.setNameObj(user.getNameObj());
-		card.setCreationDate(user.getCreationDate());
-		card.setStatus(user.getStatus());
-		card.setType(user.getType());
+    public User updatePhoneUser(User user) throws Exception {
 
+        User userBase = null;
 
+        userBase = userDAO.retrieve(new User(user.getId()));
 
-	}
+        if (userBase != null) {
 
+            userBase.setPhoneNumber(user.getPhoneNumber());
 
+            userBase.setPhone(user.getPhone());
 
-	@Asynchronous
-	@Override
-	public void updateStartInfo(UserStartInfo userStartInfo) throws Exception {
+            userDAO.update(userBase);
+        }
+        return userBase;
+    }
 
-		User user = userDAO.retrieve(new User(userStartInfo.getIdUser()));
-		user.setLastLogin(new Date());
+    @Override
+    public void confirmUserSMS(String idUser) throws Exception {
 
-		if(userStartInfo.getKeyIOS() != null){
-			user.setKeyIOS(userStartInfo.getKeyIOS());
-		}
+        User user = retrieve(idUser);
 
-		if(userStartInfo.getKeyAndroid() != null){
-			user.setKeyAndroid(userStartInfo.getKeyAndroid());
-		}
+        UserAuthKey key = userAuthKeyService.createKey(idUser, UserAuthKeyTypeEnum.SMS);
 
-		if(userStartInfo.getLanguage() != null){
-			user.setLanguage(userStartInfo.getLanguage());
-		}
+        String message = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.confirm.sms", key.getKey());
 
-		if(userStartInfo.getLatitude() != null){
+        notificationService.sendNotification(new NotificationBuilder()
+                .setTo(user)
+                .setTypeSending(TypeSendingNotificationEnum.SMS)
+                .setMessage(message)
+                .setFgAlertOnly(true)
+                .build());
+    }
 
-			if(user.getLastAddress() == null){
-				user.setLastAddress(new AddressInfo());
-			}
 
-			user.getLastAddress().setLatitude(userStartInfo.getLatitude());
-			user.getLastAddress().setLongitude(userStartInfo.getLongitude());
-		}
+    @Override
+    public void confirmUserEmail(String idUser) throws Exception {
 
-		userDAO.update(user);
-	}
+        User user = retrieve(idUser);
 
-	public User updatePhoneUser (User user) throws Exception {
+        UserAuthKey key = userAuthKeyService.createKey(idUser, UserAuthKeyTypeEnum.EMAIL);
 
-		User userBase = null;
+        final String projectName = configurationService.loadByCode("PROJECT_NAME").getValue();
 
-		userBase = userDAO.retrieve(new User(user.getId()));
+        String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.confirm.email.title", projectName);
 
-		if(userBase != null){
+        String configKeyLang = user.getLanguage() == null ? "" : "_" + user.getLanguage().toUpperCase();
 
-			userBase.setPhoneNumber(user.getPhoneNumber());
+        final int emailTemplateId = configurationService.loadByCode("USER_EMAIL_CONFIRM_ID" + configKeyLang).getValueAsInt();
 
-			userBase.setPhone(user.getPhone());
+        final String link = configurationService.loadByCode("USER_EMAIL_CONFIRM_LINK").getValue()
+                .replaceAll("__LANGUAGE__", user.getLanguage())
+                .replaceAll("__KEY__", key.getKey())
+                .replaceAll("__USER__", user.getId())
+                .replaceAll("__TYPE__", key.getType().toString());
 
-			userDAO.update(userBase);
-		}
-		return userBase;
-	}
+        sendNotification(user, title, emailTemplateId, link);
+    }
 
-	@Override
-	public void confirmUserSMS(String idUser) throws Exception {
 
-		User user = retrieve(idUser);
+    @Override
+    public Boolean validateKey(UserAuthKey key) throws Exception {
 
-		UserAuthKey key = userAuthKeyService.createKey(idUser, UserAuthKeyTypeEnum.SMS);
+        boolean validate = userAuthKeyService.validateKey(key);
 
-		String message = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.confirm.sms", key.getKey());
+        if (validate) {
+            User user = userDAO.retrieve(new User(key.getIdUser()));
+            user.setUserConfirmed(true);
 
-		notificationService.sendNotification(new NotificationBuilder()
-				.setTo(user)
-				.setTypeSending(TypeSendingNotificationEnum.SMS)
-				.setMessage(message)
-				.setFgAlertOnly(true)
-				.build());
-	}
+            if (key.getType().equals(UserAuthKeyTypeEnum.EMAIL)) {
+                user.setEmailConfirmed(true);
+            } else {
+                user.setPhoneConfirmed(true);
+            }
 
+            userDAO.update(user);
+        }
 
+        return validate;
+    }
 
-	@Override
-	public void confirmUserEmail(String idUser) throws Exception {
 
-		User user = retrieve(idUser);
+    @Override
+    public void forgotPassword(String email) throws Exception {
 
-		UserAuthKey key = userAuthKeyService.createKey(idUser, UserAuthKeyTypeEnum.EMAIL);
+        User user = retrieveByEmail(email);
 
-		final String projectName = configurationService.loadByCode("PROJECT_NAME").getValue();
+        if (user == null) {
+            throw new BusinessException("user_not_found");
+        }
 
-		String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.confirm.email.title", projectName);
+        UserAuthKey key = userAuthKeyService.createKey(user.getId(), UserAuthKeyTypeEnum.EMAIL);
 
-		String configKeyLang = user.getLanguage() == null ? "" : "_"+user.getLanguage().toUpperCase();
+        if (user.getLanguage() == null) {
+            user.setLanguage("PT_BR");
+        }
 
-		final int emailTemplateId = configurationService.loadByCode("USER_EMAIL_CONFIRM_ID" + configKeyLang).getValueAsInt();
+        final String projectName = configurationService.loadByCode("PROJECT_NAME").getValue();
 
-		final String link = configurationService.loadByCode("USER_EMAIL_CONFIRM_LINK").getValue()
-				.replaceAll("__LANGUAGE__", user.getLanguage())
-				.replaceAll("__KEY__", key.getKey())
-				.replaceAll("__USER__", user.getId())
-				.replaceAll("__TYPE__", key.getType().toString());
+        String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.confirm.email.forgot.title", projectName);
 
-		sendNotification(user, title, emailTemplateId, link);
-	}
+        final int emailTemplateId = configurationService.loadByCode("USER_EMAIL_FORGOT_ID").getValueAsInt();
 
+        String baseLink = "__BASE__/email_forgot_password_user?l=__LANGUAGE__&k=__KEY__&u=__USER__&t=__TYPE__";
 
+        final String link = baseLink
+                .replaceAll("__BASE__", configurationService.loadByCode("PROJECT_URL").getValue())
+                .replaceAll("__LANGUAGE__", user.getLanguage())
+                .replaceAll("__KEY__", key.getKey())
+                .replaceAll("__USER__", user.getId())
+                .replaceAll("__TYPE__", key.getType().toString());
 
-	@Override
-	public Boolean validateKey(UserAuthKey key)throws Exception {
+        sendNotification(user, title, emailTemplateId, link);
+    }
 
-		boolean validate = userAuthKeyService.validateKey(key);
 
-		if(validate){
-			User user = userDAO.retrieve(new User(key.getIdUser()));
-			user.setUserConfirmed(true);
+    private void sendNotification(User user, String title, int emailTemplateId, String link) throws Exception {
 
-			if(key.getType().equals(UserAuthKeyTypeEnum.EMAIL)){
-				user.setEmailConfirmed(true);
-			}
-			else{
-				user.setPhoneConfirmed(true);
-			}
+        final String projectName = configurationService.loadByCode("PROJECT_NAME").getValue();
+        final String projectLogo = configurationService.loadByCode("PROJECT_LOGO_URL").getValue();
 
-			userDAO.update(user);
-		}
+        notificationService.sendNotification(new NotificationBuilder()
+                .setTo(user)
+                .setTypeSending(TypeSendingNotificationEnum.EMAIL)
+                .setTitle(title)
+                .setFgAlertOnly(true)
+                .setEmailDataTemplate(new EmailDataTemplate() {
 
-		return validate;
-	}
+                    @Override
+                    public Integer getTemplateId() {
+                        return emailTemplateId;
+                    }
 
+                    @Override
+                    public Map<String, Object> getData() {
 
-	@Override
-	public void forgotPassword(String email) throws Exception {
+                        Map<String, Object> params = new HashMap<>();
+                        params.put("user_name", user.getName());
+                        params.put("confirmation_link", link);
+                        params.put("project_name", projectName);
+                        params.put("project_logo", projectLogo);
 
-		User user = retrieveByEmail(email);
+                        return params;
+                    }
+                })
+                .build());
+    }
 
-		if(user == null){
-			throw new BusinessException("user_not_found");
-		}
 
-		UserAuthKey key = userAuthKeyService.createKey(user.getId(), UserAuthKeyTypeEnum.EMAIL);
+    @Override
+    public List<UserCard> searchByName(String name) throws Exception {
 
-		if(user.getLanguage() == null){
-			user.setLanguage("PT_BR");
-		}
+        List<UserCard> list = null;
 
-		final String projectName = configurationService.loadByCode("PROJECT_NAME").getValue();
+        Map<String, Object> params = new HashMap<>();
+        params.put("like:name", name);
 
-		String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.confirm.email.forgot.title", projectName);
+        List<User> listUsers = userDAO.search(params, null, 10, 0);
 
-		final int emailTemplateId = configurationService.loadByCode("USER_EMAIL_FORGOT_ID").getValueAsInt();
+        if (listUsers != null) {
+            list = new ArrayList<>();
 
-		String baseLink = "__BASE__/email_forgot_password_user?l=__LANGUAGE__&k=__KEY__&u=__USER__&t=__TYPE__";
+            for (User user : listUsers) {
+                list.add(generateCard(user));
+            }
+        }
 
-		final String link = baseLink
-				.replaceAll("__BASE__", configurationService.loadByCode("PROJECT_URL").getValue())
-				.replaceAll("__LANGUAGE__", user.getLanguage())
-				.replaceAll("__KEY__", key.getKey())
-				.replaceAll("__USER__", user.getId())
-				.replaceAll("__TYPE__", key.getType().toString());
+        return list;
+    }
 
-		sendNotification(user, title, emailTemplateId, link);
-	}
 
+    @Override
+    public List<UserCard> listAll() throws Exception {
 
-	private void sendNotification(User user, String title, int emailTemplateId, String link) throws Exception {
+        List<UserCard> list = null;
+        List<User> listUsers = userDAO.listAll();
 
-		final String projectName = configurationService.loadByCode("PROJECT_NAME").getValue();
-		final String projectLogo = configurationService.loadByCode("PROJECT_LOGO_URL").getValue();
+        if (listUsers != null) {
+            list = new ArrayList<>();
 
-		notificationService.sendNotification(new NotificationBuilder()
-				.setTo(user)
-				.setTypeSending(TypeSendingNotificationEnum.EMAIL)
-				.setTitle(title)
-				.setFgAlertOnly(true)
-				.setEmailDataTemplate(new EmailDataTemplate() {
+            for (User user : listUsers) {
+                list.add(generateCard(user));
+            }
+        }
 
-					@Override
-					public Integer getTemplateId() {
-						return emailTemplateId;
-					}
+        return list;
+    }
 
-					@Override
-					public Map<String, Object> getData() {
 
-						Map<String, Object> params = new HashMap<>();
-						params.put("user_name", user.getName());
-						params.put("confirmation_link", link);
-						params.put("project_name", projectName);
-						params.put("project_logo", projectLogo);
+    @Override
+    public void cancelUser(String idUser) throws Exception {
 
-						return params;
-					}
-				})
-				.build());
-	}
+        User user = retrieve(idUser);
+        userFreezerService.moveToFreezer(user);
+    }
 
 
-	@Override
-	public List<UserCard> searchByName(String name) throws Exception {
+    @Override
+    public Boolean checkToken(String token) throws Exception {
 
-		List<UserCard> list = null;
+        Boolean validated = true;
+        User user = retrieveByToken(token);
 
-		Map<String, Object> params = new HashMap<>();
-		params.put("like:name", name);
+        if (user == null || user.getToken() == null || !user.getToken().equals(token) || user.getTokenExpirationDate().before(new Date())) {
+            validated = false;
+        }
 
-		List<User> listUsers = userDAO.search(params, null, 10, 0);
+        return validated;
+    }
 
-		if(listUsers != null){
-			list = new ArrayList<>();
 
-			for(User user : listUsers){
-				list.add(generateCard(user));
-			}
-		}
+    @Override
+    public User retrieveByToken(String token) throws Exception {
 
-		return list;
-	}
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("token", token);
 
+        User user = userDAO.retrieve(params);
 
+        return user;
+    }
 
-	@Override
-	public List<UserCard> listAll() throws Exception {
 
-		List<UserCard> list = null;
-		List<User> listUsers = userDAO.listAll();
+    private void createToken(User userDB) throws Exception {
 
-		if(listUsers != null){
-			list = new ArrayList<>();
+        userDB.setToken(UUID.randomUUID().toString());
 
-			for(User user : listUsers){
-				list.add(generateCard(user));
-			}
-		}
+        Calendar expCal = Calendar.getInstance();
+        expCal.add(Calendar.HOUR, 12);
+        userDB.setTokenExpirationDate(expCal.getTime());
 
-		return list;
-	}
+        userDAO.update(userDB);
+    }
 
 
+    @Override
+    public List<User> customersByRadius(Double latitude, Double longitude, Integer distanceKM) throws Exception {
 
-	@Override
-	public void cancelUser(String idUser) throws Exception {
+        List<User> list = userDAO.search(new SearchBuilder()
+                .appendParam("geo:lastAddress", new Double[]{latitude, longitude, new Double(distanceKM)})
+                .build());
 
-		User user = retrieve(idUser);
-		userFreezerService.moveToFreezer(user);
-	}
+        return list;
+    }
 
 
+    @Override
+    public void testNotification(String idUser, String msg) throws Exception {
 
-	@Override
-	public Boolean checkToken(String token) throws Exception {
+        final String projectName = configurationService.loadByCode("PROJECT_NAME").getValue();
+        final String projectLogo = configurationService.loadByCode("PROJECT_LOGO_URL").getValue();
 
-		Boolean validated = true;
-		User user = retrieveByToken(token);
+        User user = retrieve(idUser);
 
-		if(user == null || user.getToken() == null || !user.getToken().equals(token) || user.getTokenExpirationDate().before(new Date())){
-			validated = false;
-		}
+        NotificationBuilder builder = new NotificationBuilder()
+                .setTo(user)
+                .setMessage(msg)
+                .setTypeSending(TypeSendingNotificationEnum.APP_EMAIL);
 
-		return validated;
-	}
+        Configuration configuration = configurationService.loadByCode("MSG_EMAIL");
 
+        if (configuration != null) {
+            final int emailTemplateId = configuration.getValueAsInt();
 
+            builder = builder.setEmailDataTemplate(new EmailDataTemplate() {
 
-	@Override
-	public User retrieveByToken(String token) throws Exception {
+                @Override
+                public Integer getTemplateId() {
+                    return emailTemplateId;
+                }
 
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("token", token);
+                @Override
+                public Map<String, Object> getData() {
 
-		User user = userDAO.retrieve(params);
+                    Map<String, Object> params = new HashMap<>();
+                    params.put("user_name", user.getName());
+                    params.put("msg", msg);
+                    params.put("project_name", projectName);
+                    params.put("project_logo", projectLogo);
 
-		return user;
-	}
+                    return params;
+                }
+            });
+        }
 
+        notificationService.sendNotification(builder.build());
+    }
 
 
-	private void createToken(User userDB) throws Exception{
+    @Override
+    public String pathGallery(String idUser, PhotoUploadTypeEnum photoUploadTypeEnum) throws Exception {
 
-		userDB.setToken(UUID.randomUUID().toString());
+        String path = null;
 
-		Calendar expCal = Calendar.getInstance();
-		expCal.add(Calendar.HOUR, 12);
-		userDB.setTokenExpirationDate(expCal.getTime());
+        if (photoUploadTypeEnum == null) {
+            path = configurationService.loadByCode("PATH_BASE").getValue() + "/user/" + idUser + "/gallery";
+        } else if (PhotoUploadTypeEnum.IMAGE.equals(photoUploadTypeEnum)) {
+            path = configurationService.loadByCode("PATH_BASE").getValue() + "/user/" + idUser + "/gallery/photo";
+        } else if (PhotoUploadTypeEnum.VIDEO.equals(photoUploadTypeEnum)) {
+            path = configurationService.loadByCode("PATH_BASE").getValue() + "/user/" + idUser + "/gallery/video";
+        }
 
-		userDAO.update(userDB);
-	}
+        return path;
+    }
 
 
+    @Override
+    public List<User> listByFieldInfo(String field, String value) throws Exception {
 
-	@Override
-	public List<User> customersByRadius(Double latitude, Double longitude, Integer distanceKM) throws Exception {
+        List<User> listUser = userDAO.listByFieldInfo(field, value);
 
-		List<User> list = userDAO.search(new SearchBuilder()
-				.appendParam("geo:lastAddress", new Double[]{latitude, longitude, new Double(distanceKM)})
-				.build());
+        return listUser;
 
-		return list;
-	}
+    }
 
 
+    @Override
+    public void changeStatus(String idUser) throws Exception {
 
-	@Override
-	public void testNotification(String idUser, String msg) throws Exception {
+        User user = retrieve(idUser);
 
-		final String projectName = configurationService.loadByCode("PROJECT_NAME").getValue();
-		final String projectLogo = configurationService.loadByCode("PROJECT_LOGO_URL").getValue();
+        if (user.getStatus().equals(UserStatusEnum.ACTIVE)) {
+            user.setStatus(UserStatusEnum.BLOCKED);
+        } else {
+            user.setStatus(UserStatusEnum.ACTIVE);
+        }
 
-		User user = retrieve(idUser);
+        userDAO.update(user);
+    }
 
-		NotificationBuilder builder = new NotificationBuilder()
-				.setTo(user)
-				.setMessage(msg)
-				.setTypeSending(TypeSendingNotificationEnum.APP_EMAIL);
 
-		Configuration configuration = configurationService.loadByCode("MSG_EMAIL");
+    @Override
+    public void saveByAdmin(User user) throws Exception {
 
-		if(configuration != null){
-			final int emailTemplateId = configuration.getValueAsInt();
 
-			builder = builder.setEmailDataTemplate(new EmailDataTemplate() {
+        boolean sendEmail = user.getId() == null;
 
-				@Override
-				public Integer getTemplateId() {
-					return emailTemplateId;
-				}
-
-				@Override
-				public Map<String, Object> getData() {
-
-					Map<String, Object> params = new HashMap<>();
-					params.put("user_name", user.getName());
-					params.put("msg", msg);
-					params.put("project_name", projectName);
-					params.put("project_logo", projectLogo);
-
-					return params;
-				}
-			});
-		}
-
-		notificationService.sendNotification(builder.build());
-	}
-
-
-
-	@Override
-	public String pathGallery(String idUser, PhotoUploadTypeEnum photoUploadTypeEnum) throws Exception {
-
-		String path = null;
-
-		if(photoUploadTypeEnum == null){
-			path = configurationService.loadByCode("PATH_BASE").getValue() + "/user/" + idUser + "/gallery";
-		}else if(PhotoUploadTypeEnum.IMAGE.equals(photoUploadTypeEnum)){
-			path = configurationService.loadByCode("PATH_BASE").getValue() + "/user/" + idUser + "/gallery/photo";
-		}else if(PhotoUploadTypeEnum.VIDEO.equals(photoUploadTypeEnum)){
-			path = configurationService.loadByCode("PATH_BASE").getValue() + "/user/" + idUser + "/gallery/video";
-		}
-
-		return path;
-	}
-
-
-	@Override
-	public List<User> listByFieldInfo(String field, String value) throws Exception {
-
-		List<User> listUser = userDAO.listByFieldInfo(field, value);
-
-		return listUser;
-
-	}
-
-
-	@Override
-	public void changeStatus(String idUser) throws Exception {
-
-		User user = retrieve(idUser);
-
-		if(user.getStatus().equals(UserStatusEnum.ACTIVE)){
-			user.setStatus(UserStatusEnum.BLOCKED);
-		}
-		else{
-			user.setStatus(UserStatusEnum.ACTIVE);
-		}
-
-		userDAO.update(user);
-	}
-
-
-	@Override
-	public void saveByAdmin(User user) throws Exception {
-
-
-		boolean sendEmail = user.getId() == null;
-
-		save(user);
+        save(user);
 
 //		Thread.sleep(2000);
 
-		if(sendEmail){
+        if (sendEmail) {
 
-			if (user.getEmail() == null){
-				throw new BusinessException("missing_user_email");
-			}
+            if (user.getEmail() == null) {
+                throw new BusinessException("missing_user_email");
+            }
 
-			//forgotPassword(user);
-			UserAuthKey key = userAuthKeyService.createKey(user.getId(), UserAuthKeyTypeEnum.EMAIL);
+            //forgotPassword(user);
+            UserAuthKey key = userAuthKeyService.createKey(user.getId(), UserAuthKeyTypeEnum.EMAIL);
 
-			final String projectName = configurationService.loadByCode("PROJECT_NAME").getValue();
+            final String projectName = configurationService.loadByCode("PROJECT_NAME").getValue();
 
-			String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.register.password.title", projectName);
+            String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.register.password.title", projectName);
 
-			String configKeyLang = user.getLanguage() == null ? "" : "_"+user.getLanguage().toUpperCase();
+            String configKeyLang = user.getLanguage() == null ? "" : "_" + user.getLanguage().toUpperCase();
 
-			final int emailTemplateId = configurationService.loadByCode("USER_EMAIL_FORGOT_ID" + configKeyLang).getValueAsInt();
+            final int emailTemplateId = configurationService.loadByCode("USER_EMAIL_FORGOT_ID" + configKeyLang).getValueAsInt();
 
-			final String link = configurationService.loadByCode("USER_EMAIL_FORGOT_LINK").getValue()
-					.replaceAll("__LANGUAGE__", user.getLanguage())
-					.replaceAll("__KEY__", key.getKey())
-					.replaceAll("__USER__", user.getId())
-					.replaceAll("__TYPE__", key.getType().toString());
+            final String link = configurationService.loadByCode("USER_EMAIL_FORGOT_LINK").getValue()
+                    .replaceAll("__LANGUAGE__", user.getLanguage())
+                    .replaceAll("__KEY__", key.getKey())
+                    .replaceAll("__USER__", user.getId())
+                    .replaceAll("__TYPE__", key.getType().toString());
 
-			sendNotification(user, title, emailTemplateId, link);
-		}
-	}
+            sendNotification(user, title, emailTemplateId, link);
+        }
+    }
 
-	@Override
-	public List<UserCard> search(UserSearch search) throws Exception {
+    @Override
+    public List<UserCard> search(UserSearch search) throws Exception {
 
-		SearchBuilder searchBuilder = new SearchBuilder();
-		searchBuilder.appendParam("status", UserStatusEnum.ACTIVE);
-		if (search.getQueryString() != null && StringUtils.isNotEmpty(search.getQueryString().trim())) {
-			searchBuilder.appendParam("name", search.getQueryString());
-		}
-		searchBuilder.setFirst(TOTAL_PAGE * (search.getPage() -1));
-		searchBuilder.setMaxResults(TOTAL_PAGE);
+        SearchBuilder searchBuilder = new SearchBuilder();
+        searchBuilder.appendParam("status", UserStatusEnum.ACTIVE);
+        if (search.getQueryString() != null && StringUtils.isNotEmpty(search.getQueryString().trim())) {
+            searchBuilder.appendParam("name", search.getQueryString());
+        }
+
+        if (search.getCode() != null) {
+            searchBuilder.appendParamQuery("code", search.getCode());
+        }
+
+        searchBuilder.setFirst(TOTAL_PAGE * (search.getPage() - 1));
+        searchBuilder.setMaxResults(TOTAL_PAGE);
 //		Sort sort = new Sort(new SortField("creationDate", SortField.Type.LONG, true));
 //		searchBuilder.setSort(sort);
 
-		//ordena
-		List<UserCard> list = null;
-		List<User> listUsers = this.userDAO.search(searchBuilder.build());
-		if(listUsers != null){
-			list = new ArrayList<>();
+        //ordena
+        List<UserCard> list = null;
+        List<User> listUsers = this.userDAO.search(searchBuilder.build());
+        if (listUsers != null) {
+            list = new ArrayList<>();
 
-			for(User user : listUsers){
-				list.add(generateCard(user));
-			}
-		}
-		return list;
+            for (User user : listUsers) {
+                list.add(generateCard(user));
+            }
+        }
+        return list;
 
 
-	}
+    }
 
     @Override
     public List<UserCard> listActives() throws Exception {
 
         List<User> listUsers = null;
 
-		SearchBuilder searchBuilder = new SearchBuilder();
-		searchBuilder.appendParam("status", UserStatusEnum.ACTIVE);
+        SearchBuilder searchBuilder = new SearchBuilder();
+        searchBuilder.appendParam("status", UserStatusEnum.ACTIVE);
 
-		listUsers = userDAO.search(searchBuilder.build());
-		List<UserCard> list = null;
-		if(listUsers != null){
-			list = new ArrayList<>();
+        listUsers = userDAO.search(searchBuilder.build());
+        List<UserCard> list = null;
+        if (listUsers != null) {
+            list = new ArrayList<>();
 
-			for(User user : listUsers){
-				list.add(generateCard(user));
-			}
-		}
+            for (User user : listUsers) {
+                list.add(generateCard(user));
+            }
+        }
 
         return list;
     }
 
 
-	@Override
-	public UserResultSearch searchAdmin(UserSearch userSearch) throws Exception {
-		if (userSearch.getPage() == null) {
-			throw new BusinessException("missing_page");
-		} else {
-			SearchBuilder sb = this.userDAO.createBuilder();
-			if (userSearch.getStatus() != null) {
-				sb.appendParamQuery("status", userSearch.getStatus());
-			}else {
-				sb.appendParamQuery("status", UserStatusEnum.values(), OperationEnum.IN);
-			}
+    @Override
+    public UserResultSearch searchAdmin(UserSearch userSearch) throws Exception {
+        if (userSearch.getPage() == null) {
+            throw new BusinessException("missing_page");
+        } else {
+            SearchBuilder sb = this.userDAO.createBuilder();
+            if (userSearch.getStatus() != null) {
+                sb.appendParamQuery("status", userSearch.getStatus());
+            } else {
+                sb.appendParamQuery("status", UserStatusEnum.values(), OperationEnum.IN);
+            }
 
-			if (userSearch.getType() != null) {
-				sb.appendParamQuery("type", userSearch.getType());
-			}
+            if (userSearch.getType() != null) {
+                sb.appendParamQuery("type", userSearch.getType());
+            }
 
-			if (userSearch.getTypeIn() != null) {
-				sb.appendParamQuery("type", userSearch.getTypeIn(), OperationEnum.IN);
-			}
+            if (userSearch.getCode() != null) {
+                sb.appendParamQuery("code", userSearch.getCode());
+            }
 
-			if (userSearch.getQueryString() != null && !userSearch.getQueryString().isEmpty()) {
-				sb.appendParamQuery("name|nameObj", userSearch.getQueryString(), OperationEnum.OR_FIELDS);
-			}
+            if (userSearch.getTypeIn() != null) {
+                sb.appendParamQuery("type", userSearch.getTypeIn(), OperationEnum.IN);
+            }
 
-			if (userSearch.getCreationDate() != null){
-				sb.appendParamQuery("creationDate", userSearch.getCreationDate(), OperationEnum.GT);
-			}
+            if (userSearch.getQueryString() != null && !userSearch.getQueryString().isEmpty()) {
+                sb.appendParamQuery("name|nameObj", userSearch.getQueryString(), OperationEnum.OR_FIELDS);
+            }
+
+            if (userSearch.getCreationDate() != null) {
+                sb.appendParamQuery("creationDate", userSearch.getCreationDate(), OperationEnum.GT);
+            }
 
 
-			//sb.setQuery(qb.build());
-			if (userSearch.getPageItensNumber() != null && userSearch.getPageItensNumber() > 0) {
-				sb.setFirst(userSearch.getPageItensNumber() * (userSearch.getPage() - 1));
-				sb.setMaxResults(userSearch.getPageItensNumber());
-			} else {
-				sb.setFirst(10 * (userSearch.getPage() - 1));
-				sb.setMaxResults(10);
-			}
+            //sb.setQuery(qb.build());
+            if (userSearch.getPageItensNumber() != null && userSearch.getPageItensNumber() > 0) {
+                sb.setFirst(userSearch.getPageItensNumber() * (userSearch.getPage() - 1));
+                sb.setMaxResults(userSearch.getPageItensNumber());
+            } else {
+                sb.setFirst(10 * (userSearch.getPage() - 1));
+                sb.setMaxResults(10);
+            }
 
-			Sort sort = new Sort(new SortField("name", SortField.Type.STRING, false));
-			sb.setSort(sort);
-			List<User> listUsers = this.userDAO.search(sb.build());
-			int totalAmount = this.totalAmount(sb);
-			int pageQuantity;
-			if (userSearch.getPageItensNumber() != null && userSearch.getPageItensNumber() > 0) {
-				pageQuantity = this.pageQuantity(userSearch.getPageItensNumber(), totalAmount);
-			} else {
-				pageQuantity = this.pageQuantity(10, totalAmount);
-			}
+            Sort sort = new Sort(new SortField("name", SortField.Type.STRING, false));
+            sb.setSort(sort);
+            List<User> listUsers = this.userDAO.search(sb.build());
+            int totalAmount = this.totalAmount(sb);
+            int pageQuantity;
+            if (userSearch.getPageItensNumber() != null && userSearch.getPageItensNumber() > 0) {
+                pageQuantity = this.pageQuantity(userSearch.getPageItensNumber(), totalAmount);
+            } else {
+                pageQuantity = this.pageQuantity(10, totalAmount);
+            }
 
-			List<UserCard> list = new ArrayList<>();
+            List<UserCard> list = new ArrayList<>();
 
-			if (listUsers != null && !listUsers.isEmpty()){
-				for(User user : listUsers){
-					list.add(generateCard(user));
-				}
-			}
+            if (listUsers != null && !listUsers.isEmpty()) {
+                for (User user : listUsers) {
+                    list.add(generateCard(user));
+                }
+            }
 
-			UserResultSearch result = new UserResultSearch();
-			result.setList(list);
-			result.setTotalAmount(totalAmount);
-			result.setPageQuantity(pageQuantity);
-			return result;
-		}
-	}
+            UserResultSearch result = new UserResultSearch();
+            result.setList(list);
+            result.setTotalAmount(totalAmount);
+            result.setPageQuantity(pageQuantity);
+            return result;
+        }
+    }
 
-	private int totalAmount(SearchBuilder sb) throws Exception {
-		int count = this.userDAO.count(sb.build());
-		return count;
-	}
+    private int totalAmount(SearchBuilder sb) throws Exception {
+        int count = this.userDAO.count(sb.build());
+        return count;
+    }
 
-	private int pageQuantity(int numberOfItensByPage, int totalAmount) throws Exception {
-		int pageQuantity;
-		if (totalAmount % numberOfItensByPage != 0) {
-			pageQuantity = totalAmount / numberOfItensByPage + 1;
-		} else {
-			pageQuantity = totalAmount / numberOfItensByPage;
-		}
+    private int pageQuantity(int numberOfItensByPage, int totalAmount) throws Exception {
+        int pageQuantity;
+        if (totalAmount % numberOfItensByPage != 0) {
+            pageQuantity = totalAmount / numberOfItensByPage + 1;
+        } else {
+            pageQuantity = totalAmount / numberOfItensByPage;
+        }
 
-		return pageQuantity;
-	}
+        return pageQuantity;
+    }
 
 
 }
