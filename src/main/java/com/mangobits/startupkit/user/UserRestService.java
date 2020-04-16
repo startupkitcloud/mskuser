@@ -1,6 +1,7 @@
 package com.mangobits.startupkit.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mangobits.startupkit.admin.userb.UserBService;
 import com.mangobits.startupkit.admin.util.SecuredAdmin;
 import com.mangobits.startupkit.authkey.UserAuthKey;
 import com.mangobits.startupkit.core.configuration.Configuration;
@@ -19,12 +20,10 @@ import com.mangobits.startupkit.ws.JsonContainer;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.StreamingOutput;
 import java.io.*;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
@@ -42,6 +41,12 @@ public class UserRestService extends UserBaseRestService{
 	
 	@EJB
 	protected UserService userService;
+
+	@EJB
+	private UserBService userBService;
+
+	@Context
+	private HttpServletRequest requestB;
 
 	@EJB
 	private ConfigurationService configurationService;
@@ -83,6 +88,11 @@ public class UserRestService extends UserBaseRestService{
 		JsonContainer cont = new JsonContainer();
 
 		try {
+			String authorizationHeader = this.requestB.getHeader("Authorization");
+			if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+				String token = authorizationHeader.substring("Bearer".length()).trim();
+				userSearch.setCode(this.userBService.retrieveByToken(token).getIdObj());
+			}
 			UserResultSearch result = this.userService.searchAdmin(userSearch);
 			cont.setData(result);
 		} catch (Exception var5) {

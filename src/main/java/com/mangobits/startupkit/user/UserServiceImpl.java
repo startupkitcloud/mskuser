@@ -984,7 +984,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (search.getCode() != null) {
-            searchBuilder.appendParamQuery("code", search.getCode());
+            searchBuilder.appendParam("code", search.getCode());
         }
 
         searchBuilder.setFirst(TOTAL_PAGE * (search.getPage() - 1));
