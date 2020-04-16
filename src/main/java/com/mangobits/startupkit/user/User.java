@@ -166,6 +166,9 @@ public class User implements GeneralUser {
 	
 	@Field
 	private String type;
+
+
+	private String idAvatar;
 	
 	
 	
@@ -497,5 +500,13 @@ public class User implements GeneralUser {
 
 	public void setNameObj(String nameObj) {
 		this.nameObj = nameObj;
+	}
+
+	public String getIdAvatar() {
+		return idAvatar;
+	}
+
+	public void setIdAvatar(String idAvatar) {
+		this.idAvatar = idAvatar;
 	}
 }
