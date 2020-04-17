@@ -656,13 +656,15 @@ public class UserServiceImpl implements UserService {
 
         final int emailTemplateId = configurationService.loadByCode("USER_EMAIL_CONFIRM_ID" + configKeyLang).getValueAsInt();
 
+        final String msg = "definir";
+
         final String link = configurationService.loadByCode("USER_EMAIL_CONFIRM_LINK").getValue()
                 .replaceAll("__LANGUAGE__", user.getLanguage())
                 .replaceAll("__KEY__", key.getKey())
                 .replaceAll("__USER__", user.getId())
                 .replaceAll("__TYPE__", key.getType().toString());
 
-        sendNotification(user, title, emailTemplateId, link);
+        sendNotification(user, title, emailTemplateId, link, msg);
     }
 
 
@@ -711,6 +713,8 @@ public class UserServiceImpl implements UserService {
 
         String baseLink = "__BASE__/email_forgot_password_user?l=__LANGUAGE__&k=__KEY__&u=__USER__&t=__TYPE__";
 
+        final String msg = "mudar";
+
         final String link = baseLink
                 .replaceAll("__BASE__", configurationService.loadByCode("PROJECT_URL").getValue())
                 .replaceAll("__LANGUAGE__", user.getLanguage())
@@ -718,11 +722,11 @@ public class UserServiceImpl implements UserService {
                 .replaceAll("__USER__", user.getId())
                 .replaceAll("__TYPE__", key.getType().toString());
 
-        sendNotification(user, title, emailTemplateId, link);
+        sendNotification(user, title, emailTemplateId, link, msg);
     }
 
 
-    private void sendNotification(User user, String title, int emailTemplateId, String link) throws Exception {
+    private void sendNotification(User user, String title, int emailTemplateId, String link, String msg) throws Exception {
 
         final String projectName = configurationService.loadByCode("PROJECT_NAME").getValue();
         final String projectLogo = configurationService.loadByCode("PROJECT_LOGO_URL").getValue();
@@ -745,6 +749,7 @@ public class UserServiceImpl implements UserService {
                         Map<String, Object> params = new HashMap<>();
                         params.put("user_name", user.getName());
                         params.put("confirmation_link", link);
+                        params.put("msg", msg);
                         params.put("project_name", projectName);
                         params.put("project_logo", projectLogo);
 
@@ -960,9 +965,9 @@ public class UserServiceImpl implements UserService {
 
             String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.register.password.title", projectName);
 
-            String configKeyLang = user.getLanguage() == null ? "" : "_" + user.getLanguage().toUpperCase();
+            final String msg = "definir";
 
-            final int emailTemplateId = configurationService.loadByCode("USER_EMAIL_FORGOT_ID" + configKeyLang).getValueAsInt();
+            final int emailTemplateId = configurationService.loadByCode("USER_EMAIL_FORGOT_ID" ).getValueAsInt();
 
             final String link = configurationService.loadByCode("USER_EMAIL_FORGOT_LINK").getValue()
                     .replaceAll("__LANGUAGE__", user.getLanguage())
@@ -970,7 +975,7 @@ public class UserServiceImpl implements UserService {
                     .replaceAll("__USER__", user.getId())
                     .replaceAll("__TYPE__", key.getType().toString());
 
-            sendNotification(user, title, emailTemplateId, link);
+            sendNotification(user, title, emailTemplateId, link, msg);
         }
     }
 
