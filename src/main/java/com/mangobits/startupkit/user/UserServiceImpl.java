@@ -240,11 +240,13 @@ public class UserServiceImpl implements UserService {
 
         String configKeyLang = user.getLanguage() == null ? "" : "_" + user.getLanguage().toUpperCase();
 
+        final String projectName = configurationService.loadByCode("PROJECT_NAME").getValue();
+
         Configuration confEmailId = configurationService.loadByCode("EMAIL_USER_WELCOME" + configKeyLang);
 
         if (confEmailId != null) {
 
-            String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.email.welcome.title");
+            String title = MessageUtils.message(LanguageEnum.localeByLanguage(user.getLanguage()), "user.email.welcome.title", projectName);
 
             final int emailTemplateId = confEmailId.getValueAsInt();
 
@@ -265,7 +267,8 @@ public class UserServiceImpl implements UserService {
 
                             Map<String, Object> params = new HashMap<>();
                             params.put("user_name", user.getName());
-
+                            params.put("project_name", projectName);
+                            System.out.println(projectName);
                             return params;
                         }
                     })
@@ -752,7 +755,6 @@ public class UserServiceImpl implements UserService {
                         params.put("msg", msg);
                         params.put("project_name", projectName);
                         params.put("project_logo", projectLogo);
-
                         return params;
                     }
                 })
