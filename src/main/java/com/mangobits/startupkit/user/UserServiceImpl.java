@@ -269,8 +269,6 @@ public class UserServiceImpl implements UserService {
 
                             Map<String, Object> params = new HashMap<>();
                             params.put("user_name", user.getName());
-                            params.put("project_name", projectName);
-                            System.out.println(projectName);
                             return params;
                         }
                     })

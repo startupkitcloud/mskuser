@@ -131,7 +131,6 @@ public class UserRestService extends UserBaseRestService {
     }
 
 
-    @SecuredUser
     @GET
     @Path("/load/{idUser}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -383,7 +382,6 @@ public class UserRestService extends UserBaseRestService {
     }
 
 
-    @SecuredUser
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -411,7 +409,6 @@ public class UserRestService extends UserBaseRestService {
     }
 
 
-    @SecuredUser
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
