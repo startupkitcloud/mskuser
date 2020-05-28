@@ -131,6 +131,30 @@ public class UserRestService extends UserBaseRestService {
     }
 
 
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    @Path("/loginApple")
+    public String loginApple(User usMon) throws Exception {
+
+        String resultStr = null;
+        JsonContainer cont = new JsonContainer();
+
+        try {
+
+            User user = userService.loginApple(usMon);
+            cont.setData(user);
+
+        } catch (Exception e) {
+            handleException(cont, e, "login apple");
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        resultStr = mapper.writeValueAsString(cont);
+
+        return resultStr;
+    }
+
     @GET
     @Path("/load/{idUser}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")

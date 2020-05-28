@@ -331,6 +331,14 @@ public class UserServiceImpl implements UserService {
     }
 
 
+    @Override
+    public User loginApple(User user) throws Exception {
+        User userDB = userDAO.retrieveByIdApple(user.getIdApple());
+        user = loginSocial(user, userDB);
+        return user;
+    }
+
+
     private User loginSocial(User user, User userDB) throws Exception {
 
         if (userDB == null) {

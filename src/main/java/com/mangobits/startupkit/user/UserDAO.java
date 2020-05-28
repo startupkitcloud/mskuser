@@ -69,6 +69,30 @@ public class UserDAO extends AbstractDAO<User> {
 		
 		return usuario;
 	}
+
+
+	public User retrieveByIdApple(String idApple) throws DAOException{
+
+		User usuario = null;
+
+		try {
+
+			javax.persistence.Query query = entityManager.createNativeQuery("{idApple: '"  + idApple + "'}", User.class);
+
+			usuario = (User) query.getSingleResult();
+
+
+		} catch (NoResultException e) {
+
+			//nao faz nada
+		}
+		catch (Exception e) {
+
+			throw new DAOException("Got an error loading the user", e);
+		}
+
+		return usuario;
+	}
 	
 	@SuppressWarnings("unchecked")
 	public List<User> listByFieldInfo(String field, String value) throws DAOException{
