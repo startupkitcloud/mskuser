@@ -17,6 +17,9 @@ public interface UserService {
 	
 	
 	User loginGoogle(User user) throws Exception;
+
+
+	User loginApple(User user) throws Exception;
 	
 	
 	User login(User user) throws Exception;

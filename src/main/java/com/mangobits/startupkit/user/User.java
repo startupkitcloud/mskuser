@@ -49,6 +49,10 @@ public class User implements GeneralUser {
 	
 	@Field
 	private String idGoogle;
+
+
+	@Field
+	private String idApple;
 	
 	
 	@Field
@@ -166,6 +170,9 @@ public class User implements GeneralUser {
 	
 	@Field
 	private String type;
+
+
+	private String idAvatar;
 	
 	
 	
@@ -497,5 +504,21 @@ public class User implements GeneralUser {
 
 	public void setNameObj(String nameObj) {
 		this.nameObj = nameObj;
+	}
+
+	public String getIdAvatar() {
+		return idAvatar;
+	}
+
+	public void setIdAvatar(String idAvatar) {
+		this.idAvatar = idAvatar;
+	}
+
+	public String getIdApple() {
+		return idApple;
+	}
+
+	public void setIdApple(String idApple) {
+		this.idApple = idApple;
 	}
 }
