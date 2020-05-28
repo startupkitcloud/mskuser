@@ -164,6 +164,15 @@ public class UserServiceImpl implements UserService {
                 return userDB;
             }
 
+            if (user.getIdApple() != null && !user.getIdApple().equals("") && (userDB.getIdApple() == null
+                    || userDB.getIdApple().equals(""))) {
+
+                userDB.setIdApple(user.getIdApple());
+                userDAO.update(userDB);
+
+                return userDB;
+            }
+
             if (fgPhoneError) {
                 throw new BusinessException("phone_exists");
             } else {
@@ -369,7 +378,8 @@ public class UserServiceImpl implements UserService {
 
         User userDB = userDAO.retrieve(new User(user.getId()));
 
-        if (userDB == null || (user.getPassword() == null && user.getIdFacebook() == null && user.getIdGoogle() == null)) {
+        if (userDB == null || (user.getPassword() == null && user.getIdFacebook() == null && user.getIdGoogle() == null
+                && user.getIdApple() == null)) {
             throw new BusinessException("user_not_found");
         }
 
@@ -382,6 +392,10 @@ public class UserServiceImpl implements UserService {
         }
 
         if (user.getIdGoogle() != null && (userDB.getIdGoogle() == null || !user.getIdGoogle().equals(userDB.getIdGoogle()))) {
+            throw new BusinessException("invalid_user_password");
+        }
+
+        if (user.getIdApple() != null && (userDB.getIdApple() == null || !user.getIdApple().equals(userDB.getIdApple()))) {
             throw new BusinessException("invalid_user_password");
         }
 
