@@ -1,119 +1,62 @@
 package com.mangobits.startupkit.user.freezer;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
+import com.mangobits.startupkit.core.annotation.MSKEntity;
+import com.mangobits.startupkit.core.annotation.MSKId;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import java.util.Date;
 
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-@Entity(name="userFreezer")
-@Indexed
+@MSKEntity(name="userFreezer")
 public class UserFreezer {
 
-	
-	
-	@Id
-	@DocumentId
-	@GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
+	@MSKId
     private String id;
-	
-	
-	@Field
+
 	private String idFacebook;
-	
-	
-	@Field
+
 	private String idGoogle;
-	
-	
-	@Field
+
 	private String phone;
-	
-	
-	@Field
+
 	private Long phoneNumber;
 	
-	
 	private Integer phoneCountryCode;
-	
-	
-	
-	@Field
-	private String name;
-	
-		
-	
-	@Field
-	private String email;
-	
-	
-	@Field
-	private String cpf;
-	
-	
-	
-	private String keyIOS;
-	
-	
-	private String keyAndroid;
-	
 
-	
+	private String name;
+
+	private String email;
+
+	private String cpf;
+
+	private String keyIOS;
+
+	private String keyAndroid;
+
 	private String password;
-	
-	
+
 	@JsonIgnore
 	private String salt;
-	
-	
-	
+
 	private Date birthDate;
-	
-	
+
 	private String birthDateStr;
-	
-	
-	
+
 	private String gender;
-	
-	
-	
+
 	private String language;
-	
-	
-	
+
 	@JsonIgnore
 	private String locale;
-	
-	
-	
+
 	@JsonIgnore
-	@Field
 	private Date creationDate;
-	
-	
-	
+
 	private Boolean phoneConfirmed;
-	
-	
-	
+
 	private Boolean emailConfirmed;
-	
-	
-	
+
 	private Boolean userConfirmed;
-	
-	
-	
-	
+
 	public UserFreezer(){
 		
 	}

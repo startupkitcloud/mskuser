@@ -10,7 +10,8 @@ import com.mangobits.startupkit.core.configuration.ConfigurationService;
 import com.mangobits.startupkit.core.dao.OperationEnum;
 import com.mangobits.startupkit.core.dao.SearchBuilder;
 import com.mangobits.startupkit.core.exception.BusinessException;
-import com.mangobits.startupkit.core.photo.*;
+import com.mangobits.startupkit.core.photo.PhotoUpload;
+import com.mangobits.startupkit.core.photo.PhotoUploadTypeEnum;
 import com.mangobits.startupkit.core.utils.BusinessUtils;
 import com.mangobits.startupkit.core.utils.ImageUtil;
 import com.mangobits.startupkit.core.utils.MessageUtils;
@@ -20,13 +21,7 @@ import com.mangobits.startupkit.notification.NotificationService;
 import com.mangobits.startupkit.notification.TypeSendingNotificationEnum;
 import com.mangobits.startupkit.notification.email.data.EmailDataTemplate;
 import com.mangobits.startupkit.user.freezer.UserFreezerService;
-import net.coobird.thumbnailator.Thumbnails;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.*;
@@ -36,7 +31,6 @@ import javax.inject.Inject;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.net.URL;
 import java.util.*;
 import java.util.logging.Level;
@@ -785,14 +779,14 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public List<UserCard> searchByName(String name) throws Exception {
+    public List<UserCard> searchByName(String name) {
 
         List<UserCard> list = null;
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("like:name", name);
-
-        List<User> listUsers = userDAO.search(params, null, 10, 0);
+        List<User> listUsers = userDAO.search(userDAO.createBuilder()
+                .appendParamQuery("name", name, OperationEnum.LIKE)
+                .setMaxResults(10)
+                .build());
 
         if (listUsers != null) {
             list = new ArrayList<>();
@@ -807,7 +801,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public List<UserCard> listAll() throws Exception {
+    public List<UserCard> listAll() {
 
         List<UserCard> list = null;
         List<User> listUsers = userDAO.listAll();
@@ -847,9 +841,9 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public User retrieveByToken(String token) throws Exception {
+    public User retrieveByToken(String token) {
 
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("token", token);
 
         User user = userDAO.retrieve(params);
@@ -874,7 +868,8 @@ public class UserServiceImpl implements UserService {
     public List<User> customersByRadius(Double latitude, Double longitude, Integer distanceKM) throws Exception {
 
         List<User> list = userDAO.search(new SearchBuilder()
-                .appendParam("geo:lastAddress", new Double[]{latitude, longitude, new Double(distanceKM)})
+                .appendParamQuery("lastAddress", new Double[]{latitude, longitude, new Double(distanceKM)},
+                        OperationEnum.GEO)
                 .build());
 
         return list;
@@ -942,7 +937,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public List<User> listByFieldInfo(String field, String value) throws Exception {
+    public List<User> listByFieldInfo(String field, String value) {
 
         List<User> listUser = userDAO.listByFieldInfo(field, value);
 
@@ -974,15 +969,12 @@ public class UserServiceImpl implements UserService {
 
         save(user);
 
-//		Thread.sleep(2000);
-
         if (sendEmail) {
 
             if (user.getEmail() == null) {
                 throw new BusinessException("missing_user_email");
             }
 
-            //forgotPassword(user);
             UserAuthKey key = userAuthKeyService.createKey(user.getId(), UserAuthKeyTypeEnum.EMAIL);
 
             final String projectName = configurationService.loadByCode("PROJECT_NAME").getValue();
@@ -1004,22 +996,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserCard> search(UserSearch search) throws Exception {
+    public List<UserCard> search(UserSearch search) {
 
         SearchBuilder searchBuilder = new SearchBuilder();
-        searchBuilder.appendParam("status", UserStatusEnum.ACTIVE);
+        searchBuilder.appendParamQuery("status", UserStatusEnum.ACTIVE);
         if (search.getQueryString() != null && StringUtils.isNotEmpty(search.getQueryString().trim())) {
-            searchBuilder.appendParam("name", search.getQueryString());
+            searchBuilder.appendParamQuery("name", search.getQueryString());
         }
 
         if (search.getCode() != null) {
-            searchBuilder.appendParam("code", search.getCode());
+            searchBuilder.appendParamQuery("code", search.getCode());
         }
 
         searchBuilder.setFirst(TOTAL_PAGE * (search.getPage() - 1));
         searchBuilder.setMaxResults(TOTAL_PAGE);
-//		Sort sort = new Sort(new SortField("creationDate", SortField.Type.LONG, true));
-//		searchBuilder.setSort(sort);
 
         //ordena
         List<UserCard> list = null;
@@ -1037,12 +1027,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserCard> listActives() throws Exception {
+    public List<UserCard> listActives() {
 
-        List<User> listUsers = null;
+        List<User> listUsers;
 
         SearchBuilder searchBuilder = new SearchBuilder();
-        searchBuilder.appendParam("status", UserStatusEnum.ACTIVE);
+        searchBuilder.appendParamQuery("status", UserStatusEnum.ACTIVE);
 
         listUsers = userDAO.search(searchBuilder.build());
         List<UserCard> list = null;
@@ -1100,11 +1090,11 @@ public class UserServiceImpl implements UserService {
                 sb.setMaxResults(10);
             }
 
-            Sort sort = new Sort(new SortField("name", SortField.Type.STRING, false));
-            sb.setSort(sort);
+            sb.appendSort("name", 1);
+
             List<User> listUsers = this.userDAO.search(sb.build());
-            int totalAmount = this.totalAmount(sb);
-            int pageQuantity;
+            long totalAmount = this.totalAmount(sb);
+            long pageQuantity;
             if (userSearch.getPageItensNumber() != null && userSearch.getPageItensNumber() > 0) {
                 pageQuantity = this.pageQuantity(userSearch.getPageItensNumber(), totalAmount);
             } else {
@@ -1127,13 +1117,13 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private int totalAmount(SearchBuilder sb) throws Exception {
-        int count = this.userDAO.count(sb.build());
+    private long totalAmount(SearchBuilder sb) throws Exception {
+        long count = this.userDAO.count(sb.build());
         return count;
     }
 
-    private int pageQuantity(int numberOfItensByPage, int totalAmount) throws Exception {
-        int pageQuantity;
+    private long pageQuantity(int numberOfItensByPage, long totalAmount) throws Exception {
+        long pageQuantity;
         if (totalAmount % numberOfItensByPage != 0) {
             pageQuantity = totalAmount / numberOfItensByPage + 1;
         } else {

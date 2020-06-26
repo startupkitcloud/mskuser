@@ -3,7 +3,7 @@
   	<modelVersion>4.0.0</modelVersion>
     <groupId>com.mangobits.startupkit.user</groupId>
     <artifactId>MSKUser</artifactId>
-    <version>1.2.6</version>
+    <version>2.0.0</version>
     <packaging>ejb</packaging>
  
     <name>${project.groupId}:${project.artifactId}</name>
@@ -23,11 +23,11 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         
         <!-- msk config versions -->
-		<msk-core-version>1.2.2</msk-core-version>
-		<msk-notification-version>1.2.0</msk-notification-version>
+		<msk-core-version>2.0.1</msk-core-version>
+		<msk-notification-version>2.0.0</msk-notification-version>
 		<msk-rs-version>1.2.0</msk-rs-version>
-		<msk-authkey-version>1.2.0</msk-authkey-version>
-		<msk-admin-version>1.2.0</msk-admin-version>
+		<msk-authkey-version>2.0.0</msk-authkey-version>
+		<msk-admin-version>2.0.0</msk-admin-version>
     </properties>
 
     <dependencies>
@@ -63,34 +63,6 @@
 		</dependency>
 		
 		<dependency>
-             <groupId>org.hibernate.ogm</groupId>
-             <artifactId>hibernate-ogm-core</artifactId>
-             <version>5.0.0.Final</version>
-             <scope>provided</scope>
-         </dependency>
-		
-		<dependency>
-		    <groupId>org.hibernate.ogm</groupId>
-		    <artifactId>hibernate-ogm-mongodb</artifactId>
-		    <version>5.0.0.Final</version>
-		    <scope>provided</scope> 
-		</dependency>
-
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-search</artifactId>
-			<version>5.5.4.Final</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.mongodb</groupId>
-			<artifactId>mongo-java-driver</artifactId>
-			<version>3.12.1</version>
-			<scope>provided</scope>
-		</dependency>
-		
-		<dependency>
 		    <groupId>org.apache.poi</groupId>
 		    <artifactId>poi</artifactId>
 		    <version>3.15</version>
@@ -116,9 +88,9 @@
 							<manifest>
 								<addClasspath>true</addClasspath>
 							</manifest>
-				            <manifestEntries>
-				               <Dependencies>org.hibernate.ogm:5.0 services, org.hibernate.ogm.mongodb:5.0 services</Dependencies>
-				            </manifestEntries>
+<!--				            <manifestEntries>-->
+<!--				               <Dependencies>org.hibernate.ogm:5.0 services, org.hibernate.ogm.mongodb:5.0 services</Dependencies>-->
+<!--				            </manifestEntries>-->
 				         </archive>
 					</configuration>
 				</plugin>

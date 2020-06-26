@@ -1,20 +1,14 @@
 package com.mangobits.startupkit.user.preference;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.mangobits.startupkit.user.preference.Preference;
-import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.Indexed;
+import com.mangobits.startupkit.core.annotation.MSKEntity;
+import com.mangobits.startupkit.core.annotation.MSKId;
 
 import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.Id;
 import java.util.Date;
 import java.util.List;
 
-@JsonIgnoreProperties(value={"hibernateLazyInitializer", "handler"}, ignoreUnknown=true)
-@Entity(name="userPreferences")
-@Indexed
+@MSKEntity(name="userPreferences")
 public class UserPreferences {
 
     public UserPreferences(String id) {
@@ -24,14 +18,10 @@ public class UserPreferences {
     public UserPreferences() {
     }
 
-
-    @Id
-    @DocumentId
+    @MSKId
     private String id;
 
-
     private Date creationDate;
-
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<Preference> listPreferences;

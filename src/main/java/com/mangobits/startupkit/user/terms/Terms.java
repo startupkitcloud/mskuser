@@ -1,21 +1,14 @@
 package com.mangobits.startupkit.user.terms;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.hibernate.search.annotations.Indexed;
+import com.mangobits.startupkit.core.annotation.MSKEntity;
+import com.mangobits.startupkit.core.annotation.MSKId;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-@Entity(name="terms")
-@Indexed
+@MSKEntity(name="terms")
 public class Terms {
-	
-	
-	@Id
+
+	@MSKId
 	private String language;
-	
-	
+
 	private String terms;
 	
 	

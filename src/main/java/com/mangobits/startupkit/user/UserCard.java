@@ -1,45 +1,26 @@
 package com.mangobits.startupkit.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
-
-import javax.persistence.Embeddable;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import java.util.Date;
 
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-@Indexed
-@Embeddable
 public class UserCard {
 
-
-	@Field
 	private String id;
-	
-	
+
 	private String name;
 
 	private String nameObj;
 
-
-
 	private String type;
 
-	@Enumerated(EnumType.STRING)
 	private UserStatusEnum status;
 
 	private Date creationDate;
 
-
 	private String idObj;
 
-
 	private String email;
-	
-	
+
 	private String phone;
 
 

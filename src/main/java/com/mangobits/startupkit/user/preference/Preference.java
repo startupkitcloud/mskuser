@@ -1,53 +1,39 @@
 package com.mangobits.startupkit.user.preference;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.mangobits.startupkit.core.annotation.MSKEntity;
+import com.mangobits.startupkit.core.annotation.MSKId;
 import com.mangobits.startupkit.core.status.SimpleStatusEnum;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
 
-import javax.persistence.*;
+import javax.persistence.Transient;
 import java.util.Date;
 
-@JsonIgnoreProperties(value={"hibernateLazyInitializer", "handler"}, ignoreUnknown=true)
-@Entity(name="preference")
-@Indexed
+@MSKEntity(name="preference")
 public class Preference {
+
+    @MSKId
+    private String id;
+
+    private String name;
+
+    private String desc;
+
+    @Transient
+    private Boolean selected;
+
+    @JsonIgnore
+    private Date creationDate;
+
+    private SimpleStatusEnum status;
+
 
     public Preference(){
 
     }
 
-
     public Preference(String id){
         this.id = id;
     }
-
-
-    @Id
-    @DocumentId
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
-    private String id;
-
-
-    @Field
-    private String name;
-
-
-    @Field
-    private String desc;
-
-
-    @Transient
-    private Boolean selected;
-
-
-    @JsonIgnore
-    @Field
-    private Date creationDate;
 
 
     public String getId() {
@@ -90,9 +76,7 @@ public class Preference {
         this.status = status;
     }
 
-    @Field
-    @Enumerated(EnumType.STRING)
-    private SimpleStatusEnum status;
+
 
     public Boolean getSelected() {
         return selected;
