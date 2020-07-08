@@ -1,6 +1,5 @@
 package com.mangobits.startupkit.user;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mangobits.startupkit.admin.userb.UserBService;
 import com.mangobits.startupkit.admin.util.SecuredAdmin;
 import com.mangobits.startupkit.authkey.UserAuthKey;
@@ -16,7 +15,6 @@ import com.mangobits.startupkit.core.utils.FileUtil;
 import com.mangobits.startupkit.notification.email.EmailService;
 import com.mangobits.startupkit.user.util.SecuredUser;
 import com.mangobits.startupkit.user.util.UserBaseRestService;
-import com.mangobits.startupkit.ws.JsonContainer;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -60,49 +58,23 @@ public class UserRestService extends UserBaseRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("/loginFB")
-    public String loginFB(User usMon) throws Exception {
-
-        String resultStr = null;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-
-            User user = userService.loginFB(usMon);
-            cont.setData(user);
-
-        } catch (Exception e) {
-            handleException(cont, e, "login FB");
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+    public User loginFB(User usMon) throws Exception {
+        return userService.loginFB(usMon);
     }
+
 
     @SecuredAdmin
     @POST
     @Consumes({"application/json"})
     @Produces({"application/json;charset=utf-8"})
     @Path("/searchAdmin")
-    public String searchAdmin(UserSearch userSearch) throws Exception {
-        JsonContainer cont = new JsonContainer();
-
-        try {
-            String authorizationHeader = this.requestB.getHeader("Authorization");
-            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-                String token = authorizationHeader.substring("Bearer".length()).trim();
-                userSearch.setCode(this.userBService.retrieveByToken(token).getIdObj());
-            }
-            UserResultSearch result = this.userService.searchAdmin(userSearch);
-            cont.setData(result);
-        } catch (Exception var5) {
-            this.handleException(cont, var5, "searching admin");
+    public UserResultSearch searchAdmin(UserSearch userSearch) throws Exception {
+        String authorizationHeader = this.requestB.getHeader("Authorization");
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String token = authorizationHeader.substring("Bearer".length()).trim();
+            userSearch.setCode(this.userBService.retrieveByToken(token).getIdObj());
         }
-
-        ObjectMapper mapper = new ObjectMapper();
-        String resultStr = mapper.writeValueAsString(cont);
-        return resultStr;
+        return this.userService.searchAdmin(userSearch);
     }
 
 
@@ -110,24 +82,8 @@ public class UserRestService extends UserBaseRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("/loginGoogle")
-    public String loginGoogle(User usMon) throws Exception {
-
-        String resultStr = null;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-
-            User user = userService.loginGoogle(usMon);
-            cont.setData(user);
-
-        } catch (Exception e) {
-            handleException(cont, e, "login google");
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+    public User loginGoogle(User usMon) throws Exception {
+        return userService.loginGoogle(usMon);
     }
 
 
@@ -135,47 +91,15 @@ public class UserRestService extends UserBaseRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("/loginApple")
-    public String loginApple(User usMon) throws Exception {
-
-        String resultStr = null;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-
-            User user = userService.loginApple(usMon);
-            cont.setData(user);
-
-        } catch (Exception e) {
-            handleException(cont, e, "login apple");
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+    public User loginApple(User usMon) throws Exception {
+        return userService.loginApple(usMon);
     }
 
     @GET
     @Path("/load/{idUser}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public String load(@PathParam("idUser") String idUser) throws Exception {
-
-        String resultStr = null;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-
-            User user = userService.retrieve(idUser);
-            cont.setData(user);
-
-        } catch (Exception e) {
-            handleException(cont, e, "loading user");
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+    public User load(@PathParam("idUser") String idUser) throws Exception {
+        return userService.retrieve(idUser);
     }
 
 
@@ -183,24 +107,8 @@ public class UserRestService extends UserBaseRestService {
     @GET
     @Path("/loggedUser/{token}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public String loggedUser(@PathParam("token") String token) throws Exception {
-
-        String resultStr = null;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-
-            User user = userService.retrieveByToken(token);
-            cont.setData(user);
-
-        } catch (Exception e) {
-            handleException(cont, e, "logged user");
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+    public User loggedUser(@PathParam("token") String token) throws Exception {
+        return userService.retrieveByToken(token);
     }
 
 
@@ -208,28 +116,16 @@ public class UserRestService extends UserBaseRestService {
     @GET
     @Path("/loggedUserCard")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public String loggedUserCard() throws Exception {
+    public UserCard loggedUserCard() throws Exception {
+        User user = getUserTokenSession();
 
-        String resultStr;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-
-            User user = getUserTokenSession();
-
-            if (user != null) {
-                UserCard card = userService.generateCard(user);
-                cont.setData(card);
-            }
-
-        } catch (Exception e) {
-            handleException(cont, e, "logged user card");
+        if (user != null) {
+            UserCard card = userService.generateCard(user);
+            return card;
         }
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+        else{
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
     }
 
 
@@ -237,24 +133,9 @@ public class UserRestService extends UserBaseRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("/login")
-    public String login(User usMon) throws Exception {
-
-        String resultStr = null;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-
-            User user = userService.login(usMon);
-            cont.setData(user);
-
-        } catch (Exception e) {
-            handleException(cont, e, "login");
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+    public User login(User usMon) throws Exception {
+        User user = userService.login(usMon);
+        return user;
     }
 
 
@@ -262,48 +143,17 @@ public class UserRestService extends UserBaseRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("/autoLogin")
-    public String autoLogin(User usMon) throws Exception {
-
-        String resultStr = null;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-
-            User user = userService.autoLogin(usMon);
-            cont.setData(user);
-
-        } catch (Exception e) {
-            handleException(cont, e, "auto login");
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+    public User autoLogin(User usMon) throws Exception {
+        return userService.autoLogin(usMon);
     }
 
 
     @SecuredUser
-    @GET
+    @PUT
     @Path("/logout/{idUser}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public String logout(@PathParam("idUser") String idUser) throws Exception {
-
-        String resultStr = null;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-            userService.logout(idUser);
-            cont.setData("OK");
-
-        } catch (Exception e) {
-            handleException(cont, e, "logout user");
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+    public void logout(@PathParam("idUser") String idUser) throws Exception {
+        userService.logout(idUser);
     }
 
 
@@ -311,72 +161,26 @@ public class UserRestService extends UserBaseRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("/newUser")
-    public String newUser(User usMon) throws Exception {
-
-        String resultStr;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-
-            userService.createNewUser(usMon);
-            cont.setData(usMon);
-
-        } catch (Exception e) {
-            handleException(cont, e, "new user");
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+    public void newUser(User usMon) throws Exception {
+        userService.createNewUser(usMon);
     }
+
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("/saveAnonymous")
-    public String saveAnonymous(User user) throws Exception {
-
-        String resultStr;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-
-            user = userService.saveAnonymous(user);
-            cont.setData(user);
-
-        } catch (Exception e) {
-            handleException(cont, e, "new user");
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+    public User saveAnonymous(User user) throws Exception {
+        return userService.saveAnonymous(user);
     }
+
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("/saveByPhone")
-    public String saveByPhone(User usMon) throws Exception {
-
-        String resultStr;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-
-            User user = userService.saveByPhone(usMon);
-            cont.setData(user);
-
-        } catch (Exception e) {
-            handleException(cont, e, "saving by phone");
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+    public User saveByPhone(User usMon) throws Exception {
+        return userService.saveByPhone(usMon);
     }
 
 
@@ -385,24 +189,8 @@ public class UserRestService extends UserBaseRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("/updatePhoneUser")
-    public String updatePhoneUser(User usMon) throws Exception {
-
-        String resultStr;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-
-            User user = userService.updatePhoneUser(usMon);
-            cont.setData(user);
-
-        } catch (Exception e) {
-            handleException(cont, e, "update phone user");
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+    public User updatePhoneUser(User usMon) throws Exception {
+        return userService.updatePhoneUser(usMon);
     }
 
 
@@ -410,26 +198,8 @@ public class UserRestService extends UserBaseRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("/update")
-    public String update(User usMon) throws Exception {
-
-        String resultStr;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-
-            userService.updateFromClient(usMon);
-
-            cont.setData("OK");
-            cont.setSuccess(true);
-
-        } catch (Exception e) {
-            handleException(cont, e, "updating a user");
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+    public void update(User usMon) throws Exception {
+        userService.updateFromClient(usMon);
     }
 
 
@@ -437,24 +207,8 @@ public class UserRestService extends UserBaseRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("/updatePassword")
-    public String updatePassword(User usMon) throws Exception {
-
-        String resultStr;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-
-            String password = userService.updatePassword(usMon);
-            cont.setData(password);
-
-        } catch (Exception e) {
-            handleException(cont, e, "updating password");
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+    public void updatePassword(User usMon) throws Exception {
+        userService.updatePassword(usMon);
     }
 
 
@@ -463,24 +217,8 @@ public class UserRestService extends UserBaseRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("/updateStartInfo")
-    public String updateStartInfo(UserStartInfo userStartInfo) throws Exception {
-
-        String resultStr;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-
-            userService.updateStartInfo(userStartInfo);
-            cont.setData("OK");
-        } catch (Exception e) {
-            handleException(cont, e, "updating start info");
-        }
-
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+    public void updateStartInfo(UserStartInfo userStartInfo) throws Exception {
+        userService.updateStartInfo(userStartInfo);
     }
 
 
@@ -489,31 +227,15 @@ public class UserRestService extends UserBaseRestService {
     @Path("/saveFacebookAvatar")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public String saveFacebookAvatar(PhotoUpload fotoUpload) throws Exception {
+    public void saveFacebookAvatar(PhotoUpload fotoUpload) throws Exception {
 
-        String resultStr = null;
-        JsonContainer cont = new JsonContainer();
+        User user = userService.retrieve(fotoUpload.getIdObject());
 
-        try {
-
-            User user = userService.retrieve(fotoUpload.getIdObject());
-
-            if (user == null) {
-                throw new BusinessException("User with id  '" + fotoUpload.getIdObject() + "' not found to attach photo");
-            }
-
-            userService.saveFacebookAvatar(fotoUpload);
-
-            cont.setData("OK");
-
-        } catch (Exception e) {
-            handleException(cont, e, "saving a facebook avatar");
+        if (user == null) {
+            throw new BusinessException("User with id  '" + fotoUpload.getIdObject() + "' not found to attach photo");
         }
 
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+        userService.saveFacebookAvatar(fotoUpload);
     }
 
 
@@ -522,59 +244,42 @@ public class UserRestService extends UserBaseRestService {
     @Path("/saveUserImage")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Consumes(MediaType.APPLICATION_JSON)
-    public String saveUserImage(PhotoUpload photoUpload) throws Exception {
+    public void saveUserImage(PhotoUpload photoUpload) throws Exception {
+        User user = userService.retrieve(photoUpload.getIdObject());
 
-        String resultStr;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-
-            User user = userService.retrieve(photoUpload.getIdObject());
-
-            if (user == null) {
-                throw new BusinessException("User with id  '" + photoUpload.getIdObject() + "' not found to attach photo");
-            }
-
-            //get the final size
-            int finalWidth = configurationService.loadByCode("SIZE_DETAIL_MOBILE").getValueAsInt();
-            photoUpload.setFinalWidth(finalWidth);
-            String idPhoto;
-
-            //soh adiciona na galeria se nao tiver idSubObject
-            if (photoUpload.getIdSubObject() == null) {
-
-                idPhoto = UUID.randomUUID().toString();
-
-                GalleryItem gi = new GalleryItem();
-                gi.setId(idPhoto);
-
-                if (user.getGallery() == null) {
-                    user.setGallery(new ArrayList<>());
-                }
-
-                user.setIdAvatar(idPhoto);
-                user.getGallery().add(gi);
-
-            } else {
-
-                idPhoto = photoUpload.getIdSubObject();
-            }
-
-            String path = userService.pathImage(user.getId());
-
-            new PhotoUtils().saveImage(photoUpload, path, idPhoto);
-            userService.update(user);
-
-            cont.setDesc("OK");
-
-        } catch (Exception e) {
-            handleException(cont, e, "saving user image");
+        if (user == null) {
+            throw new BusinessException("User with id  '" + photoUpload.getIdObject() + "' not found to attach photo");
         }
 
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
+        //get the final size
+        int finalWidth = configurationService.loadByCode("SIZE_DETAIL_MOBILE").getValueAsInt();
+        photoUpload.setFinalWidth(finalWidth);
+        String idPhoto;
 
-        return resultStr;
+        //soh adiciona na galeria se nao tiver idSubObject
+        if (photoUpload.getIdSubObject() == null) {
+
+            idPhoto = UUID.randomUUID().toString();
+
+            GalleryItem gi = new GalleryItem();
+            gi.setId(idPhoto);
+
+            if (user.getGallery() == null) {
+                user.setGallery(new ArrayList<>());
+            }
+
+            user.setIdAvatar(idPhoto);
+            user.getGallery().add(gi);
+
+        } else {
+
+            idPhoto = photoUpload.getIdSubObject();
+        }
+
+        String path = userService.pathImage(user.getId());
+
+        new PhotoUtils().saveImage(photoUpload, path, idPhoto);
+        userService.update(user);
     }
 
 
@@ -675,25 +380,8 @@ public class UserRestService extends UserBaseRestService {
     @GET
     @Path("/searchByName/{nameUser}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public String searchByName(final @PathParam("nameUser") String name) throws Exception {
-
-        String resultStr;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-
-            List<UserCard> list = userService.searchByName(name);
-
-            cont.setData(list);
-
-        } catch (Exception e) {
-            handleException(cont, e, "searching by name");
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+    public List<UserCard> searchByName(final @PathParam("nameUser") String name) throws Exception {
+        return userService.searchByName(name);
     }
 
 
@@ -701,50 +389,20 @@ public class UserRestService extends UserBaseRestService {
     @GET
     @Path("/listAll")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public String listAll() throws Exception {
-
-        String resultStr;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-
-            List<UserCard> list = userService.listAll();
-            cont.setData(list);
-
-        } catch (Exception e) {
-            handleException(cont, e, "listing all users");
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+    public List<UserCard> listAll() throws Exception {
+        return userService.listAll();
     }
+
 
     @SecuredAdmin
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("/saveAdmin")
-    public String saveAdmin(User user) throws Exception {
-
-        String resultStr = null;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-
-            userService.save(user);
-            confirmUserEmail(user.getId());
-            cont.setData(user);
-
-        } catch (Exception e) {
-            handleException(cont, e, "saving a user");
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+    public User saveAdmin(User user) throws Exception {
+        userService.save(user);
+        confirmUserEmail(user.getId());
+        return user;
     }
 
 
@@ -753,95 +411,34 @@ public class UserRestService extends UserBaseRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("/cancelUser")
-    public String cancelUser(User user) throws Exception {
-
-        String resultStr;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-
-            userService.cancelUser(user.getId());
-            cont.setData("OK");
-
-        } catch (Exception e) {
-            handleException(cont, e, "canceling a user");
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+    public void cancelUser(User user) throws Exception {
+        userService.cancelUser(user.getId());
     }
 
 
     @SecuredUser
-    @GET
+    @PUT
     @Path("/confirmUserSMS/{idUser}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public String confirmUserSMS(@PathParam("idUser") String idUser) throws Exception {
-
-        String resultStr;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-
-            userService.confirmUserSMS(idUser);
-            cont.setData("OK");
-        } catch (Exception e) {
-            handleException(cont, e, "confirming user SMS");
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+    public void confirmUserSMS(@PathParam("idUser") String idUser) throws Exception {
+        userService.confirmUserSMS(idUser);
     }
 
 
     @SecuredUser
-    @GET
+    @PUT
     @Path("/confirmUserEmail/{idUser}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public String confirmUserEmail(@PathParam("idUser") String idUser) throws Exception {
-
-        String resultStr;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-
-            userService.confirmUserEmail(idUser);
-            cont.setData("OK");
-        } catch (Exception e) {
-            handleException(cont, e, "confirming user email");
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+    public void confirmUserEmail(@PathParam("idUser") String idUser) throws Exception {
+        userService.confirmUserEmail(idUser);
     }
 
 
-    @GET
+    @PUT
     @Path("/forgotPassword/{email}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public String forgotPassword(@PathParam("email") String email) throws Exception {
-
-        String resultStr;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-
-            userService.forgotPassword(email);
-            cont.setData("OK");
-        } catch (Exception e) {
-            handleException(cont, e, "forgot password");
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+    public void forgotPassword(@PathParam("email") String email) throws Exception {
+        userService.forgotPassword(email);
     }
 
 
@@ -849,49 +446,16 @@ public class UserRestService extends UserBaseRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("/validateKey")
-    public String validateKey(UserAuthKey userAuthKey) throws Exception {
-
-        String resultStr;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-
-            Boolean validated = userService.validateKey(userAuthKey);
-            cont.setData(validated);
-
-        } catch (Exception e) {
-            handleException(cont, e, "validating key");
-        }
-
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+    public Boolean validateKey(UserAuthKey userAuthKey) throws Exception {
+        return userService.validateKey(userAuthKey);
     }
 
 
-    @GET
+    @PUT
     @Path("/testNotification/{idUser}/{msg}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public String testNotification(@PathParam("idUser") String idUser, @PathParam("msg") String msg) throws Exception {
-
-        String resultStr;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-
-            userService.testNotification(idUser, msg);
-            cont.setData("OK");
-
-        } catch (Exception e) {
-            handleException(cont, e, "testing notification");
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+    public void testNotification(@PathParam("idUser") String idUser, @PathParam("msg") String msg) throws Exception {
+        userService.testNotification(idUser, msg);
     }
 
 
@@ -900,25 +464,10 @@ public class UserRestService extends UserBaseRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("/changeStatus")
-    public String changeStatus(User user) throws Exception {
-
-        String resultStr;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-
-            userService.changeStatus(user.getId());
-            cont.setData("OK");
-
-        } catch (Exception e) {
-            handleException(cont, e, "changing status");
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+    public void changeStatus(User user) throws Exception {
+        userService.changeStatus(user.getId());
     }
+
 
     @GET
     @Path("/video/{idUser}/{name}")
@@ -926,6 +475,7 @@ public class UserRestService extends UserBaseRestService {
     public Response video(@HeaderParam("Range") String range, final @PathParam("name") String name, final @PathParam("idUser") String idUser) throws Exception {
         return buildStream(new File(userService.pathGallery(idUser, PhotoUploadTypeEnum.VIDEO) + "/" + name), range);
     }
+
 
     private Response buildStream(final File asset, final String range) throws Exception {
 
@@ -1029,33 +579,9 @@ public class UserRestService extends UserBaseRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("/saveByAdmin")
-    public String saveByAdmin(User user) throws Exception {
-
-        String resultStr = null;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-
-            userService.saveByAdmin(user);
-
-            cont.setData(user);
-
-        } catch (Exception e) {
-
-            if (!(e instanceof BusinessException)) {
-                e.printStackTrace();
-                emailService.sendEmailError(e);
-            }
-
-            cont.setSuccess(false);
-            cont.setDesc(e.getMessage());
-        }
-
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+    public User saveByAdmin(User user) throws Exception {
+        userService.saveByAdmin(user);
+        return user;
     }
 
 
@@ -1063,26 +589,7 @@ public class UserRestService extends UserBaseRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("/search")
-    public String search(UserSearch userSearch) throws Exception {
-
-        String resultStr;
-        JsonContainer cont = new JsonContainer();
-
-        try {
-            userSearch.setCode(this.getUserTokenSession().getCode());
-            List<UserCard> list = userService.search(userSearch);
-            cont.setData(list);
-
-        } catch (Exception e) {
-            handleException(cont, e, "searching users");
-        }
-
-
-        ObjectMapper mapper = new ObjectMapper();
-        resultStr = mapper.writeValueAsString(cont);
-
-        return resultStr;
+    public List<UserCard> search(UserSearch userSearch) throws Exception {
+        return userService.search(userSearch);
     }
-
-
 }

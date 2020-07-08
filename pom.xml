@@ -25,7 +25,6 @@
         <!-- msk config versions -->
 		<msk-core-version>2.0.1</msk-core-version>
 		<msk-notification-version>2.0.0</msk-notification-version>
-		<msk-rs-version>1.2.0</msk-rs-version>
 		<msk-authkey-version>2.0.0</msk-authkey-version>
 		<msk-admin-version>2.0.0</msk-admin-version>
     </properties>
@@ -42,12 +41,6 @@
 			<groupId>com.mangobits.startupkit.notification</groupId>
 			<artifactId>MSKNotification</artifactId>
 			<version>${msk-notification-version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.mangobits.startupkit.ws</groupId>
-			<artifactId>MSKRs</artifactId>
-			<version>${msk-rs-version}</version>
 		</dependency>
 
 		<dependency>
