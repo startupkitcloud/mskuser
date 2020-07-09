@@ -8,6 +8,7 @@ import com.mangobits.startupkit.core.photo.GalleryItem;
 import com.mangobits.startupkit.core.user.GeneralUser;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 
+import javax.json.bind.annotation.JsonbDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +51,7 @@ public class User implements GeneralUser {
 
 	private AddressInfo lastAddress;
 
+	@JsonbDateFormat(value = "yyyy-MM-dd HH:mm:ss")
 	private Date lastLogin;
 
 	private String password;
@@ -57,9 +59,9 @@ public class User implements GeneralUser {
 	@BsonIgnore
 	private String oldPassword;
 
-	@JsonIgnore
 	private String salt;
 
+	@JsonbDateFormat(value = "yyyy-MM-dd")
 	private Date birthDate;
 
 	private String birthDateStr;

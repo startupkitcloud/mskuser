@@ -1,5 +1,6 @@
 package com.mangobits.startupkit.user;
 
+import javax.json.bind.annotation.JsonbDateFormat;
 import java.util.Date;
 
 
@@ -15,6 +16,7 @@ public class UserCard {
 
 	private UserStatusEnum status;
 
+	@JsonbDateFormat(value = "yyyy-MM-dd HH:mm:ss")
 	private Date creationDate;
 
 	private String idObj;
