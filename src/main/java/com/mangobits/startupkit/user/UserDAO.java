@@ -1,9 +1,7 @@
 package com.mangobits.startupkit.user;
 
 import com.mangobits.startupkit.core.dao.AbstractDAO;
-import com.mangobits.startupkit.core.exception.DAOException;
 
-import javax.persistence.NoResultException;
 import java.util.List;
 
 
@@ -20,101 +18,30 @@ public class UserDAO extends AbstractDAO<User> {
 	}
 
 	
-	
-	public User retrieveByIdFacebook(String idFacebook) throws DAOException{
-		
-		User usuario = null;
-		
-		try {
-			
-			javax.persistence.Query query = entityManager.createNativeQuery("{idFacebook: '"  + idFacebook + "'}", User.class);
-			
-			usuario = (User) query.getSingleResult();
-			
-			
-		} catch (NoResultException e) {
-			
-			//nao faz nada
-		}
-		catch (Exception e) {
-			
-			throw new DAOException("Got an error loading the user", e);
-		}
-		
-		return usuario;
+	public User retrieveByIdFacebook(String idFacebook) {
+		return retrieve(createBuilder()
+				.appendParamQuery("idFacebook", idFacebook)
+				.build());
 	}
 	
-	
-	
-	
-	public User retrieveByIdGoogle(String idGoogle) throws DAOException{
-		
-		User usuario = null;
-		
-		try {
-			
-			javax.persistence.Query query = entityManager.createNativeQuery("{idGoogle: '"  + idGoogle + "'}", User.class);
-			
-			usuario = (User) query.getSingleResult();
-			
-			
-		} catch (NoResultException e) {
-			
-			//nao faz nada
-		}
-		catch (Exception e) {
-			
-			throw new DAOException("Got an error loading the user", e);
-		}
-		
-		return usuario;
+
+	public User retrieveByIdGoogle(String idGoogle) {
+		return retrieve(createBuilder()
+				.appendParamQuery("idGoogle", idGoogle)
+				.build());
 	}
 
 
-	public User retrieveByIdApple(String idApple) throws DAOException{
-
-		User usuario = null;
-
-		try {
-
-			javax.persistence.Query query = entityManager.createNativeQuery("{idApple: '"  + idApple + "'}", User.class);
-
-			usuario = (User) query.getSingleResult();
-
-
-		} catch (NoResultException e) {
-
-			//nao faz nada
-		}
-		catch (Exception e) {
-
-			throw new DAOException("Got an error loading the user", e);
-		}
-
-		return usuario;
+	public User retrieveByIdApple(String idApple) {
+		return retrieve(createBuilder()
+				.appendParamQuery("idApple", idApple)
+				.build());
 	}
 	
-	@SuppressWarnings("unchecked")
-	public List<User> listByFieldInfo(String field, String value) throws DAOException{
-		
-		List<User> listUser = null;
-		
-		try {
-			
-			javax.persistence.Query query = entityManager.createNativeQuery("{'info." + field + "' : '"  + value + "'}", User.class);
-			
-			listUser = query.getResultList();
-			
-			
-		} catch (NoResultException e) {
-			
-			//nao faz nada
-		}
-		catch (Exception e) {
-			
-			throw new DAOException("Got an error listByFieldInfo the user", e);
-		}
-		
-		return listUser;
+
+	public List<User> listByFieldInfo(String field, String value) {
+		return search(createBuilder()
+				.appendParamQuery("info." + field, value)
+				.build());
 	}
 }

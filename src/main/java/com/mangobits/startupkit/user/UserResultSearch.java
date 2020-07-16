@@ -1,22 +1,14 @@
 package com.mangobits.startupkit.user;
 
-import org.hibernate.search.annotations.IndexedEmbedded;
-
-import javax.persistence.ElementCollection;
-import javax.persistence.FetchType;
 import java.util.List;
 
 public class UserResultSearch {
 
-
-    @IndexedEmbedded
-    @ElementCollection(
-            fetch = FetchType.EAGER
-    )
     private List<UserCard> list;
 
-    private int totalAmount;
-    private int pageQuantity;
+    private long totalAmount;
+
+    private long pageQuantity;
 
     public UserResultSearch() {
     }
@@ -29,19 +21,19 @@ public class UserResultSearch {
         this.list = list;
     }
 
-    public int getTotalAmount() {
+    public long getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(int totalAmount) {
+    public void setTotalAmount(long totalAmount) {
         this.totalAmount = totalAmount;
     }
 
-    public int getPageQuantity() {
+    public long getPageQuantity() {
         return pageQuantity;
     }
 
-    public void setPageQuantity(int pageQuantity) {
+    public void setPageQuantity(long pageQuantity) {
         this.pageQuantity = pageQuantity;
     }
 

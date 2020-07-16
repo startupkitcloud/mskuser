@@ -1,16 +1,15 @@
 package com.mangobits.startupkit.user.util;
 
+import com.mangobits.startupkit.user.User;
+import com.mangobits.startupkit.user.UserService;
+
 import javax.ejb.EJB;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 
-import com.mangobits.startupkit.user.User;
-import com.mangobits.startupkit.user.UserService;
-import com.mangobits.startupkit.ws.BasicRestService;
-
-public class UserBaseRestService extends BasicRestService {
+public class UserBaseRestService {
 
 	@Context
     private HttpServletRequest request;

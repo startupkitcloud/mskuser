@@ -76,7 +76,7 @@ public class PreferenceServiceImpl implements PreferenceService {
     public List<Preference> listAll() throws Exception {
 
         SearchBuilder builder = new SearchBuilder();
-        builder.appendParam("status", SimpleStatusEnum.ACTIVE);
+        builder.appendParamQuery("status", SimpleStatusEnum.ACTIVE);
 
         List<Preference> list = preferenceDAO.search(builder.build());
 
@@ -93,7 +93,7 @@ public class PreferenceServiceImpl implements PreferenceService {
         List<Preference> list = null;
 
         SearchBuilder builder = new SearchBuilder();
-        builder.appendParam("status", SimpleStatusEnum.ACTIVE);
+        builder.appendParamQuery("status", SimpleStatusEnum.ACTIVE);
 
         list = preferenceDAO.search(builder.build());
 

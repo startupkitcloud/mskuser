@@ -1,5 +1,6 @@
 package com.mangobits.startupkit.user;
 
+import javax.json.bind.annotation.JsonbDateFormat;
 import javax.persistence.Embeddable;
 import java.util.Date;
 import java.util.List;
@@ -16,10 +17,16 @@ public class UserSearch {
     private Integer page;
 
     private String type;
+
     private String code;
+
     private List<String> typeIn;
+
     private String status;
+
+    @JsonbDateFormat(value = "yyyy-MM-dd HH:mm:ss")
     private Date creationDate;
+
     private Integer pageItensNumber;
 
     public String getCode() {

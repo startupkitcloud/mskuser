@@ -1,215 +1,108 @@
 package com.mangobits.startupkit.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mangobits.startupkit.core.address.AddressInfo;
+import com.mangobits.startupkit.core.annotation.MSKEntity;
+import com.mangobits.startupkit.core.annotation.MSKId;
+import com.mangobits.startupkit.core.photo.GalleryItem;
+import com.mangobits.startupkit.core.user.GeneralUser;
+import org.bson.codecs.pojo.annotations.BsonIgnore;
+
+import javax.json.bind.annotation.JsonbDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Transient;
-
-import com.mangobits.startupkit.core.photo.GalleryItem;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.OrderBy;
-import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.search.annotations.SortableField;
-import org.hibernate.search.annotations.Spatial;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.mangobits.startupkit.core.address.AddressInfo;
-import com.mangobits.startupkit.core.photo.PhotoUpload;
-import com.mangobits.startupkit.core.user.GeneralUser;
-
-@JsonIgnoreProperties(value={"hibernateLazyInitializer", "handler"}, ignoreUnknown=true)
-@Entity(name="user")
-@Indexed
+@MSKEntity(name="user")
 public class User implements GeneralUser {
 
-	
-	
-	@Id
-	@DocumentId
-	@GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
+	@MSKId
     private String id;
-	
-	
-	@Field
+
 	private String idFacebook;
-	
-	
-	@Field
+
 	private String idGoogle;
 
-
-	@Field
 	private String idApple;
-	
-	
-	@Field
+
 	private String phone;
-	
-	
-	@Field
+
 	private Long phoneNumber;
 
-
 	private String document;
-	
-	
+
 	private Integer phoneCountryCode;
 
-
-	@SortableField
-	@Field
 	private String name;
 
-	@Field
 	private String idObj;
 
-	@Field
 	private String nameObj;
 
-
-	@Field
 	private String code;
-	
-		
-	
-	@Field
-	private String email;
-	
-	
-	@Field
-	private String cpf;
-	
-	
-	
-	private String keyIOS;
-	
-	
-	private String keyAndroid;
-	
-	
-	
-	@SortableField
-	@Spatial	
-	@IndexedEmbedded
-	private AddressInfo lastAddress;
-	
-	
-	
-	@Field
-	private Date lastLogin;
-	
 
-	
+	private String email;
+
+	private String cpf;
+
+	private String keyIOS;
+
+	private String keyAndroid;
+
+	private AddressInfo lastAddress;
+
+	@JsonbDateFormat(value = "yyyy-MM-dd HH:mm:ss")
+	private Date lastLogin;
+
 	private String password;
-	
-	
-	@Transient
+
+	@BsonIgnore
 	private String oldPassword;
-	
-	
-	@JsonIgnore
+
 	private String salt;
-	
-	
-	
+
+	@JsonbDateFormat(value = "yyyy-MM-dd")
 	private Date birthDate;
-	
-	
+
 	private String birthDateStr;
-	
-	
-	
+
 	private String gender;
-	
-	
-	
+
 	private String language;
-	
-	
-	
+
 	@JsonIgnore
 	private String locale;
-	
-	
-	
+
 	@JsonIgnore
-	@Field
 	private Date creationDate;
-	
-	
-	
+
 	private Boolean phoneConfirmed;
-	
-	
-	
+
 	private Boolean emailConfirmed;
-	
-	
-	
+
 	private Boolean userConfirmed;
-	
-	
-	
-	@Field
+
 	private String token;
-	
-	
-	
-	@Field
+
 	private String type;
 
-
 	private String idAvatar;
-	
-	
-	
+
 	private Date tokenExpirationDate;
-	
-	
-	@Field
-	@Enumerated(EnumType.STRING)
+
 	private UserStatusEnum status;
-	
-	
-	@IndexedEmbedded
-	@ElementCollection(fetch=FetchType.EAGER)
+
 	private Map<String, String> info;
 
-
-	@Deprecated
-	@OrderBy(clause = "index")
-	@IndexedEmbedded
-	@ElementCollection(fetch=FetchType.EAGER)
-	private List<PhotoUpload> listPhotoUpload;
-
-
-
-	@ElementCollection(fetch=FetchType.EAGER)
 	private List<GalleryItem> gallery;
-	
-	
+
 	public User(){
 		
 	}
-	
-	
+
 	public User(String id){
 		this.id = id;
 	}
-
 
 	@Override
 	public String getId() {
@@ -455,14 +348,6 @@ public class User implements GeneralUser {
 
 	public void setInfo(Map<String, String> info) {
 		this.info = info;
-	}
-
-	public List<PhotoUpload> getListPhotoUpload() {
-		return listPhotoUpload;
-	}
-
-	public void setListPhotoUpload(List<PhotoUpload> listPhotoUpload) {
-		this.listPhotoUpload = listPhotoUpload;
 	}
 
 	public List<GalleryItem> getGallery() {
