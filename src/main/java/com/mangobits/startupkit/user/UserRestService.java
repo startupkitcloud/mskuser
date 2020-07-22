@@ -161,8 +161,9 @@ public class UserRestService extends UserBaseRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("/newUser")
-    public void newUser(User usMon) throws Exception {
+    public User newUser(User usMon) throws Exception {
         userService.createNewUser(usMon);
+        return usMon;
     }
 
 
