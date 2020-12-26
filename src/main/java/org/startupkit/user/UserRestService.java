@@ -1,20 +1,20 @@
-package com.mangobits.startupkit.user;
+package org.startupkit.user;
 
-import com.mangobits.startupkit.admin.userb.UserBService;
-import com.mangobits.startupkit.admin.util.SecuredAdmin;
-import com.mangobits.startupkit.authkey.UserAuthKey;
-import com.mangobits.startupkit.core.configuration.Configuration;
-import com.mangobits.startupkit.core.configuration.ConfigurationEnum;
-import com.mangobits.startupkit.core.configuration.ConfigurationService;
-import com.mangobits.startupkit.core.exception.BusinessException;
-import com.mangobits.startupkit.core.photo.GalleryItem;
-import com.mangobits.startupkit.core.photo.PhotoUpload;
-import com.mangobits.startupkit.core.photo.PhotoUploadTypeEnum;
-import com.mangobits.startupkit.core.photo.PhotoUtils;
-import com.mangobits.startupkit.core.utils.FileUtil;
-import com.mangobits.startupkit.notification.email.EmailService;
-import com.mangobits.startupkit.user.util.SecuredUser;
-import com.mangobits.startupkit.user.util.UserBaseRestService;
+import org.startupkit.admin.userb.UserBService;
+import org.startupkit.admin.util.SecuredAdmin;
+import org.startupkit.authkey.UserAuthKey;
+import org.startupkit.core.configuration.Configuration;
+import org.startupkit.core.configuration.ConfigurationEnum;
+import org.startupkit.core.configuration.ConfigurationService;
+import org.startupkit.core.exception.BusinessException;
+import org.startupkit.core.photo.GalleryItem;
+import org.startupkit.core.photo.PhotoUpload;
+import org.startupkit.core.photo.PhotoUploadTypeEnum;
+import org.startupkit.core.photo.PhotoUtils;
+import org.startupkit.core.utils.FileUtil;
+import org.startupkit.notification.email.EmailService;
+import org.startupkit.user.util.SecuredUser;
+import org.startupkit.user.util.UserBaseRestService;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -161,8 +161,9 @@ public class UserRestService extends UserBaseRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("/newUser")
-    public void newUser(User usMon) throws Exception {
+    public User newUser(User usMon) throws Exception {
         userService.createNewUser(usMon);
+        return usMon;
     }
 
 

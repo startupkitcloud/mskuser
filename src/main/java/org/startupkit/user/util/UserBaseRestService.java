@@ -1,7 +1,7 @@
-package com.mangobits.startupkit.user.util;
+package org.startupkit.user.util;
 
-import com.mangobits.startupkit.user.User;
-import com.mangobits.startupkit.user.UserService;
+import org.startupkit.user.User;
+import org.startupkit.user.UserService;
 
 import javax.ejb.EJB;
 import javax.servlet.http.HttpServletRequest;

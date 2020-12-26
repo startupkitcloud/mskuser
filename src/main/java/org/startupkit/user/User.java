@@ -1,11 +1,11 @@
-package com.mangobits.startupkit.user;
+package org.startupkit.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.mangobits.startupkit.core.address.AddressInfo;
-import com.mangobits.startupkit.core.annotation.MSKEntity;
-import com.mangobits.startupkit.core.annotation.MSKId;
-import com.mangobits.startupkit.core.photo.GalleryItem;
-import com.mangobits.startupkit.core.user.GeneralUser;
+import org.startupkit.core.address.AddressInfo;
+import org.startupkit.core.annotation.MSKEntity;
+import org.startupkit.core.annotation.MSKId;
+import org.startupkit.core.photo.GalleryItem;
+import org.startupkit.core.user.GeneralUser;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 
 import javax.json.bind.annotation.JsonbDateFormat;

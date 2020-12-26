@@ -1,8 +1,8 @@
-package com.mangobits.startupkit.user;
+package org.startupkit.user;
 
-import com.mangobits.startupkit.authkey.UserAuthKey;
-import com.mangobits.startupkit.core.photo.PhotoUpload;
-import com.mangobits.startupkit.core.photo.PhotoUploadTypeEnum;
+import org.startupkit.authkey.UserAuthKey;
+import org.startupkit.core.photo.PhotoUpload;
+import org.startupkit.core.photo.PhotoUploadTypeEnum;
 
 import javax.ejb.Local;
 import java.util.List;
