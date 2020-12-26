@@ -1,6 +1,6 @@
-package com.mangobits.startupkit.user;
+package org.startupkit.user;
 
-import com.mangobits.startupkit.core.configuration.ConfigurationService;
+import org.startupkit.core.configuration.ConfigurationService;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;

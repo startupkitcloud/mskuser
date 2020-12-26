@@ -1,4 +1,4 @@
-package com.mangobits.startupkit.user.util;
+package org.startupkit.user.util;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

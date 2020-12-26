@@ -1,4 +1,4 @@
-package com.mangobits.startupkit.user.util;
+package org.startupkit.user.util;
 
 import java.io.IOException;
 
@@ -16,7 +16,7 @@ import javax.ws.rs.ext.Provider;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.mangobits.startupkit.user.UserService;
+import org.startupkit.user.UserService;
 
 @SecuredUser
 @Provider

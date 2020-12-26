@@ -1,4 +1,4 @@
-package com.mangobits.startupkit.user;
+package org.startupkit.user;
 
 public enum LanguageEnum {
 

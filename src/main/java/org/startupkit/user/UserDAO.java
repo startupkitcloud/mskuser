@@ -1,6 +1,6 @@
-package com.mangobits.startupkit.user;
+package org.startupkit.user;
 
-import com.mangobits.startupkit.core.dao.AbstractDAO;
+import org.startupkit.core.dao.AbstractDAO;
 
 import java.util.List;
 
