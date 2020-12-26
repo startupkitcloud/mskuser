@@ -1,4 +1,4 @@
-package com.mangobits.startupkit.user;
+package org.startupkit.user;
 
 import java.util.List;
 

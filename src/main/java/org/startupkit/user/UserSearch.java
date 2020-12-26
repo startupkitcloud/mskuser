@@ -1,4 +1,4 @@
-package com.mangobits.startupkit.user;
+package org.startupkit.user;
 
 import javax.json.bind.annotation.JsonbDateFormat;
 import javax.persistence.Embeddable;

@@ -1,4 +1,4 @@
-package com.mangobits.startupkit.user;
+package org.startupkit.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
