@@ -1,4 +1,4 @@
-package com.mangobits.startupkit.user.helper;
+package org.startupkit.user.helper;
 
 import javax.ejb.Local;
 

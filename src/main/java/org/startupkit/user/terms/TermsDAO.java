@@ -1,6 +1,6 @@
-package com.mangobits.startupkit.user.terms;
+package org.startupkit.user.terms;
 
-import com.mangobits.startupkit.core.dao.AbstractDAO;
+import org.startupkit.core.dao.AbstractDAO;
 
 
 public class TermsDAO extends AbstractDAO<Terms> {

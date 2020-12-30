@@ -1,6 +1,6 @@
-package com.mangobits.startupkit.user.terms;
+package org.startupkit.user.terms;
 
-import com.mangobits.startupkit.user.util.UserBaseRestService;
+import org.startupkit.user.util.UserBaseRestService;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;

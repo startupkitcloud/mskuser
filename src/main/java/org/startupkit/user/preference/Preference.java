@@ -1,9 +1,9 @@
-package com.mangobits.startupkit.user.preference;
+package org.startupkit.user.preference;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.mangobits.startupkit.core.annotation.MSKEntity;
-import com.mangobits.startupkit.core.annotation.MSKId;
-import com.mangobits.startupkit.core.status.SimpleStatusEnum;
+import org.startupkit.core.annotation.MSKEntity;
+import org.startupkit.core.annotation.MSKId;
+import org.startupkit.core.status.SimpleStatusEnum;
 
 import javax.persistence.Transient;
 import java.util.Date;

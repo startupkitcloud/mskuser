@@ -70,10 +70,9 @@ public class User implements GeneralUser {
 
 	private String language;
 
-	@JsonIgnore
 	private String locale;
 
-	@JsonIgnore
+	@JsonbDateFormat(value = "yyyy-MM-dd HH:mm:ss")
 	private Date creationDate;
 
 	private Boolean phoneConfirmed;
