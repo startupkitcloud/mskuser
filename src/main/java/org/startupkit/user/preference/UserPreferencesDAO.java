@@ -1,6 +1,6 @@
-package com.mangobits.startupkit.user.preference;
+package org.startupkit.user.preference;
 
-import com.mangobits.startupkit.core.dao.AbstractDAO;
+import org.startupkit.core.dao.AbstractDAO;
 
 public class UserPreferencesDAO extends AbstractDAO<UserPreferences> {
 

@@ -1,7 +1,7 @@
-package com.mangobits.startupkit.user.preference;
+package org.startupkit.user.preference;
 
-import com.mangobits.startupkit.core.annotation.MSKEntity;
-import com.mangobits.startupkit.core.annotation.MSKId;
+import org.startupkit.core.annotation.MSKEntity;
+import org.startupkit.core.annotation.MSKId;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.FetchType;

@@ -1,4 +1,4 @@
-package com.mangobits.startupkit.user.helper;
+package org.startupkit.user.helper;
 
 import java.io.ByteArrayOutputStream;
 import java.util.List;
@@ -14,8 +14,8 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
-import com.mangobits.startupkit.user.User;
-import com.mangobits.startupkit.user.UserDAO;
+import org.startupkit.user.User;
+import org.startupkit.user.UserDAO;
 
 @Stateless
 @TransactionManagement(TransactionManagementType.CONTAINER)

@@ -1,9 +1,9 @@
-package com.mangobits.startupkit.user.preference;
+package org.startupkit.user.preference;
 
-import com.mangobits.startupkit.core.configuration.ConfigurationService;
-import com.mangobits.startupkit.notification.email.EmailService;
-import com.mangobits.startupkit.user.UserService;
-import com.mangobits.startupkit.user.util.UserBaseRestService;
+import org.startupkit.core.configuration.ConfigurationService;
+import org.startupkit.notification.email.EmailService;
+import org.startupkit.user.UserService;
+import org.startupkit.user.util.UserBaseRestService;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;

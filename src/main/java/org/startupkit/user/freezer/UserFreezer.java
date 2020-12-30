@@ -1,8 +1,8 @@
-package com.mangobits.startupkit.user.freezer;
+package org.startupkit.user.freezer;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.mangobits.startupkit.core.annotation.MSKEntity;
-import com.mangobits.startupkit.core.annotation.MSKId;
+import org.startupkit.core.annotation.MSKEntity;
+import org.startupkit.core.annotation.MSKId;
 
 import java.util.Date;
 

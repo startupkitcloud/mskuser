@@ -1,7 +1,7 @@
-package com.mangobits.startupkit.user.helper;
+package org.startupkit.user.helper;
 
-import com.mangobits.startupkit.user.util.SecuredUser;
-import com.mangobits.startupkit.user.util.UserBaseRestService;
+import org.startupkit.user.util.SecuredUser;
+import org.startupkit.user.util.UserBaseRestService;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
