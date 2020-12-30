@@ -1,4 +1,4 @@
-package com.mangobits.startupkit.user.terms;
+package org.startupkit.user.terms;
 
 import javax.ejb.Local;
 

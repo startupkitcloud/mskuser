@@ -1,13 +1,13 @@
-package com.mangobits.startupkit.user.preference;
+package org.startupkit.user.preference;
 
-import com.mangobits.startupkit.admin.userb.UserB;
-import com.mangobits.startupkit.admin.userb.UserBService;
-import com.mangobits.startupkit.core.dao.SearchBuilder;
-import com.mangobits.startupkit.core.exception.BusinessException;
-import com.mangobits.startupkit.core.status.SimpleStatusEnum;
-import com.mangobits.startupkit.core.utils.BusinessUtils;
-import com.mangobits.startupkit.user.User;
-import com.mangobits.startupkit.user.UserService;
+import org.startupkit.admin.userb.UserB;
+import org.startupkit.admin.userb.UserBService;
+import org.startupkit.core.dao.SearchBuilder;
+import org.startupkit.core.exception.BusinessException;
+import org.startupkit.core.status.SimpleStatusEnum;
+import org.startupkit.core.utils.BusinessUtils;
+import org.startupkit.user.User;
+import org.startupkit.user.UserService;
 import org.apache.commons.collections.CollectionUtils;
 
 import javax.ejb.EJB;

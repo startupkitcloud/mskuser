@@ -1,4 +1,4 @@
-package com.mangobits.startupkit.user.preference;
+package org.startupkit.user.preference;
 
 import javax.ejb.Local;
 import java.util.List;

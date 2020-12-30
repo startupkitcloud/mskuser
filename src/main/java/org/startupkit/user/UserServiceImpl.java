@@ -1056,8 +1056,6 @@ public class UserServiceImpl implements UserService {
             SearchBuilder sb = this.userDAO.createBuilder();
             if (userSearch.getStatus() != null) {
                 sb.appendParamQuery("status", userSearch.getStatus());
-            } else {
-                sb.appendParamQuery("status", UserStatusEnum.values(), OperationEnum.IN);
             }
 
             if (userSearch.getType() != null) {

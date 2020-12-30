@@ -1,6 +1,6 @@
-package com.mangobits.startupkit.user.freezer;
+package org.startupkit.user.freezer;
 
-import com.mangobits.startupkit.user.User;
+import org.startupkit.user.User;
 
 import javax.ejb.Local;
 

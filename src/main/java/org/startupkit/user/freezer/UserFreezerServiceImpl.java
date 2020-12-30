@@ -1,7 +1,7 @@
-package com.mangobits.startupkit.user.freezer;
+package org.startupkit.user.freezer;
 
-import com.mangobits.startupkit.user.User;
-import com.mangobits.startupkit.user.UserDAO;
+import org.startupkit.user.User;
+import org.startupkit.user.UserDAO;
 import org.apache.commons.beanutils.BeanUtils;
 
 import javax.ejb.Stateless;

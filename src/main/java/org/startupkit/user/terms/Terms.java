@@ -1,7 +1,7 @@
-package com.mangobits.startupkit.user.terms;
+package org.startupkit.user.terms;
 
-import com.mangobits.startupkit.core.annotation.MSKEntity;
-import com.mangobits.startupkit.core.annotation.MSKId;
+import org.startupkit.core.annotation.MSKEntity;
+import org.startupkit.core.annotation.MSKId;
 
 @MSKEntity(name="terms")
 public class Terms {
