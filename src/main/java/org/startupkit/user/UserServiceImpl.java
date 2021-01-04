@@ -280,7 +280,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private void validateUser(User user) throws Exception {
+    protected void validateUser(User user) throws Exception {
 
         User userDB = null;
 
@@ -342,7 +342,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private User loginSocial(User user, User userDB) throws Exception {
+    protected User loginSocial(User user, User userDB) throws Exception {
 
         if (userDB == null) {
             user = createNewUser(user);
@@ -409,7 +409,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private User login(User user, String password) throws Exception {
+    protected User login(User user, String password) throws Exception {
 
         User userDB = retrieveByEmail(user.getEmail());
 
@@ -577,7 +577,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private void generateCard(User user, UserCard card) {
+    protected void generateCard(User user, UserCard card) {
 
         card.setId(user.getId());
         card.setName(user.getName());
@@ -588,8 +588,6 @@ public class UserServiceImpl implements UserService {
         card.setCreationDate(user.getCreationDate());
         card.setStatus(user.getStatus());
         card.setType(user.getType());
-
-
     }
 
 
@@ -745,7 +743,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private void sendNotification(User user, String title, int emailTemplateId, String link, String msg) throws Exception {
+    protected void sendNotification(User user, String title, int emailTemplateId, String link, String msg) throws Exception {
 
         final String projectName = configurationService.loadByCode("PROJECT_NAME").getValue();
         final String projectLogo = configurationService.loadByCode("PROJECT_LOGO_URL").getValue();
@@ -852,7 +850,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private void createToken(User userDB) throws Exception {
+    protected void createToken(User userDB) throws Exception {
 
         userDB.setToken(UUID.randomUUID().toString());
 
@@ -1115,12 +1113,12 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private long totalAmount(SearchBuilder sb) throws Exception {
+    protected long totalAmount(SearchBuilder sb) throws Exception {
         long count = this.userDAO.count(sb.build());
         return count;
     }
 
-    private long pageQuantity(int numberOfItensByPage, long totalAmount) throws Exception {
+    protected long pageQuantity(int numberOfItensByPage, long totalAmount) throws Exception {
         long pageQuantity;
         if (totalAmount % numberOfItensByPage != 0) {
             pageQuantity = totalAmount / numberOfItensByPage + 1;
@@ -1130,6 +1128,4 @@ public class UserServiceImpl implements UserService {
 
         return pageQuantity;
     }
-
-
 }

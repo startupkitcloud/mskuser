@@ -53,9 +53,8 @@ public class PreferenceServiceImpl implements PreferenceService {
         }
 
         save(preference);
-
-
     }
+
 
     @Override
     public void save(Preference preference) throws Exception {
