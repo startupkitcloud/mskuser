@@ -208,8 +208,8 @@ public class UserRestService extends UserBaseRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("/updatePassword")
-    public void updatePassword(User usMon) throws Exception {
-        userService.updatePassword(usMon);
+    public String updatePassword(User usMon) throws Exception {
+        return userService.updatePassword(usMon);
     }
 
 
