@@ -981,7 +981,7 @@ public class UserServiceImpl implements UserService {
 
             final String msg = "definir";
 
-            final int emailTemplateId = configurationService.loadByCode("USER_EMAIL_FORGOT_ID").getValueAsInt();
+            final int emailTemplateId = configurationService.loadByCode("USER_WELCOME_SET_PASSWORD_ID").getValueAsInt();
 
             final String link = configurationService.loadByCode("USER_EMAIL_FORGOT_LINK").getValue()
                     .replaceAll("__LANGUAGE__", user.getLanguage())
