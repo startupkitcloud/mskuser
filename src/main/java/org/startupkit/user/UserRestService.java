@@ -3,6 +3,7 @@ package org.startupkit.user;
 import org.startupkit.admin.userb.UserBService;
 import org.startupkit.admin.util.SecuredAdmin;
 import org.startupkit.authkey.UserAuthKey;
+import org.startupkit.core.bucket.BucketService;
 import org.startupkit.core.configuration.Configuration;
 import org.startupkit.core.configuration.ConfigurationEnum;
 import org.startupkit.core.configuration.ConfigurationService;
@@ -10,7 +11,6 @@ import org.startupkit.core.exception.BusinessException;
 import org.startupkit.core.photo.GalleryItem;
 import org.startupkit.core.photo.PhotoUpload;
 import org.startupkit.core.photo.PhotoUploadTypeEnum;
-import org.startupkit.core.photo.PhotoUtils;
 import org.startupkit.core.utils.FileUtil;
 import org.startupkit.notification.email.EmailService;
 import org.startupkit.user.util.SecuredUser;
@@ -48,6 +48,9 @@ public class UserRestService extends UserBaseRestService {
 
     @EJB
     private UserBService userBService;
+
+    @EJB
+    private BucketService bucketService;
 
     @Context
     private HttpServletRequest requestB;
@@ -208,8 +211,8 @@ public class UserRestService extends UserBaseRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("/updatePassword")
-    public void updatePassword(User usMon) throws Exception {
-        userService.updatePassword(usMon);
+    public String updatePassword(User usMon) throws Exception {
+        return userService.updatePassword(usMon);
     }
 
 
@@ -277,9 +280,8 @@ public class UserRestService extends UserBaseRestService {
             idPhoto = photoUpload.getIdSubObject();
         }
 
-        String path = userService.pathImage(user.getId());
-
-        new PhotoUtils().saveImage(photoUpload, path, idPhoto);
+        String confPath = configurationService.loadByCode(ConfigurationEnum.PATH_BASE).getValue();
+        user.setUrlImage(bucketService.saveImage(photoUpload, confPath,  "user/" + user.getId() + "/" + idPhoto));
         userService.update(user);
     }
 
