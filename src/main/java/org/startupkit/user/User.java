@@ -95,6 +95,8 @@ public class User implements GeneralUser {
 
 	private List<GalleryItem> gallery;
 
+	private String urlImage;
+
 	public User(){
 		
 	}
@@ -404,5 +406,13 @@ public class User implements GeneralUser {
 
 	public void setIdApple(String idApple) {
 		this.idApple = idApple;
+	}
+
+	public String getUrlImage() {
+		return urlImage;
+	}
+
+	public void setUrlImage(String urlImage) {
+		this.urlImage = urlImage;
 	}
 }
