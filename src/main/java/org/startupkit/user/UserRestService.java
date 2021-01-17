@@ -23,6 +23,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
 import java.io.*;
+import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
@@ -360,6 +361,38 @@ public class UserRestService extends UserBaseRestService {
 
 
                     ByteArrayInputStream in = new ByteArrayInputStream(FileUtil.readFile(path));
+
+                    byte[] buf = new byte[16384];
+
+                    int len = in.read(buf);
+
+                    while (len != -1) {
+
+                        out.write(buf, 0, len);
+
+                        len = in.read(buf);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        };
+    }
+
+
+    @GET
+    @Path("/userImageBucket/{idUser}")
+    @Produces("image/jpeg")
+    public StreamingOutput userImageBucket(final @PathParam("idUser") String idUser) throws Exception {
+
+        return out -> {
+
+            try {
+
+                User user = userService.retrieve(idUser);
+
+                if(user != null && user.getUrlImage() != null){
+                    BufferedInputStream in = new BufferedInputStream(new URL(user.getUrlImage()).openStream());
 
                     byte[] buf = new byte[16384];
 
