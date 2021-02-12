@@ -61,7 +61,7 @@ public class User implements GeneralUser {
 
 	private String salt;
 
-	@JsonbDateFormat(value = "yyyy-MM-dd")
+	@JsonbDateFormat(value = "yyyy-MM-dd HH:mm:ss")
 	private Date birthDate;
 
 	private String birthDateStr;
